@@ -1,0 +1,19 @@
+[project]
+name = "timewalk-test"
+version = "0.1.0"
+description = "The integration test of timewalk: a class folder, a project history built from history/, and tests that drive the page"
+requires-python = ">=3.11"
+dependencies = ["timewalk"]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+# The branch under test. Students use main, so the work in progress lives on its own branch.
+timewalk = { git = "https://github.com/rahuldave/timewalk", branch = "walks" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

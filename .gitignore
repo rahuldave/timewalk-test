@@ -1,0 +1,9 @@
+# Built by `just build` from history/, and its replay copy
+repo/
+repo-replay/
+build/
+.venv/
+__pycache__/
+.pytest_cache/
+# timewalk follows the head of its branch: `just test` upgrades it each run
+uv.lock

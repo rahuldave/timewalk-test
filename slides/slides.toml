@@ -1,0 +1,8 @@
+# The slides of the default walk. talk.md holds seven slides, separated by lines that are exactly ---
+[slides]
+step-00 = ["talk.md#1"]
+step-01 = ["talk.md#2"]
+step-02 = ["talk.md#3-4"]
+step-03 = ["talk.md#5"]
+step-04 = ["talk.md#6"]
+step-05 = ["talk.md#7"]
