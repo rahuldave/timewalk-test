@@ -1,0 +1,28 @@
+# The walks of this class. The first is the default. Every path is read from this folder.
+
+[[walk]]
+id = "narrative"
+title = "tally, step by step"
+kind = "narrative"
+notes = "notes.md"
+slides = "slides/slides.toml"
+
+[[walk]]
+id = "tests"
+title = "Only the tests"
+kind = "narrative"
+folder = "walks/tests"            # notes.md, and slides/slides.toml, in this folder
+steps = ["step-01", "step-02", "step-05"]
+
+[[walk]]
+id = "parts"
+title = "Tests first, on the parts branch"
+kind = "narrative"
+folder = "walks/parts"
+tags = "parts-*"                  # steps of its own, on another branch
+
+[[walk]]
+id = "tutorial"
+title = "tally, one move at a time"
+kind = "tutorial"                 # the tagged steps, and the small commits between them
+folder = "walks/tutorial"

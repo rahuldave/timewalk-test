@@ -61,3 +61,19 @@ def test_the_pdf_has_one_page_per_slide(kit: Path) -> None:
     subprocess.run([sys.executable, "-m", "timewalk.slides_pdf", str(kit / "slides" / "slides.toml"), "--notes", str(kit / "notes.md"), "-o", str(out)],
                    check=True, capture_output=True)
     assert len(PdfReader(out).pages) == 7
+
+
+def test_quick_slide_changes_leave_one_slide_in_the_pane(windows) -> None:
+    "Down and Up pressed quickly, on a step with two slides: each window shows one slide, the last one asked for."
+    yours, room = windows
+    yours.mouse.click(300, 300)
+    for step in ("step-01", "step-02"):
+        yours.keyboard.press("ArrowRight")
+        shows(yours, "#step-name", step)
+    for key in ("ArrowDown", "ArrowUp", "ArrowDown", "ArrowUp", "ArrowDown"):
+        yours.keyboard.press(key)
+    for page in (yours, room):
+        shows(page, "#slide-count", "Slide 2 of 2")
+        page.wait_for_function("document.querySelector('#slide h2')?.textContent === 'Why ignore case'")
+        page.wait_for_timeout(500)
+        assert page.locator("#slide .slide-md").count() == 1

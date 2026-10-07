@@ -1,0 +1,5 @@
+# The slides of the walk on tests. A path may name a slide in another slides folder of the class.
+[slides]
+step-01 = ["../../../slides/talk.md#2", "tests.md#1"]
+step-02 = ["../../../slides/talk.md#3"]
+step-05 = ["tests.md#2"]

@@ -1,0 +1,11 @@
+# The slides of the tutorial. A move may have slides of its own; its key is quoted, as it holds a dot.
+# With sync (the default), a move shows its first slide, and a slide of a move makes that move.
+[slides]
+step-00 = ["../../../slides/talk.md#1"]
+step-01 = ["../../../slides/talk.md#2"]
+step-02 = ["../../../slides/talk.md#3"]
+"step-02.1" = ["moves.md#1"]
+"step-02.3" = ["moves.md#2"]
+step-03 = ["../../../slides/talk.md#5"]
+step-04 = ["../../../slides/talk.md#6"]
+step-05 = ["../../../slides/talk.md#7"]

@@ -16,9 +16,11 @@ TIMEWALK = [sys.executable, "-m", "timewalk"]  # the timewalk that this Python i
 
 @pytest.fixture
 def kit(tmp_path: Path) -> Path:
-    "A class folder in tmp_path: the notes and slides copied, and repo/ built from history/."
-    shutil.copy(ROOT / "notes.md", tmp_path / "notes.md")
-    shutil.copytree(ROOT / "slides", tmp_path / "slides")
+    "A class folder in tmp_path: the notes, slides, table of contents and walks copied, and repo/ built from history/."
+    for name in ("notes.md", "toc.toml"):
+        shutil.copy(ROOT / name, tmp_path / name)
+    for name in ("slides", "walks"):
+        shutil.copytree(ROOT / name, tmp_path / name)
     subprocess.run([sys.executable, str(ROOT / "history" / "build.py"), str(tmp_path / "repo")], check=True, capture_output=True)
     return tmp_path
 
@@ -30,22 +32,32 @@ def free_port() -> int:
 
 
 @pytest.fixture
-def served(kit: Path):
-    "timewalk on the kit, with the notes and slides of the default walk. Yields the address, token included."
-    port = free_port()
-    process = subprocess.Popen([*TIMEWALK, str(kit / "repo"), "--notes", str(kit / "notes.md"), "--slides", str(kit / "slides" / "slides.toml"),
-                                "--discard-edits", "--port", str(port), "--no-open", "--assistant", ""],
-                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    address = None
-    for line in process.stdout:
-        found = re.search(r"open\s+(http://\S+)", line)
-        if found:
-            address = found.group(1)
-            break
-    assert address, "timewalk printed no address"
-    yield address
-    process.terminate()
-    process.wait(timeout=10)
+def start(kit: Path):
+    "A function that starts timewalk on the kit with the given options and returns its address, token included."
+    processes = []
+
+    def run(*options: str) -> str:
+        process = subprocess.Popen([*TIMEWALK, str(kit / "repo"), *options, "--port", str(free_port()), "--no-open", "--assistant", ""],
+                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        processes.append(process)
+        seen = []
+        for line in process.stdout:
+            seen.append(line)
+            found = re.search(r"open\s+(http://\S+)", line)
+            if found:
+                return found.group(1)
+        raise AssertionError("timewalk printed no address:\n" + "".join(seen))
+
+    yield run
+    for process in processes:
+        process.terminate()
+        process.wait(timeout=10)
+
+
+@pytest.fixture
+def served(kit: Path, start) -> str:
+    "timewalk on the kit, without a table: the notes and slides of the default walk, and --discard-edits."
+    return start("--notes", str(kit / "notes.md"), "--slides", str(kit / "slides" / "slides.toml"), "--discard-edits")
 
 
 @pytest.fixture(scope="session")
@@ -57,14 +69,20 @@ def browser():
         chrome.close()
 
 
+def open_windows(browser, address: str):
+    "Your window and the Room window on the page, each ready."
+    context = browser.new_context(viewport={"width": 1400, "height": 900})
+    yours, room = context.new_page(), context.new_page()
+    yours.goto(address)
+    room.goto(address + "&room=1")
+    for page in (yours, room):
+        page.wait_for_selector("#tabs button")
+    return context, yours, room
+
+
 @pytest.fixture
 def windows(browser, served: str):
     "Two windows on the page: yours, and the Room window for the class."
-    context = browser.new_context(viewport={"width": 1400, "height": 900})
-    yours, room = context.new_page(), context.new_page()
-    yours.goto(served)
-    room.goto(served + "&room=1")
-    for page in (yours, room):
-        page.wait_for_selector("#tabs button")
+    context, yours, room = open_windows(browser, served)
     yield yours, room
     context.close()
