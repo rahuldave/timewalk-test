@@ -52,6 +52,8 @@ What changed:
   matters is `test_case`.
 
 files:
+- diff `tests/test_count.py`: two tests. The second asks for something the code cannot do yet.
+  show: `self.assertEqual(count("A a"), {"a": 2})`
 
 $ uv run python -m unittest discover -s tests -q
 
@@ -79,6 +81,8 @@ What changed:
 - `tests/test_empty.py`: new file, 8 lines; adds `class Empty` and `test_empty`.
 
 files:
+- diff `tests/test_empty.py`: an empty text counts nothing.
+  show: `self.assertEqual(count(""), {})`
 
 $ uv run python -m unittest discover -s tests -q
 
@@ -94,6 +98,8 @@ What changed:
 - `src/tally/__init__.py`: +1 -1; changes `count`. One word, `lower()`, answers the failing test.
 
 files:
+- diff `src/tally/__init__.py`: one word, `lower()`, answers the failing test.
+  show: `for word in text.lower().split():`
 
 $ uv run python -m unittest discover -s tests -q
 $ echo "The the" | uv run tally
@@ -125,6 +131,8 @@ What changed:
 - `src/tally/__init__.py`: +1 -1; changes `count`, in its signature only.
 
 files:
+- diff `src/tally/__init__.py`: the signature says what goes in and what comes out.
+  show: `def count(text: str) -> dict[str, int]:`
 
 $ uv run python -m unittest discover -s tests -q
 
@@ -143,6 +151,8 @@ What changed:
 - `src/tally/__init__.py`: +1 -0; changes `count`.
 
 files:
+- diff `src/tally/__init__.py`: one line under the signature says what the function does.
+  show: `"How many times each word appears, ignoring case."`
 
 $ uv run python -c "import tally; print(tally.count.__doc__)"
 
@@ -179,6 +189,9 @@ What changed:
 - `tests/test_top.py`: new file, 8 lines; adds `class Top` and `test_most_common_first`.
 
 files:
+- diff `src/tally/__init__.py`: sort by count, most common first, then by the word.
+  show: `return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]`
+- file `tests/test_top.py`: its test, with three words.
 
 $ uv run python -m unittest discover -s tests -q
 
@@ -192,6 +205,8 @@ What changed:
 - `src/tally/__init__.py`: +8 -3; changes `main`.
 
 files:
+- diff `src/tally/__init__.py`: `main` reads the option before the file name.
+  show: `if args[:1] == ["--top"]:`
 
 $ uv run tally --top 3 data/corpus.txt
 
@@ -214,6 +229,9 @@ What changed:
 - `justfile`: +6 -0; adds `recipe report`, and a line in `setup`.
 
 files:
+- diff `justfile`: the report, and the line in `setup` that makes it when it is missing.
+  show: `uv run tally --top 10 data/corpus.txt > build/top.txt`
+  show: `test -f build/top.txt || just report`
 
 $ just setup
 $ cat build/top.txt

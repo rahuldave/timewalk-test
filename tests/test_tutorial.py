@@ -83,7 +83,7 @@ def test_files_of_a_move_open_its_change_whatever_the_code(tutored) -> None:
     yours.click("#notes .p-move.here .p-files button")
     for page in (yours, room):
         shows(page, "#file-path", "tests/test_count.py")
-        shows(page, "#view-diff", "Changes in step-02.1")
+        shows(page, "#view-next", "Next change: step-02.1")
     assert "def test_case" in yours.locator("#file-body").inner_text()
 
 
@@ -185,3 +185,89 @@ def test_the_mode_shows_at_every_step_of_a_tutorial(tutored) -> None:
     yours.wait_for_selector("#move-modes button[data-mode=watch][aria-pressed=true]")
     shows(room, "#walk-title", "tally, one move at a time (tutorial, watch mode)")
     assert room.locator("#move-modes").is_hidden()
+
+
+def open_item(page, text: str) -> None:
+    "Click the item of the notes whose button names that path, in the move being worked on."
+    page.locator("#notes .p-move.here .p-item button", has_text=text).first.click()
+
+
+def test_an_item_opens_next_change_with_its_line_marked_and_an_excerpt_in_the_notes(tutored) -> None:
+    "Do mode at step-02: move 1's diff item opens Next change: step-02.1, its show: line marked; the notes draw the excerpt."
+    yours, room, _ = tutored
+    to_step_02(yours)
+    yours.wait_for_selector("#notes .p-move.here .p-excerpt pre.diff")
+    assert "count(\"A a\")" in yours.locator("#notes .p-move.here .p-excerpt").first.inner_text()
+    open_item(yours, "tests/test_count.py")
+    for page in (yours, room):
+        page.wait_for_selector("#view-next[aria-selected=true]")
+        shows(page, "#view-next", "Next change: step-02.1")
+        page.wait_for_selector("#file-body .line.mark")
+
+
+def test_apply_the_whole_move_then_the_files_match_and_the_move_is_done(tutored, kit: Path) -> None:
+    "Apply types git cherry-pick into the shell; the files then match step-02.1, and move 1 is marked done by itself."
+    yours, room, _ = tutored
+    to_step_02(yours)
+    yours.wait_for_selector("#notes .p-move.here .p-item")
+    open_item(yours, "tests/test_count.py")
+    yours.wait_for_selector("#apply-bar:not([hidden])")
+    yours.click("#apply-move")
+    for page in (yours, room):
+        page.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.2')", timeout=20000)
+    assert (kit / "repo-replay" / "tests" / "test_count.py").is_file()
+    assert head(kit).startswith("step-01:"), "Apply makes edits; the code is still at the step's start"
+
+
+def test_apply_is_disabled_on_a_file_the_learner_changed(tutored, kit: Path) -> None:
+    "The learner made tests/test_count.py their own way: Apply is disabled, and says what to do instead."
+    yours, _, _ = tutored
+    to_step_02(yours)
+    (kit / "repo-replay" / "tests").mkdir(exist_ok=True)
+    (kit / "repo-replay" / "tests" / "test_count.py").write_text("# my own try\n")
+    subprocess.run(["git", "-C", str(kit / "repo-replay"), "add", "-N", "tests/test_count.py"], check=True)
+    yours.wait_for_selector("#notes .p-move.here .p-item")
+    yours.wait_for_function("document.querySelector('#tree')?.innerText.includes('test_count.py')")
+    open_item(yours, "tests/test_count.py")
+    yours.wait_for_selector("#apply-bar:not([hidden])")
+    yours.wait_for_function("document.getElementById('apply-move').disabled")
+    assert "Catch me up" in yours.locator("#apply-note").inner_text()
+
+
+def test_a_file_item_of_a_move_not_made_shows_the_answer(tutored) -> None:
+    "Do mode at step-05: the file item of move 1 opens the file as step-05.1 leaves it, read only, as the tab says."
+    yours, _, _ = tutored
+    yours.mouse.click(300, 400)
+    for name in ("step-01", "step-02", "step-03", "step-04", "step-05"):
+        yours.keyboard.press("ArrowRight")
+        shows(yours, "#step-name", name)
+    yours.wait_for_selector("#notes .p-move.here .p-item")
+    open_item(yours, "tests/test_top.py")
+    shows(yours, "#view-at", "At step-05.1")
+    yours.wait_for_selector("#view-at[aria-selected=true]")
+    assert "test_most_common_first" in yours.locator("#file-body").inner_text()
+
+
+def test_your_file_offers_your_own_editor(tutored) -> None:
+    "Your file has a link to open the file in your editor, at the marked line; the Room has none."
+    yours, room, _ = tutored
+    yours.locator("#tree .file button", has_text="README.md").first.click()
+    yours.wait_for_selector("#open-editor:not([hidden])")
+    assert yours.locator("#open-editor").get_attribute("href").startswith("vscode://file/")
+    room.wait_for_function("document.getElementById('file-path').textContent === 'README.md'")
+    assert room.locator("#open-editor").is_hidden()
+
+
+def test_not_done_stays_after_the_files_matched(tutored, kit: Path) -> None:
+    "Apply, the files match, the move is done by itself; Not done then keeps the learner's choice, though the files still match."
+    yours, _, _ = tutored
+    to_step_02(yours)
+    yours.wait_for_selector("#notes .p-move.here .p-item")
+    open_item(yours, "tests/test_count.py")
+    yours.wait_for_selector("#apply-bar:not([hidden])")
+    yours.click("#apply-move")
+    yours.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.2')", timeout=20000)
+    yours.locator("#notes .p-move").first.locator("button:has-text('Not done')").click()
+    yours.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.1')")
+    yours.wait_for_timeout(4500)   # two polls of files match
+    assert yours.evaluate("document.querySelector('#notes .p-move.here h3').textContent").startswith("step-02.1")

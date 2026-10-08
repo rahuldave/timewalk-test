@@ -35,6 +35,8 @@ What changed:
 - `justfile`: +4 -0; adds `recipe check`.
 
 files:
+- diff `justfile`: the recipe compiles every Python file.
+  show: `uv run python -m py_compile src/tally/*.py`
 
 $ just check && echo "the code compiles"
 
@@ -54,6 +56,9 @@ What changed:
 - `hooks/pre-commit`: new file, 3 lines.
 
 files:
+- file `hooks/pre-commit`: three lines; git runs it before a commit.
+- diff `hooks/pre-commit`: the hook only runs the check.
+  show: `just check`
 
 Run it by hand on a broken file, and see it refuse. Then remove the file:
 
@@ -79,6 +84,8 @@ What changed:
 - `justfile`: +4 -0; adds `recipe install-hook`.
 
 files:
+- diff `justfile`: one line of git config, in a recipe of its own.
+  show: `git config core.hooksPath hooks`
 
 $ just install-hook && git config core.hooksPath
 
@@ -113,6 +120,8 @@ What changed:
 - `tests/test_count.py`: new file, 9 lines; adds `class Count` and `test_words`.
 
 files:
+- diff `tests/test_count.py`: one test of counting.
+  show: `self.assertEqual(count("a b a"), {"a": 2, "b": 1})`
 
 $ uv run python -m unittest discover -s tests -q
 
@@ -129,6 +138,8 @@ What changed:
 - `hooks/pre-commit`: +1 -0.
 
 files:
+- diff `hooks/pre-commit`: the tests run after the check.
+  show: `uv run python -m unittest discover -s tests -q`
 
 $ sh hooks/pre-commit && echo "the hook passed"
 

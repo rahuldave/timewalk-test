@@ -251,6 +251,10 @@ def build(dest: Path) -> None:
     # Only a worktree of dest is removed, never another folder of that name.
     if link.is_file() and link.read_text().strip() == f"gitdir: {dest / '.git' / 'worktrees' / replay.name}":
         shutil.rmtree(replay)
+    # Since timewalk 1.1, the replay copy is a clone whose remote "home" is dest. It too belongs to the old history.
+    config = replay / ".git" / "config"
+    if config.is_file() and f"url = {dest}\n" in config.read_text():
+        shutil.rmtree(replay)
     if dest.exists():
         shutil.rmtree(dest)
     dest.mkdir(parents=True)

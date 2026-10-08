@@ -55,6 +55,11 @@ $ just setup
 Two test files arrive, and one of the three tests fails until counting ignores case. The fix is one line in
 `count`: `text.lower()`. Read `tests/test_count.py` first, then the fix in "Changes in this step".
 
+files:
+- file `tests/test_count.py`: two tests; `test_case` is the one that failed.
+- diff `src/tally/__init__.py`: the fix, one word.
+  show: `for word in text.lower().split():`
+
 $ uv run python -m unittest discover -s tests -q
 $ echo "The the THE" | uv run tally
 
