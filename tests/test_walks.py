@@ -26,7 +26,7 @@ def steps_of(page) -> list[str]:
 def test_the_picker_changes_the_walk_in_every_window(walked) -> None:
     "Your window lists the walks; a change gives both windows that walk's steps, notes and slides. The Room shows the title."
     yours, room = walked
-    assert yours.evaluate("[...document.querySelectorAll('#walk-picker option')].map((o) => o.value)") == ["narrative", "tests", "parts", "tutorial"]
+    assert yours.evaluate("[...document.querySelectorAll('#walk-picker option')].map((o) => o.value)") == ["narrative", "tests", "parts", "tutorial", "hooks"]
     assert room.locator("#walk-picker").is_hidden() and room.locator("#walk-title").inner_text() == "tally, step by step"
     yours.select_option("#walk-picker", "tests")
     for page in (yours, room):
@@ -81,7 +81,7 @@ def test_a_command_runs_at_the_step_of_the_walk(walked, kit: Path) -> None:
     yours.select_option("#walk-picker", "tests")
     shows(yours, "#step-name", "step-01")
     yours.locator("#terms .term:not([hidden])").click()
-    yours.keyboard.type("git describe --tags; echo walk-$((6*7))\n")
+    yours.keyboard.type("git --no-pager tag --points-at HEAD; echo walk-$((6*7))\n")   # step-01's commit is also hooks-00
     assert "step-01" in output_of(yours.url, "replay", "walk-42")
 
 
@@ -93,7 +93,7 @@ def test_the_checks_pass_this_class(kit: Path) -> None:
     "timewalk-check finds nothing wrong with the walks of this class."
     done = check(kit)
     assert done.returncode == 0, done.stdout
-    assert "4 walks, 0 errors, 0 warnings" in done.stdout
+    assert "5 walks, 0 errors, 0 warnings" in done.stdout
 
 
 BROKEN = [
@@ -140,4 +140,4 @@ def test_a_class_without_a_table_is_as_before(kit: Path) -> None:
     (kit / "toc.toml").unlink()
     out = kit / "build" / "slides.pdf"
     subprocess.run([sys.executable, "-m", "timewalk.slides_pdf", str(kit / "slides" / "slides.toml"), "-o", str(out)], check=True, capture_output=True)
-    assert len(PdfReader(out).pages) == 7
+    assert len(PdfReader(out).pages) == 8

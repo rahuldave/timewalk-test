@@ -15,25 +15,27 @@ $ echo "a b a" | PYTHONPATH=src python3 -m tally
 We add the tests one by one, and run them after each.
 
 ### step-02.1 A test of counting
-One test file arrives.
+One test file arrives, with two tests. Run them: one fails, because counting does not ignore case yet.
 
 files:
 
 $ PYTHONPATH=src python3 -m unittest discover -s tests -q
 
+> Say: look, a failure. It is a question that the code has not answered yet.
+
 ### step-02.2 A test of an empty text
-A second test file.
+A second test file. Run the tests again: it passes, and the case test still fails.
 
 files:
 
-$ echo move-two
+$ PYTHONPATH=src python3 -m unittest discover -s tests -q
 
 ### step-02.3 Case does not matter
-Counting ignores case, and the tests pass.
+Counting ignores case, and the tests pass. This last move is the tagged commit of the step.
 
 files:
 
-$ echo move-three
+$ PYTHONPATH=src python3 -m unittest discover -s tests -q
 
 ## step-03 Formatting
 

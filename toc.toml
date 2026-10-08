@@ -1,9 +1,10 @@
 # The walks of this class. The first is the default. Every path is read from this folder.
+# just present opens the first; just present tutorial opens another. just check checks them all.
 
 [[walk]]
 id = "narrative"
 title = "tally, step by step"
-kind = "narrative"
+kind = "narrative"                # the tagged steps, and nothing between them
 notes = "notes.md"
 slides = "slides/slides.toml"
 
@@ -12,7 +13,7 @@ id = "tests"
 title = "Only the tests"
 kind = "narrative"
 folder = "walks/tests"            # notes.md, and slides/slides.toml, in this folder
-steps = ["step-01", "step-02", "step-05"]
+steps = ["step-01", "step-02", "step-05"]   # some of the steps of main
 
 [[walk]]
 id = "parts"
@@ -26,3 +27,11 @@ id = "tutorial"
 title = "tally, one move at a time"
 kind = "tutorial"                 # the tagged steps, and the small commits between them
 folder = "walks/tutorial"
+
+[[walk]]
+id = "hooks"
+title = "A git hook, one move at a time"
+kind = "tutorial"
+folder = "walks/hooks"
+tags = "hooks-*"                  # a tutorial on one part, with tags of its own on the branch hooks
+sync = false                      # the slides do not follow the moves

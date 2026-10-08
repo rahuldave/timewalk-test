@@ -125,3 +125,27 @@ def test_alt_shift_right_in_the_notes_editor_selects_and_does_not_move(tutored, 
     yours.wait_for_timeout(500)
     shows(yours, "#step-name", "step-02")
     assert head(kit).startswith("step-01:")
+
+
+def test_a_tutorial_on_tags_of_its_own_with_sync_off(browser, kit: Path, start) -> None:
+    "The hooks walk: moves between hooks-00 and hooks-01 on its branch; with sync off, Down pages the slides and makes no move."
+    context, yours, room = open_windows(browser, start("--toc", str(kit / "toc.toml"), "--walk", "hooks", "--discard-edits"))
+    shows(yours, "#step-name", "hooks-00")
+    yours.mouse.click(300, 400)
+    yours.keyboard.press("ArrowRight")
+    shows(yours, "#step-name", "hooks-01")
+    assert head(kit) == "step-01: count the words", "hooks-01 starts at hooks-00, which is step-01's commit"
+    yours.wait_for_selector("#moves:not([hidden])")
+    assert moves_of(yours) == ["Start*", "1", "2-", "3-"]
+    yours.keyboard.press("Shift+ArrowRight")
+    for page in (yours, room):
+        shows(page, "#step-name", "hooks-01.1")
+    assert head(kit) == "hooks-01.1: a recipe that checks the code"
+    yours.wait_for_function("[...document.querySelectorAll('#notes .p-move.here .p-files button')].map((b) => b.textContent).join() === 'justfile'")
+    shows(yours, "#slide-count", "Slide 1 of 3")
+    yours.keyboard.press("ArrowDown")
+    yours.keyboard.press("ArrowDown")
+    shows(yours, "#slide-count", "Slide 3 of 3")   # move 3's slide, shown without making move 3
+    shows(room, "#step-name", "hooks-01.1")
+    assert head(kit) == "hooks-01.1: a recipe that checks the code"
+    context.close()

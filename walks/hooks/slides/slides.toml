@@ -1,0 +1,7 @@
+# The slides of the hooks tutorial. A move may have slides of its own even with sync off: they come after the
+# step's slides, and Up and Down page through them without making moves.
+[slides]
+hooks-00 = ["../../../slides/talk.md#2"]
+hooks-01 = ["hooks.md#1-2"]
+"hooks-01.3" = ["hooks.md#3"]
+hooks-02 = ["hooks.md#4"]

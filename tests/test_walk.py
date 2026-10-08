@@ -9,7 +9,8 @@ from websockets.sync.client import connect
 from pypdf import PdfReader
 
 STEPS = [f"step-0{i}" for i in range(6)]
-SLIDES = {"step-02": 2}  # every other step has one slide
+SLIDES = {"step-01": 2, "step-02": 2}  # every other step has one slide, but step-03, which is a document
+DOCS = {"step-03": "formatting.md"}  # named from the slides folder, without a table of contents
 
 
 def shows(page, selector: str, text: str) -> None:
@@ -24,6 +25,11 @@ def test_the_room_follows_every_step_and_slide(windows) -> None:
     for step in STEPS:
         for page in (yours, room):
             shows(page, "#step-name", step)
+        if step in DOCS:
+            for page in (yours, room):
+                shows(page, "#slide-count", DOCS[step])   # a document names its file, and has no slide count
+            yours.keyboard.press("ArrowRight")
+            continue
         count = SLIDES.get(step, 1)
         for page in (yours, room):
             shows(page, "#slide-count", f"Slide 1 of {count}")
@@ -56,11 +62,11 @@ def test_a_command_typed_in_your_window_runs_in_the_shell_at_the_step(windows, s
 
 
 def test_the_pdf_has_one_page_per_slide(kit: Path) -> None:
-    "timewalk-pdf makes one page for each of the seven slides."
+    "timewalk-pdf makes one page for each of the seven slides, and one for the document of step-03."
     out = kit / "build" / "slides.pdf"
     subprocess.run([sys.executable, "-m", "timewalk.slides_pdf", str(kit / "slides" / "slides.toml"), "--notes", str(kit / "notes.md"), "-o", str(out)],
                    check=True, capture_output=True)
-    assert len(PdfReader(out).pages) == 7
+    assert len(PdfReader(out).pages) == 8
 
 
 def test_quick_slide_changes_leave_one_slide_in_the_pane(windows) -> None:

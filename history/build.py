@@ -7,7 +7,9 @@ The project is `tally`, a small word counter. Its history has what every kind of
 - tagged steps on main, step-00 to step-05, each an annotated tag whose message is the step's note;
 - small commits between step-01 and step-02, and between step-03 and step-04, for a tutorial. Their subjects
   start with `step-02.1:` and so on. The last commit of a step has the plain `step-NN:` subject and the tag;
-- a branch `parts` from step-00 with its own tags, `parts-01` and `parts-02`, for a walk on one part.
+- a branch `parts` from step-00 with its own tags, `parts-01` and `parts-02`, for a walk on one part;
+- a branch `hooks` from step-01 with its own tags, `hooks-00` to `hooks-02`, and small commits between them, for a
+  tutorial on one part: a git hook that checks the code before each commit.
 
 Every author, committer and date is fixed, so the commits get the same hashes on every build.
 """
@@ -103,6 +105,21 @@ PARTS = [
      ("parts-02", "One more test\n\nAn empty text.")),
 ]
 
+# The branch `hooks`, from step-01: a tutorial on one part, with tags of its own and small commits between them.
+CHECK = JUSTFILE + "\n# Check that every Python file compiles\ncheck:\n    python3 -m py_compile src/tally/*.py\n"
+HOOK = "#!/bin/sh\n# Run before each commit: refuse it if the code does not compile.\njust check\n"
+SETUP = CHECK + "\n# Make git run the hooks in hooks/\nsetup:\n    git config core.hooksPath hooks\n"
+HOOK_TESTS = HOOK + "python3 -m unittest discover -s tests -q\n"
+HOOKS = [
+    ("hooks-01.1: a recipe that checks the code", {"justfile": CHECK}, None),
+    ("hooks-01.2: a hook script that runs the check", {"hooks/pre-commit": HOOK}, None),
+    ("hooks-01: just setup tells git to use the hook", {"justfile": SETUP},
+     ("hooks-01", "The hook\n\nA check before each commit, installed with just setup.")),
+    ("hooks-02.1: a first test", {"tests/test_count.py": TEST_COUNT.replace("    def test_case(self):\n        self.assertEqual(count(\"A a\"), {\"a\": 2})\n", "")}, None),
+    ("hooks-02: the hook runs the tests too", {"hooks/pre-commit": HOOK_TESTS},
+     ("hooks-02", "Tests in the hook\n\nA commit with a failing test is refused.")),
+]
+
 
 def git(dest: Path, *args: str, when: int = 0) -> str:
     "Run git in dest with a fixed author, committer and date."
@@ -119,6 +136,8 @@ def commit_all(dest: Path, commits: list, clock: int) -> int:
             path = dest / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(text)
+            if name.startswith("hooks/"):
+                path.chmod(0o755)  # git runs a hook only if it can execute it
         git(dest, "add", "-A", when=clock)
         git(dest, "commit", "-q", "-m", subject, when=clock)
         if tag:
@@ -128,18 +147,27 @@ def commit_all(dest: Path, commits: list, clock: int) -> int:
 
 
 def build(dest: Path) -> None:
-    "Make the repository at dest, replacing what is there."
+    "Make the repository at dest, replacing what is there, and the replay copy that timewalk made of the old one."
+    replay = dest.parent / f"{dest.name}-replay"
+    link = replay / ".git"
+    # The replay copy is a worktree of the repository replaced here: without it, timewalk would refuse the folder.
+    # Only a worktree of dest is removed, never another folder of that name.
+    if link.is_file() and link.read_text().strip() == f"gitdir: {dest / '.git' / 'worktrees' / replay.name}":
+        shutil.rmtree(replay)
     if dest.exists():
         shutil.rmtree(dest)
     dest.mkdir(parents=True)
     git(dest, "init", "-q", "-b", "main")
     clock = commit_all(dest, MAIN, 0)
     git(dest, "switch", "-q", "-c", "parts", "step-00")
-    commit_all(dest, PARTS, clock)
+    clock = commit_all(dest, PARTS, clock)
+    git(dest, "switch", "-q", "-c", "hooks", "step-01")
+    git(dest, "tag", "-a", "hooks-00", "-m", "Where the hooks start\n\ntally counts words, and nothing checks it.", when=clock)
+    commit_all(dest, HOOKS, clock + 1)
     git(dest, "switch", "-q", "main")
 
 
 if __name__ == "__main__":
     target = Path(sys.argv[1]) if len(sys.argv) > 1 else HERE.parent / "repo"
     build(target.resolve())
-    print(f"build: {target} has {len(MAIN)} commits on main and {len(PARTS)} on parts")
+    print(f"build: {target} has {len(MAIN)} commits on main, {len(PARTS)} on parts and {len(HOOKS)} on hooks")

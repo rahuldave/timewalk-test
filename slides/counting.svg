@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" font-family="Helvetica, Arial, sans-serif">
+  <rect width="640" height="360" fill="#f7f7f5"/>
+  <text x="40" y="70" font-size="34" fill="#222">"a b a"</text>
+  <text x="250" y="70" font-size="34" fill="#888">→</text>
+  <text x="320" y="70" font-size="34" fill="#222">count()</text>
+  <rect x="80" y="130" width="200" height="90" rx="10" fill="#2f5bb7"/>
+  <text x="180" y="188" font-size="40" fill="#fff" text-anchor="middle">a: 2</text>
+  <rect x="360" y="130" width="200" height="90" rx="10" fill="#6c8fd6"/>
+  <text x="460" y="188" font-size="40" fill="#fff" text-anchor="middle">b: 1</text>
+  <text x="320" y="300" font-size="22" fill="#555" text-anchor="middle">one line per word: the count, then the word</text>
+</svg>
