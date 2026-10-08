@@ -1,8 +1,7 @@
-"A tutorial walk: the moves of a step, one at a time, in both windows, with the notes, the slides and the files of each move."
+"Tutorial walks: the moves of a step, in do mode (the learner makes each move by hand) and watch mode (timewalk shows each commit)."
 
 import subprocess
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
 
 import pytest
 from conftest import open_windows
@@ -11,7 +10,7 @@ from test_walk import shows
 
 @pytest.fixture
 def tutored(browser, kit: Path, start):
-    "Your window and the Room on the tutorial walk, with --discard-edits."
+    "Your window and the Room on the tutorial walk, which starts in do mode, with --discard-edits."
     address = start("--toc", str(kit / "toc.toml"), "--walk", "tutorial", "--discard-edits")
     context, yours, room = open_windows(browser, address)
     yield yours, room, address
@@ -24,9 +23,14 @@ def head(kit: Path) -> str:
 
 
 def moves_of(page) -> list[str]:
-    "The moves row as the page draws it: each button's text, with * for the one on show and - for one that is closed."
-    return page.evaluate("""[...document.querySelectorAll('#moves button')]
-        .map((b) => b.textContent + (b.classList.contains('here') ? '*' : '') + (b.disabled ? '-' : ''))""")
+    "The move buttons of the moves row: each one's text, with * for the one on show and + for one done."
+    return page.evaluate("""[...document.querySelectorAll('#moves > button:not(.nav)')]
+        .map((b) => b.textContent + (b.classList.contains('here') ? '*' : '') + (b.classList.contains('done') ? '+' : ''))""")
+
+
+def sections_of(page) -> str:
+    "The move sections of the notes, by state: here, done, ahead or none."
+    return page.evaluate("[...document.querySelectorAll('#notes .p-move')].map((s) => s.className.replace('p-move', '').trim() || '-').join(',')")
 
 
 def to_step_02(page) -> None:
@@ -37,98 +41,118 @@ def to_step_02(page) -> None:
     shows(page, "#step-name", "step-02")
 
 
-def test_a_step_starts_before_its_first_move_and_the_moves_go_one_at_a_time(tutored, kit: Path) -> None:
-    "At step-02, both windows show its moves; Shift+Right makes the next, the code follows, and only the next move is open."
+def test_do_mode_marks_moves_done_and_never_moves_the_code(tutored, kit: Path) -> None:
+    "In do mode, the code stays at the start of the step; Done marks each move, in both windows; nothing is locked or grayed."
     yours, room, _ = tutored
-    for page in (yours, room):
-        assert page.locator("#moves").is_hidden(), "step-00 has no moves"
     to_step_02(yours)
-    assert head(kit).startswith("step-01:"), "a step starts at the code of the step before"
     for page in (yours, room):
         page.wait_for_selector("#moves:not([hidden])")
-        assert moves_of(page) == ["Start*", "1", "2-", "3-"]
-    yours.keyboard.press("Shift+ArrowRight")
+        page.wait_for_function("document.querySelector('#notes .p-hint')?.textContent.startsWith('Do:')")
+    assert head(kit).startswith("step-01:"), "a step starts at the code of the step before"
+    assert moves_of(yours) == ["Start", "1*", "2", "3"]
+    assert sections_of(yours) == "here,-,-"
+    assert yours.locator("#notes .p-move button:disabled").count() == 0 and yours.locator("#notes .p-commands button:disabled").count() == 0
+    yours.click("#notes .p-move.here button:has-text('Done')")
     for page in (yours, room):
-        shows(page, "#step-name", "step-02.1")
-        page.wait_for_function("document.querySelector('#slide h1')?.textContent === 'Move one'")
-        assert moves_of(page) == ["Start", "1*", "2", "3-"]
-    assert head(kit) == "step-02.1: a test of counting"
-    yours.keyboard.press("Shift+ArrowRight")
-    yours.keyboard.press("Shift+ArrowRight")
-    for page in (yours, room):
-        shows(page, "#step-name", "step-02.3")
-        page.wait_for_function("document.querySelector('#slide h1')?.textContent === 'Move three'")
-    assert head(kit).startswith("step-02:"), "the last move is the step's own commit"
-    yours.keyboard.press("Shift+ArrowLeft")
-    shows(room, "#step-name", "step-02.2")
-    assert head(kit) == "step-02.2: a test of an empty text"
+        page.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.2')")
+    assert sections_of(yours) == "done,here,-" and moves_of(yours) == ["Start", "1+", "2*", "3"]
+    assert head(kit).startswith("step-01:"), "Done does not move the code"
+    yours.keyboard.press("Shift+ArrowRight")   # Shift+Right is Done in do mode
+    yours.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.3')")
+    assert head(kit).startswith("step-01:")
 
 
-def test_the_notes_gray_the_moves_still_to_make_and_list_each_moves_files(tutored) -> None:
-    "Each move has a section; the later ones are grayed with their buttons off. files: opens a file of that move."
+def test_catch_me_up_sets_the_code_to_the_end_of_a_move(tutored, kit: Path) -> None:
+    "Catch me up on move 2: the code is that move's commit, and the moves up to it are done."
     yours, room, _ = tutored
     to_step_02(yours)
-    yours.keyboard.press("Shift+ArrowRight")
-    shows(yours, "#step-name", "step-02.1")
-    sections = "[...document.querySelectorAll('#notes .p-move')].map((s) => s.className.replace('p-move ', ''))"
-    yours.wait_for_function(f"{sections}.join() === 'here,later,later'")
-    assert yours.locator("#notes .p-move.later .p-commands button").first.is_disabled()
+    yours.wait_for_selector("#notes .p-move")
+    yours.locator("#notes .p-move").nth(1).locator("button:has-text('Catch me up')").click()
+    for page in (yours, room):
+        page.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.3')")
+    assert head(kit) == "step-02.2: a test of an empty text"
+    assert sections_of(yours) == "done,done,here"
+
+
+def test_files_of_a_move_open_its_change_whatever_the_code(tutored) -> None:
+    "In do mode, at the start of the step, a files: link of move 1 opens what move 1 changed, in both windows."
+    yours, room, _ = tutored
+    to_step_02(yours)
+    yours.wait_for_selector("#notes .p-move.here .p-files button")
     assert yours.locator("#notes .p-move.here .p-files button").all_inner_texts() == ["tests/test_count.py"]
     yours.click("#notes .p-move.here .p-files button")
     for page in (yours, room):
         shows(page, "#file-path", "tests/test_count.py")
+        shows(page, "#view-diff", "Changes in step-02.1")
+    assert "def test_case" in yours.locator("#file-body").inner_text()
 
 
-def test_down_past_a_move_without_slides_makes_that_move_first(tutored, kit: Path) -> None:
-    "From move 1, the next slide is move three's; move 2 has none. Down makes move 2 and keeps the slide; Down again makes move 3."
-    yours, room, _ = tutored
-    to_step_02(yours)
-    yours.keyboard.press("Shift+ArrowRight")
-    shows(yours, "#step-name", "step-02.1")
-    yours.keyboard.press("ArrowDown")
-    for page in (yours, room):
-        shows(page, "#step-name", "step-02.2")
-        page.wait_for_function("document.querySelector('#slide h1')?.textContent === 'Move one'")
-    yours.keyboard.press("ArrowDown")
-    for page in (yours, room):
-        shows(page, "#step-name", "step-02.3")
-        page.wait_for_function("document.querySelector('#slide h1')?.textContent === 'Move three'")
-    assert head(kit).startswith("step-02:")
-
-
-def test_alt_shift_right_makes_a_move_from_inside_a_terminal(tutored) -> None:
-    "With the keys in a terminal, Alt+Shift+Right still makes the next move."
+def test_a_moves_last_commands_are_its_anchor(tutored) -> None:
+    "Each move ends with the commands that show what it did, under a label."
     yours, _, _ = tutored
     to_step_02(yours)
+    yours.wait_for_selector("#notes .p-move .p-anchor")
+    assert yours.locator("#notes .p-move").count() == yours.locator("#notes .p-move .p-anchor").count() == 3
+    assert yours.locator("#notes .p-move").first.locator(".p-anchor-label").inner_text() == "After this move, run:"
+
+
+def test_watch_mode_shows_any_moves_commit_from_the_notes_or_the_arrows(tutored, kit: Path) -> None:
+    "Switch to Watch: Show on move 2 checks out its commit, skipping move 1; the arrow goes on to move 3; both windows follow."
+    yours, room, _ = tutored
+    to_step_02(yours)
+    yours.click("#move-modes button:has-text('Watch')")
+    for page in (yours, room):
+        page.wait_for_function("document.querySelector('#notes .p-hint')?.textContent.startsWith('Watch:')")
+    assert sections_of(yours) == "ahead,ahead,ahead"
+    yours.locator("#notes .p-move").nth(1).locator("button:has-text('Show')").click()
+    for page in (yours, room):
+        shows(page, "#step-name", "step-02.2")
+    assert head(kit) == "step-02.2: a test of an empty text"
+    yours.wait_for_function("(want) => [...document.querySelectorAll('#notes .p-move')].map((s) => s.className.replace('p-move', '').trim()).join(',') === want",
+                            arg="done,here,ahead")
+    yours.locator("#moves .nav").last.click()
+    shows(room, "#step-name", "step-02.3")
+    assert head(kit).startswith("step-02:")
+    yours.keyboard.press("Shift+ArrowLeft")
+    shows(room, "#step-name", "step-02.2")
+
+
+def test_watch_mode_slides_follow_the_moves(tutored) -> None:
+    "In watch mode with sync, showing move 1 shows its own slide."
+    yours, room, _ = tutored
+    to_step_02(yours)
+    yours.click("#move-modes button:has-text('Watch')")
+    yours.wait_for_selector("#notes .p-move button:has-text('Show')")
+    yours.locator("#notes .p-move").first.locator("button:has-text('Show')").click()
+    for page in (yours, room):
+        page.wait_for_function("document.querySelector('#slide h1')?.textContent === 'Move one'")
+
+
+def test_alt_shift_right_works_from_inside_a_terminal(tutored) -> None:
+    "With the keys in a terminal, Alt+Shift+Right marks the move done in do mode."
+    yours, _, _ = tutored
+    to_step_02(yours)
+    yours.wait_for_selector("#notes .p-move.here")
     yours.locator("#terms .term:not([hidden])").click()
     yours.keyboard.press("Alt+Shift+ArrowRight")
-    shows(yours, "#step-name", "step-02.1")
-
-
-def test_the_api_refuses_a_jump_over_a_move(tutored) -> None:
-    "The order holds for every window: the server refuses move 3 from the start of the step."
-    yours, _, address = tutored
-    to_step_02(yours)
-    token = parse_qs(urlparse(address).query)["t"][0]
-    status = yours.evaluate("""async (t) => (await fetch('/api/move?t=' + t, {method: 'POST', headers: {'content-type': 'application/json'},
-                               body: JSON.stringify({to: 2, move: 3})})).status""", token)
-    assert status == 409
+    yours.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.2')")
 
 
 def test_alt_shift_right_in_the_notes_editor_selects_and_does_not_move(tutored, kit: Path) -> None:
-    "In the Edit box of the notes, Option+Shift+Right selects a word, as in any text field; the tutorial stays where it is."
+    "In the Edit box of the notes, Option+Shift+Right selects a word, as in any text field; nothing changes."
     yours, _, _ = tutored
     to_step_02(yours)
+    yours.wait_for_selector("#notes .p-move.here")
     yours.click("#notes-edit")
     yours.locator("#notes-text").evaluate("e => { e.focus(); e.setSelectionRange(0, 0); }")
     yours.keyboard.press("Alt+Shift+ArrowRight")
     yours.wait_for_timeout(500)
-    shows(yours, "#step-name", "step-02")
     assert head(kit).startswith("step-01:")
+    assert yours.locator("#notes-editor").is_visible()
 
 
-def test_a_tutorial_on_tags_of_its_own_with_sync_off(browser, kit: Path, start) -> None:
-    "The hooks walk: moves between hooks-00 and hooks-01 on its branch; with sync off, Down pages the slides and makes no move."
+def test_the_hooks_walk_starts_in_watch_mode_on_tags_of_its_own(browser, kit: Path, start) -> None:
+    "The hooks walk: moves between hooks-00 and hooks-01 on its branch, in watch mode; with sync off, Down pages the slides only."
     context, yours, room = open_windows(browser, start("--toc", str(kit / "toc.toml"), "--walk", "hooks", "--discard-edits"))
     shows(yours, "#step-name", "hooks-00")
     yours.mouse.click(300, 400)
@@ -136,7 +160,7 @@ def test_a_tutorial_on_tags_of_its_own_with_sync_off(browser, kit: Path, start) 
     shows(yours, "#step-name", "hooks-01")
     assert head(kit) == "step-01: count the words", "hooks-01 starts at hooks-00, which is step-01's commit"
     yours.wait_for_selector("#moves:not([hidden])")
-    assert moves_of(yours) == ["Start*", "1", "2-", "3-"]
+    assert yours.locator("#move-modes button[aria-pressed=true]").inner_text() == "Watch"
     yours.keyboard.press("Shift+ArrowRight")
     for page in (yours, room):
         shows(page, "#step-name", "hooks-01.1")
@@ -145,7 +169,19 @@ def test_a_tutorial_on_tags_of_its_own_with_sync_off(browser, kit: Path, start) 
     shows(yours, "#slide-count", "Slide 1 of 3")
     yours.keyboard.press("ArrowDown")
     yours.keyboard.press("ArrowDown")
-    shows(yours, "#slide-count", "Slide 3 of 3")   # move 3's slide, shown without making move 3
-    shows(room, "#step-name", "hooks-01.1")
+    shows(yours, "#slide-count", "Slide 3 of 3")   # move 3's slide, shown without making move 3: sync is off
     assert head(kit) == "hooks-01.1: a recipe that checks the code"
     context.close()
+
+
+def test_the_mode_shows_at_every_step_of_a_tutorial(tutored) -> None:
+    "At step-00, which has no moves, the Do / Watch switch already shows and works; the Room names the mode in its title."
+    yours, room, _ = tutored
+    yours.wait_for_selector("#move-modes:not([hidden])")
+    assert yours.locator("#moves").is_hidden(), "step-00 has no moves"
+    assert yours.locator("#move-modes button[aria-pressed=true]").inner_text() == "Do"
+    shows(room, "#walk-title", "tally, one move at a time (tutorial, do mode)")
+    yours.click("#move-modes button:has-text('Watch')")
+    yours.wait_for_selector("#move-modes button[data-mode=watch][aria-pressed=true]")
+    shows(room, "#walk-title", "tally, one move at a time (tutorial, watch mode)")
+    assert room.locator("#move-modes").is_hidden()

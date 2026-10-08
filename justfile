@@ -11,7 +11,7 @@ default:
 
 # Build repo/, the project the walks step through, from history/
 build:
-    python3 history/build.py
+    uv run python history/build.py
 
 # Run every test against the timewalk named in pyproject.toml, or TIMEWALK_LOCAL
 test *args: build
@@ -26,7 +26,7 @@ test *args: build
 present walk="" *args:
     #!/usr/bin/env bash
     set -euo pipefail
-    [ -d repo ] || python3 history/build.py   # build once; just build starts again from the first step
+    [ -d repo ] || uv run python history/build.py   # build once; just build starts again from the first step
     {{ timewalk_run }} timewalk-check repo --toc toc.toml
     walk="{{ walk }}"
     {{ timewalk_run }} timewalk repo --toc toc.toml ${walk:+--walk "$walk"} --discard-edits --clock {{ args }}

@@ -27,14 +27,14 @@ def test_the_picker_changes_the_walk_in_every_window(walked) -> None:
     "Your window lists the walks; a change gives both windows that walk's steps, notes and slides. The Room shows the title."
     yours, room = walked
     assert yours.evaluate("[...document.querySelectorAll('#walk-picker option')].map((o) => o.value)") == ["narrative", "tests", "parts", "tutorial", "hooks"]
-    assert room.locator("#walk-picker").is_hidden() and room.locator("#walk-title").inner_text() == "tally, step by step"
+    assert room.locator("#walk-picker").is_hidden() and room.locator("#walk-title").inner_text() == "tally, step by step (narrative)"
     yours.select_option("#walk-picker", "tests")
     for page in (yours, room):
         page.wait_for_function("document.querySelectorAll('#step-list button').length === 3")
         assert steps_of(page) == ["step-01", "step-02", "step-05"]
         shows(page, "#step-name", "step-01")
         shows(page, "#slide-count", "Slide 1 of 2")
-    shows(room, "#walk-title", "Only the tests")
+    shows(room, "#walk-title", "Only the tests (narrative)")
     yours.wait_for_function("document.querySelector('#notes-pane').innerText.includes('Before any test')")
     yours.mouse.click(300, 400)
     yours.keyboard.press("ArrowDown")
@@ -141,3 +141,14 @@ def test_a_class_without_a_table_is_as_before(kit: Path) -> None:
     out = kit / "build" / "slides.pdf"
     subprocess.run([sys.executable, "-m", "timewalk.slides_pdf", str(kit / "slides" / "slides.toml"), "-o", str(out)], check=True, capture_output=True)
     assert len(PdfReader(out).pages) == 8
+
+
+def test_the_menu_groups_the_walks_by_kind_and_names_the_kind_on_show(walked) -> None:
+    "Narratives and tutorials each have a group in the menu; a label beside it says the kind of the walk on show."
+    yours, room = walked
+    groups = yours.evaluate("[...document.querySelectorAll('#walk-picker optgroup')].map((g) => g.label + ': ' + [...g.children].map((o) => o.value).join(' '))")
+    assert groups == ["Narratives: narrative tests parts", "Tutorials: tutorial hooks"]
+    shows(yours, "#walk-kind", "Narrative")
+    yours.select_option("#walk-picker", "hooks")
+    shows(yours, "#walk-kind", "Tutorial")
+    shows(room, "#walk-title", "A git hook, one move at a time (tutorial, watch mode)")

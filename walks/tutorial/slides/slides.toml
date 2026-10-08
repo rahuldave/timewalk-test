@@ -1,5 +1,5 @@
 # The slides of the tutorial. A move may have slides of its own; its key is quoted, as it holds a dot.
-# With sync (the default), a move shows its first slide, and a slide of a move makes that move.
+# With sync (the default), a move shows its first slide; in watch mode, a slide of a move also shows that move.
 [slides]
 step-00 = ["../../../slides/talk.md#1"]
 step-01 = ["../../../slides/talk.md#2"]

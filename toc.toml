@@ -26,7 +26,7 @@ tags = "parts-*"                  # steps of its own, on another branch
 id = "tutorial"
 title = "tally, one move at a time"
 kind = "tutorial"                 # the tagged steps, and the small commits between them
-folder = "walks/tutorial"
+folder = "walks/tutorial"         # starts in do mode, the default: the learner makes each move by hand
 
 [[walk]]
 id = "hooks"
@@ -34,4 +34,5 @@ title = "A git hook, one move at a time"
 kind = "tutorial"
 folder = "walks/hooks"
 tags = "hooks-*"                  # a tutorial on one part, with tags of its own on the branch hooks
+moves = "watch"                   # starts in watch mode: Show checks out each move's commit
 sync = false                      # the slides do not follow the moves

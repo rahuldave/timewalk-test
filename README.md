@@ -37,12 +37,17 @@ notes column.
 
 | Path | What it is |
 |---|---|
-| `history/build.py` | Builds `repo/`: tagged steps `step-00` to `step-05` on `main`, with small commits `step-02.1`, `step-02.2` and `step-04.1` for the tutorial; a branch `parts` with tags `parts-01` and `parts-02`; and a branch `hooks` with tags `hooks-00` to `hooks-02` and small commits between them. The same hashes on every build |
+| `history/build.py` | Builds `repo/`: tagged steps `step-00` to `step-05` on `main`, with small commits for the tutorial before step-02, step-04 and step-05; a branch `parts` with tags `parts-01` and `parts-02`; and a branch `hooks` with tags `hooks-00` to `hooks-02` and small commits between them. The same hashes on every build |
 | `toc.toml` | The table of contents: the five walks, the default first |
 | `notes.md`, `slides/` | The default walk: its notes, and its manifest with the slide files |
 | `walks/NAME/` | Each other walk: `notes.md`, and `slides/slides.toml` with its own slide files |
 | `justfile` | The recipes above |
 | `tests/` | pytest and Playwright: two windows through every walk, step, move and slide, commands typed into a shell, the checks on broken copies of the class, and the PDF |
+
+**`just setup` starts every step, and it never touches git.** It makes the environment (`uv sync`) and the
+artifacts that the step needs: `data/corpus.txt` from step-03, and `build/top.txt` from step-05. Both are ignored by
+git, so they stay through every move, and `just setup` makes them again when they are missing. Anything that changes
+git, such as installing a hook in the hooks walk, is a recipe of its own, which the notes ask the learner to run.
 
 timewalk's site explains each part, in "Several walks" and "Build a class with several walks".
 
