@@ -6,7 +6,7 @@ requires-python = ">=3.11"
 dependencies = ["timewalk"]
 
 [dependency-groups]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "pytest-timeout>=2.3"]
 
 [tool.uv]
 package = false
@@ -17,3 +17,5 @@ timewalk = { git = "https://github.com/rahuldave/timewalk", branch = "walks" }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# A test that waits on the page fails after two minutes, with a traceback, and never hangs the run.
+timeout = 120

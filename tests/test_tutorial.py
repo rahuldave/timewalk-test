@@ -45,12 +45,22 @@ def wait_for_done(page, kit: Path, move: str) -> None:
         raise
 
 
-def to_step_02(page) -> None:
+def notes_of(page, step: str) -> None:
+    "Wait until the notes column shows the step's notes, and not those of the step before."
+    page.wait_for_function("(s) => document.querySelector('#notes-title strong')?.textContent === s", arg=step)
+
+
+def to_step(page, step: str) -> None:
+    "Go right from step-00 to the step, and wait for its notes."
     page.mouse.click(300, 400)
-    page.keyboard.press("ArrowRight")
-    shows(page, "#step-name", "step-01")
-    page.keyboard.press("ArrowRight")
-    shows(page, "#step-name", "step-02")
+    for number in range(1, int(step[-2:]) + 1):
+        page.keyboard.press("ArrowRight")
+        shows(page, "#step-name", f"step-{number:02d}")
+    notes_of(page, step)
+
+
+def to_step_02(page) -> None:
+    to_step(page, "step-02")
 
 
 def test_do_mode_marks_moves_done_in_order_and_never_moves_the_code(tutored, kit: Path) -> None:
@@ -59,7 +69,7 @@ def test_do_mode_marks_moves_done_in_order_and_never_moves_the_code(tutored, kit
     to_step_02(yours)
     for page in (yours, room):
         page.wait_for_selector("#moves:not([hidden])")
-        page.wait_for_function("document.querySelector('#notes .p-hint')?.textContent.includes('Do:')")
+        page.wait_for_function("document.querySelector('#notes .p-hint')?.textContent.includes('make step-02.1 by hand')")
     assert head(kit).startswith("step-01:"), "a step starts at the code of the step before"
     assert moves_of(yours) == ["Start*", "1", "2", "3"]
     assert yours.evaluate("[...document.querySelectorAll('#moves > button:not(.nav)')].map((b) => b.disabled)") == [False, False, True, True]
@@ -90,7 +100,7 @@ def test_files_of_a_move_open_its_change_whatever_the_code(tutored) -> None:
     yours, room, _ = tutored
     to_step_02(yours)
     yours.wait_for_selector("#notes .p-move.here .p-files button")
-    assert yours.locator("#notes .p-move.here .p-files button").all_inner_texts() == ["tests/test_count.py"]
+    assert yours.locator("#notes .p-move.here .p-files button").all_inner_texts() == ["± See diff tests/test_count.py"]
     yours.click("#notes .p-move.here .p-files button")
     for page in (yours, room):
         shows(page, "#file-path", "tests/test_count.py")
@@ -113,7 +123,7 @@ def test_watch_mode_shows_the_moves_in_order_and_goes_back_to_the_start(tutored,
     to_step_02(yours)
     yours.click("#move-modes button:has-text('Watch')")
     for page in (yours, room):
-        page.wait_for_function("document.querySelector('#notes .p-hint')?.textContent.includes('Watch:')")
+        page.wait_for_function("document.querySelector('#notes .p-hint')?.textContent.includes('press Show on step-02.1')")
     assert sections_of(yours) == "next,later,later"
     assert yours.locator("#notes .p-move button:has-text('Show')").count() == 1
     yours.locator("#notes .p-move").first.locator("button:has-text('Show')").click()
@@ -171,14 +181,14 @@ def test_the_hooks_walk_starts_in_watch_mode_on_tags_of_its_own(browser, kit: Pa
     yours.mouse.click(300, 400)
     yours.keyboard.press("ArrowRight")
     shows(yours, "#step-name", "hooks-01")
-    assert head(kit) == "step-01: count the words", "hooks-01 starts at hooks-00, which is step-01's commit"
+    assert head(kit) == "step-01: the command counts the words", "hooks-01 starts at hooks-00, which is step-01's commit"
     yours.wait_for_selector("#moves:not([hidden])")
     assert yours.locator("#move-modes button[aria-pressed=true]").inner_text() == "Watch"
     yours.keyboard.press("Shift+ArrowRight")
     for page in (yours, room):
         shows(page, "#step-name", "hooks-01.1")
     assert head(kit) == "hooks-01.1: a recipe that checks the code"
-    yours.wait_for_function("[...document.querySelectorAll('#notes .p-move.here .p-files button')].map((b) => b.textContent).join() === 'justfile'")
+    yours.wait_for_function("[...document.querySelectorAll('#notes .p-move.here .p-item-path')].map((b) => b.textContent).join() === 'justfile'")
     shows(yours, "#slide-count", "Slide 1 of 3")
     yours.keyboard.press("ArrowDown")
     yours.keyboard.press("ArrowDown")
@@ -201,8 +211,8 @@ def test_the_mode_shows_at_every_step_of_a_tutorial(tutored) -> None:
 
 
 def open_item(page, text: str) -> None:
-    "Click the item of the notes whose button names that path, in the move being worked on."
-    page.locator("#notes .p-move.here .p-item button", has_text=text).first.click()
+    "Click See diff or See file on the item of the notes that names that path, in the move being worked on."
+    page.locator("#notes .p-move.here .p-item", has=page.locator(".p-item-path", has_text=text)).first.locator("button").click()
 
 
 def test_an_item_opens_next_change_with_its_line_marked_and_an_excerpt_in_the_notes(tutored) -> None:
@@ -216,6 +226,26 @@ def test_an_item_opens_next_change_with_its_line_marked_and_an_excerpt_in_the_no
         page.wait_for_selector("#view-next[aria-selected=true]")
         shows(page, "#view-next", "Next change: step-02.1")
         page.wait_for_selector("#file-body .line.mark")
+
+
+def test_an_item_says_see_diff_and_its_excerpt_opens_the_change_too(tutored) -> None:
+    "An item is one button, ± See diff and the path, with the author's words under it; a click on its excerpt opens the change as the button does."
+    yours, room, _ = tutored
+    to_step_02(yours)
+    item = yours.locator("#notes .p-move.here .p-item").first
+    item.wait_for()
+    assert item.locator("button").inner_text() == "± See diff tests/test_count.py"
+    assert item.locator(".p-item-words").inner_text().startswith("two tests.")
+    words, button = (item.locator(sel).bounding_box() for sel in (".p-item-words", "button"))
+    assert words["y"] >= button["y"] + button["height"] - 1, "the author's words are under the button"
+    yours.locator("#notes .p-move.here .p-excerpt pre.diff").first.click()
+    for page in (yours, room):
+        page.wait_for_selector("#view-next[aria-selected=true]")
+        shows(page, "#file-path", "tests/test_count.py")
+    # A move after the next one: its excerpt does nothing yet.
+    yours.locator("#notes .p-move.later .p-excerpt pre.diff").first.click()
+    yours.wait_for_timeout(500)
+    shows(yours, "#file-path", "tests/test_count.py")
 
 
 def test_apply_the_whole_move_then_the_files_match_and_the_move_is_done(tutored, kit: Path) -> None:
@@ -251,10 +281,7 @@ def test_apply_is_disabled_on_a_file_the_learner_changed(tutored, kit: Path) -> 
 def test_a_file_item_of_a_move_not_made_shows_the_answer(tutored) -> None:
     "Do mode at step-05: the file item of move 1 opens the file as step-05.1 leaves it, read only, as the tab says."
     yours, _, _ = tutored
-    yours.mouse.click(300, 400)
-    for name in ("step-01", "step-02", "step-03", "step-04", "step-05"):
-        yours.keyboard.press("ArrowRight")
-        shows(yours, "#step-name", name)
+    to_step(yours, "step-05")
     yours.wait_for_selector("#notes .p-move.here .p-item")
     open_item(yours, "tests/test_top.py")
     shows(yours, "#view-at", "At step-05.1")
@@ -285,4 +312,149 @@ def test_back_to_the_start_puts_the_code_back_in_do_mode(tutored, kit: Path) -> 
     yours.click("#moves button:has-text('Start')")
     yours.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.1')")
     assert not (kit / "repo-replay" / "tests" / "test_count.py").exists(), "the applied file is gone, with --discard-edits"
-    assert "Run just setup first" in yours.locator("#notes .p-hint").inner_text()
+    assert yours.locator("#notes .p-hint").inner_text().startswith("Run just setup. Then make step-02.1 by hand")
+
+ABOUT_DO = ("Build tally yourself, one small commit at a time: a function, its tests, types, and a report. A tutorial has one or more "
+            "steps, and each step has zero or more moves")
+
+
+def test_the_status_band_says_where_you_are_and_what_to_do(tutored) -> None:
+    "The band, in both windows: the walk's description at its first step only; then the mode, the step, the moves made and the next thing; the tag."
+    yours, room, _ = tutored
+    for page in (yours, room):
+        page.wait_for_selector("#note:not([hidden]) #about:not([hidden])")
+        assert page.locator("#about").inner_text().startswith(ABOUT_DO)
+        assert "In do mode, you make each move by hand" in page.locator("#about").inner_text()
+        shows(page, "#status", "Tutorial, do mode · step-00, step 1 of 6 · no moves · Run just setup and the commands in the notes. "
+              "Press Next step, at the end of the notes, or the Right arrow, for the next step.")
+        assert page.locator("#tag strong").inner_text() == "Where it starts"
+        assert page.locator("#tag").inner_text() == "Where it starts — A project with a command that does nothing yet."
+    to_step(yours, "step-01")
+    do = "Tutorial, do mode · step-01, step 2 of 6 · 0 of 2 moves made · Run just setup. Then make step-01.1 by hand, " \
+         "run the command at the end of its section, and press Done."
+    for page in (yours, room):
+        shows(page, "#status", do)
+        assert page.locator("#about").is_hidden(), "the description is for the walk's first step"
+        shows(page, "#tag", "Counting — The command counts words, one line per word.")
+    yours.click("#move-modes button:has-text('Watch')")
+    for page in (yours, room):
+        shows(page, "#status", "Tutorial, watch mode · step-01, step 2 of 6 · 0 of 2 moves made · Run just setup. Then press Show "
+              "on step-01.1 (Shift+Right), and run the command at the end of its section.")
+    yours.keyboard.press("Shift+ArrowRight")
+    for page in (yours, room):
+        shows(page, "#status", "Tutorial, watch mode · step-01, step 2 of 6 · 1 of 2 moves made · Press Show on step-01.2 "
+              "(Shift+Right), and run the command at the end of its section.")
+
+
+def test_a_shown_move_keeps_a_grayed_shown_button_and_restart_step_goes_back(tutored, kit: Path) -> None:
+    "Watch mode at step-01: after Show, move 1 keeps Shown, disabled; Restart step goes back to the Start in both windows, and Show comes back."
+    yours, room, _ = tutored
+    to_step(yours, "step-01")
+    yours.click("#move-modes button:has-text('Watch')")
+    yours.wait_for_selector("#notes .p-move.next button:has-text('Show')")
+    assert yours.locator("#notes .p-restart").count() == 0, "nothing to restart at the Start"
+    yours.locator("#notes .p-move.next button:has-text('Show')").click()
+    for page in (yours, room):
+        shows(page, "#step-name", "step-01.1")
+        page.wait_for_selector("#notes .p-move.here button:has-text('Shown')")
+    assert head(kit) == "step-01.1: a function that counts"
+    shown = yours.locator("#notes .p-move.here .p-move-actions button")
+    assert shown.all_inner_texts() == ["Shown ✓"] and shown.is_disabled()
+    assert yours.locator("#notes .p-move.next button:has-text('Show ▶')").is_enabled(), "the next move has Show"
+    assert yours.locator("#notes .p-move.here .p-restart button").inner_text() == "↺ Restart step"
+    yours.wait_for_timeout(600)   # past the moment when the page's own scroll to the move is not sent on
+    yours.hover("#notes-body")
+    yours.mouse.wheel(0, 400)   # the server remembers this scroll for the step; the Start must still go to the top
+    yours.wait_for_function("document.getElementById('notes-body').scrollTop > 100")
+    yours.wait_for_timeout(800)
+    yours.click("#notes .p-move.here .p-restart button")
+    for page in (yours, room):
+        shows(page, "#step-name", "step-01")
+        page.wait_for_function("document.querySelector('#notes .p-move.next h3')?.textContent.startsWith('step-01.1')")
+    assert head(kit).startswith("step-00:"), "the Start is the code of the step before"
+    assert yours.locator("#notes .p-move.next button:has-text('Show ▶')").is_enabled()
+    assert yours.locator("#notes button:has-text('Shown')").count() == 0
+    for page in (yours, room):
+        page.wait_for_timeout(500)
+        assert page.evaluate("document.getElementById('notes-body').scrollTop") == 0, "at the Start, the notes are at the top"
+
+
+def test_restart_step_in_do_mode_undoes_the_moves_marked_done(tutored) -> None:
+    "Do mode at step-01: Done on move 1 leaves Done, grayed, and Restart step; Restart step makes move 1 the one worked on again."
+    yours, room, _ = tutored
+    to_step(yours, "step-01")
+    assert yours.locator("#notes .p-restart").count() == 0, "nothing to restart before a move is made"
+    yours.click("#notes .p-move.here button:has-text('Done')")
+    for page in (yours, room):
+        page.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-01.2')")
+    done = yours.locator("#notes .p-move.done .p-move-actions button")
+    assert done.all_inner_texts() == ["Made ✓"] and done.is_disabled()
+    yours.locator("#notes .p-move.done .p-restart button").click()
+    for page in (yours, room):
+        page.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-01.1')")
+        assert page.locator("#notes .p-move.done").count() == 0
+    assert yours.locator("#notes .p-move.here button.primary").inner_text() == "Done ✓"
+
+
+def test_text_before_the_first_move_is_a_section_of_its_own(tutored) -> None:
+    "At step-01, just setup and the words before step-01.1 are in Before the moves; step-00 has no moves, and no such section."
+    yours, _, _ = tutored
+    yours.wait_for_selector("#notes .p-hint")
+    assert yours.locator("#notes .p-bridge").count() == 0
+    to_step(yours, "step-01")
+    bridge = yours.locator("#notes .p-bridge")
+    assert bridge.locator(".p-bridge-label").text_content() == "Before the moves"
+    assert "Two moves: first a function that counts" in bridge.inner_text()
+    assert bridge.locator(".p-commands button").first.inner_text().startswith("just setup")
+    assert yours.evaluate("document.querySelector('#notes').firstElementChild.className") == "p-hint"
+    assert yours.locator("#notes .p-move").count() == 2
+
+
+def test_next_step_at_the_end_of_the_notes_moves_both_windows(tutored) -> None:
+    "step-00 has no moves: Next step ends the notes, and the slide head offers it too. At step-01 it waits until both moves are done."
+    yours, room, _ = tutored
+    yours.wait_for_selector("#notes .p-next-step button.go")
+    assert yours.locator("#notes").evaluate("(n) => n.lastElementChild.className") == "p-next-step"
+    assert yours.locator("#notes .p-next-step button").inner_text() == "Next step: step-01 ▶"
+    yours.wait_for_selector("#slide-step:not([hidden])")   # step-00 has one slide, so it is the last
+    shows(yours, "#slide-step", "Next step: step-01 ▶")
+    assert room.locator("#slide-step").is_hidden(), "the Room window has no Next step in the slide head"
+    yours.click("#notes .p-next-step button")
+    for page in (yours, room):
+        shows(page, "#step-name", "step-01")
+    notes_of(yours, "step-01")
+    assert yours.locator("#notes .p-next-step").count() == 0 and yours.locator("#slide-step").is_hidden(), "two moves to make first"
+    for move in ("step-01.1", "step-01.2"):
+        yours.wait_for_function("(m) => document.querySelector('#notes .p-move.here h3')?.textContent.startsWith(m)", arg=move)
+        yours.click("#notes .p-move.here button.primary:has-text('Done')")
+    yours.wait_for_selector("#notes .p-next-step button.go")
+    yours.wait_for_selector("#slide-step:not([hidden])")
+    shows(yours, "#slide-step", "Next step: step-02 ▶")
+    yours.click("#move-modes button:has-text('Watch')")   # in watch mode no move is shown yet: no Next step anywhere
+    yours.wait_for_selector("#slide-step[hidden]", state="attached")
+    assert yours.locator("#notes .p-next-step").count() == 0
+    yours.click("#move-modes button:has-text('Do')")
+    yours.wait_for_selector("#slide-step:not([hidden])")
+    yours.click("#slide-step")
+    for page in (yours, room):
+        shows(page, "#step-name", "step-02")
+
+
+def test_step_01_moves_in_do_mode_by_hand_and_when_the_files_match(tutored, kit: Path) -> None:
+    "Do mode at step-01: Done marks move 1 by hand; then the learner writes move 2's file, the files match, and move 2 is done by itself."
+    yours, room, _ = tutored
+    to_step(yours, "step-01")
+    assert head(kit).startswith("step-00:"), "step-01 starts at step-00's code"
+    assert moves_of(yours) == ["Start*", "1", "2"] and sections_of(yours) == "here,later"
+    yours.click("#notes .p-move.here button.primary:has-text('Done')")
+    for page in (yours, room):
+        page.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-01.2')")
+    assert moves_of(yours) == ["Start", "1+", "2"]
+    tagged = subprocess.run(["git", "-C", str(kit / "repo"), "show", "step-01:src/tally/__init__.py"], capture_output=True, text=True, check=True).stdout
+    yours.bring_to_front()   # a hidden window does not ask whether the files match
+    (kit / "repo-replay" / "src" / "tally" / "__init__.py").write_text(tagged)
+    yours.wait_for_function("document.querySelectorAll('#notes .p-move.done').length === 2", timeout=20000)
+    room.wait_for_function("document.querySelectorAll('#notes .p-move.done').length === 2")
+    shows(yours, "#status", "Tutorial, do mode · step-01, step 2 of 6 · 2 of 2 moves made · Every move is made. "
+          "Press Next step, at the end of the notes, or the Right arrow, for the next step.")
+    yours.wait_for_selector("#notes .p-next-step button:has-text('Next step: step-02')")

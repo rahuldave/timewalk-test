@@ -152,3 +152,39 @@ def test_the_menu_groups_the_walks_by_kind_and_names_the_kind_on_show(walked) ->
     yours.select_option("#walk-picker", "hooks")
     shows(yours, "#walk-kind", "Tutorial")
     shows(room, "#walk-title", "A git hook, one move at a time (tutorial, watch mode)")
+
+
+def test_the_status_band_of_a_narrative(walked) -> None:
+    "The narrative's band, in both windows: its description and what a narrative is at step-00 only; the step and Right arrow; the tag."
+    yours, room = walked
+    for page in (yours, room):
+        page.wait_for_selector("#about:not([hidden])")
+        assert page.locator("#about").inner_text().startswith("How tally, a word counter, was built: one tagged step at a time")
+        assert "A narrative goes from tag to tag" in page.locator("#about").inner_text()
+        shows(page, "#status", "Narrative · step-00, step 1 of 6 · Press Next step, at the end of the notes, or the Right arrow, for the next step.")
+    yours.mouse.click(300, 400)
+    for step in ("step-01", "step-02"):
+        yours.keyboard.press("ArrowRight")
+        shows(yours, "#step-name", step)
+    for page in (yours, room):
+        shows(page, "#status", "Narrative · step-02, step 3 of 6 · Press Next step, at the end of the notes, or the Right arrow, for the next step.")
+        assert page.locator("#about").is_hidden()
+        shows(page, "#tag", "Tests — Two tests, one failing, and the fix.")
+        assert page.locator("#tag strong").inner_text() == "Tests"
+
+
+def test_next_step_on_the_last_slide_of_a_narrative(walked) -> None:
+    "step-01 has two slides: Next step shows in the slide head on the second only, and moves both windows to step-02."
+    yours, room = walked
+    yours.mouse.click(300, 400)
+    yours.keyboard.press("ArrowRight")
+    for page in (yours, room):
+        shows(page, "#slide-count", "Slide 1 of 2")
+    assert yours.locator("#slide-step").is_hidden()
+    yours.keyboard.press("ArrowDown")
+    shows(yours, "#slide-count", "Slide 2 of 2")
+    shows(yours, "#slide-step", "Next step: step-02 ▶")
+    yours.wait_for_selector("#notes .p-next-step button:has-text('Next step: step-02')")
+    yours.click("#slide-step")
+    for page in (yours, room):
+        shows(page, "#step-name", "step-02")

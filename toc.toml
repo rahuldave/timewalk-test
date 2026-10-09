@@ -4,6 +4,7 @@
 [[walk]]
 id = "narrative"
 title = "tally, step by step"
+description = "How tally, a word counter, was built: one tagged step at a time, from an empty command to a report."
 kind = "narrative"                # the tagged steps, and nothing between them
 notes = "notes.md"
 slides = "slides/slides.toml"
@@ -11,6 +12,7 @@ slides = "slides/slides.toml"
 [[walk]]
 id = "tests"
 title = "Only the tests"
+description = "Three steps of tally: the code, its tests, and the most common words."
 kind = "narrative"
 folder = "walks/tests"            # notes.md, and slides/slides.toml, in this folder
 steps = ["step-01", "step-02", "step-05"]   # some of the steps of main
@@ -18,6 +20,7 @@ steps = ["step-01", "step-02", "step-05"]   # some of the steps of main
 [[walk]]
 id = "parts"
 title = "Tests first, on the parts branch"
+description = "A part of the history on a branch of its own: the code and its tests, first."
 kind = "narrative"
 folder = "walks/parts"
 tags = "parts-*"                  # steps of its own, on another branch
@@ -25,12 +28,14 @@ tags = "parts-*"                  # steps of its own, on another branch
 [[walk]]
 id = "tutorial"
 title = "tally, one move at a time"
+description = "Build tally yourself, one small commit at a time: a function, its tests, types, and a report."
 kind = "tutorial"                 # the tagged steps, and the small commits between them
 folder = "walks/tutorial"         # starts in do mode, the default: the learner makes each move by hand
 
 [[walk]]
 id = "hooks"
 title = "A git hook, one move at a time"
+description = "A check that git runs before each commit, and then the tests in it, shown one commit at a time."
 kind = "tutorial"
 folder = "walks/hooks"
 tags = "hooks-*"                  # a tutorial on one part, with tags of its own on the branch hooks

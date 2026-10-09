@@ -9,7 +9,8 @@ shows what the move did. Every command runs through uv.
 
 $ just setup
 
-A uv project with a command that has nothing to count. This step has no moves: it is where the tutorial starts.
+A uv project with a command that has nothing to count. This step has no moves: it is where the tutorial starts. Run
+just setup, then the command below, and go to the next step.
 
 $ uv run tally
 
@@ -17,7 +18,52 @@ $ uv run tally
 
 $ just setup
 
-`count` arrives in one commit, so this step has no moves either.
+Two moves: first a function that counts, and then the command that uses it. Each move ends with a command that shows
+what it did.
+
+### step-01.1 A function that counts
+
+In `src/tally/__init__.py`, above `main`, add `count`:
+
+```python
+def count(text):
+    counts = {}
+    for word in text.split():
+        counts[word] = counts.get(word, 0) + 1
+    return counts
+```
+
+What changed:
+
+- `src/tally/__init__.py`: +7 -0; adds `count`. The command does not use it yet.
+
+files:
+- diff `src/tally/__init__.py`: a dictionary from each word to how many times it appears.
+  show: `counts[word] = counts.get(word, 0) + 1`
+
+$ uv run python -c "from tally import count; print(count('a b a'))"
+
+The function works: `{'a': 2, 'b': 1}`. The command still has nothing to count.
+
+### step-01.2 The command counts
+
+Make `main` read a file, or the standard input, and print each word with its count. Add `import sys` at the top. This
+move is the tagged commit of the step.
+
+```python
+def main() -> None:
+    text = open(sys.argv[1]).read() if len(sys.argv) > 1 else sys.stdin.read()
+    for word, n in sorted(count(text).items()):
+        print(n, word)
+```
+
+What changed:
+
+- `src/tally/__init__.py`: +5 -1; changes `main`.
+
+files:
+- diff `src/tally/__init__.py`: `main` reads the text and prints the counts.
+  show: `for word, n in sorted(count(text).items()):`
 
 $ echo "a b a" | uv run tally
 

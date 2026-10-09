@@ -5,7 +5,7 @@
 The project is `tally`, a small word counter. Its history has what every kind of walk needs:
 
 - tagged steps on main, step-00 to step-05, each an annotated tag whose message is the step's note;
-- small commits between step-01 and step-02, and between step-03 and step-04, for a tutorial. Their subjects
+- small commits before step-01, step-02, step-04 and step-05, for a tutorial; step-00 and step-03 have none. Their subjects
   start with `step-02.1:` and so on. The last commit of a step has the plain `step-NN:` subject and the tag;
 - a branch `parts` from step-00 with its own tags, `parts-01` and `parts-02`, for a walk on one part;
 - a branch `hooks` from step-01 with its own tags, `hooks-00` to `hooks-02`, and small commits between them, for a
@@ -79,6 +79,13 @@ def main() -> None:
     for word, n in sorted(count(text).items()):
         print(n, word)
 '''
+# step-01.1: the function first, which the command does not use yet
+COUNT_0 = COUNT_1.replace("import sys\n\n\n", "\n").replace('''    text = open(sys.argv[1]).read() if len(sys.argv) > 1 else sys.stdin.read()
+    for word, n in sorted(count(text).items()):
+        print(n, word)
+''', '''    print("tally: nothing to count yet")
+''')
+assert "sys" not in COUNT_0 and "def count" in COUNT_0
 COUNT_2 = COUNT_1.replace("for word in text.split():", "for word in text.lower().split():")
 TEST_COUNT = '''import unittest
 
@@ -175,7 +182,8 @@ MAIN = [
      {"README.md": README, "pyproject.toml": PYPROJECT, ".python-version": PYTHON_VERSION, ".gitignore": GITIGNORE, "uv.lock": UV_LOCK,
       "justfile": JUSTFILE, "src/tally/__init__.py": MAIN_0, "src/tally/__main__.py": DUNDER},
      ("step-00", "Where it starts\n\nA project with a command that does nothing yet.")),
-    ("step-01: count the words", {"src/tally/__init__.py": COUNT_1},
+    ("step-01.1: a function that counts", {"src/tally/__init__.py": COUNT_0}, None),
+    ("step-01: the command counts the words", {"src/tally/__init__.py": COUNT_1},
      ("step-01", "Counting\n\nThe command counts words, one line per word.")),
     ("step-02.1: a test of counting", {"tests/test_count.py": TEST_COUNT}, None),
     ("step-02.2: a test of an empty text", {"tests/test_empty.py": TEST_EMPTY}, None),
