@@ -33,6 +33,18 @@ def sections_of(page) -> str:
     return page.evaluate("[...document.querySelectorAll('#notes .p-move')].map((s) => s.className.replace('p-move', '').trim() || '-').join(',')")
 
 
+def wait_for_done(page, kit: Path, move: str) -> None:
+    "Wait until the move being worked on is the given one; on a timeout, say what the server and the page saw."
+    try:
+        page.wait_for_function("(m) => document.querySelector('#notes .p-move.here h3')?.textContent.startsWith(m)", arg=move, timeout=20000)
+    except Exception:
+        print("visibility:", page.evaluate("document.visibilityState"))
+        print("match:", page.evaluate("fetch('/api/match').then((r) => r.json())"))
+        print("state:", page.evaluate("fetch('/api/state').then((r) => r.json()).then((s) => [s.mode, s.done, s.move])"))
+        print("terminal:", page.evaluate("(window.timewalkTerminals() || []).find((t) => t.id === 'replay')?.tail.slice(-400)"))
+        raise
+
+
 def to_step_02(page) -> None:
     page.mouse.click(300, 400)
     page.keyboard.press("ArrowRight")
@@ -41,38 +53,37 @@ def to_step_02(page) -> None:
     shows(page, "#step-name", "step-02")
 
 
-def test_do_mode_marks_moves_done_and_never_moves_the_code(tutored, kit: Path) -> None:
-    "In do mode, the code stays at the start of the step; Done marks each move, in both windows; nothing is locked or grayed."
+def test_do_mode_marks_moves_done_in_order_and_never_moves_the_code(tutored, kit: Path) -> None:
+    "In do mode the code stays at the step's Start; Done marks the next move; the moves after it are greyed and do nothing."
     yours, room, _ = tutored
     to_step_02(yours)
     for page in (yours, room):
         page.wait_for_selector("#moves:not([hidden])")
-        page.wait_for_function("document.querySelector('#notes .p-hint')?.textContent.startsWith('Do:')")
+        page.wait_for_function("document.querySelector('#notes .p-hint')?.textContent.includes('Do:')")
     assert head(kit).startswith("step-01:"), "a step starts at the code of the step before"
-    assert moves_of(yours) == ["Start", "1*", "2", "3"]
-    assert sections_of(yours) == "here,-,-"
-    assert yours.locator("#notes .p-move button:disabled").count() == 0 and yours.locator("#notes .p-commands button:disabled").count() == 0
+    assert moves_of(yours) == ["Start*", "1", "2", "3"]
+    assert yours.evaluate("[...document.querySelectorAll('#moves > button:not(.nav)')].map((b) => b.disabled)") == [False, False, True, True]
+    assert sections_of(yours) == "here,later,later"
+    assert yours.locator("#notes .p-move.later button:not(:disabled)").count() == 0, "a move after the next waits"
     yours.click("#notes .p-move.here button:has-text('Done')")
     for page in (yours, room):
         page.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.2')")
-    assert sections_of(yours) == "done,here,-" and moves_of(yours) == ["Start", "1+", "2*", "3"]
+    assert sections_of(yours) == "done,here,later" and moves_of(yours) == ["Start", "1+", "2", "3"]
     assert head(kit).startswith("step-01:"), "Done does not move the code"
     yours.keyboard.press("Shift+ArrowRight")   # Shift+Right is Done in do mode
     yours.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.3')")
-    assert head(kit).startswith("step-01:")
 
-
-def test_catch_me_up_sets_the_code_to_the_end_of_a_move(tutored, kit: Path) -> None:
-    "Catch me up on move 2: the code is that move's commit, and the moves up to it are done."
+def test_catch_me_up_sets_the_code_to_the_end_of_the_move_worked_on(tutored, kit: Path) -> None:
+    "Catch me up on the move being worked on: the code is that move's commit, and the move is done."
     yours, room, _ = tutored
     to_step_02(yours)
-    yours.wait_for_selector("#notes .p-move")
-    yours.locator("#notes .p-move").nth(1).locator("button:has-text('Catch me up')").click()
+    yours.wait_for_selector("#notes .p-move.here button:has-text('Catch me up')")
+    assert yours.locator("#notes .p-move button:has-text('Catch me up')").count() == 1, "only on the move being worked on"
+    yours.click("#notes .p-move.here button:has-text('Catch me up')")
     for page in (yours, room):
-        page.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.3')")
-    assert head(kit) == "step-02.2: a test of an empty text"
-    assert sections_of(yours) == "done,done,here"
-
+        page.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.2')")
+    assert head(kit) == "step-02.1: a test of counting"
+    assert sections_of(yours) == "done,here,later"
 
 def test_files_of_a_move_open_its_change_whatever_the_code(tutored) -> None:
     "In do mode, at the start of the step, a files: link of move 1 opens what move 1 changed, in both windows."
@@ -96,26 +107,28 @@ def test_a_moves_last_commands_are_its_anchor(tutored) -> None:
     assert yours.locator("#notes .p-move").first.locator(".p-anchor-label").inner_text() == "After this move, run:"
 
 
-def test_watch_mode_shows_any_moves_commit_from_the_notes_or_the_arrows(tutored, kit: Path) -> None:
-    "Switch to Watch: Show on move 2 checks out its commit, skipping move 1; the arrow goes on to move 3; both windows follow."
+def test_watch_mode_shows_the_moves_in_order_and_goes_back_to_the_start(tutored, kit: Path) -> None:
+    "Watch: Show is on the next move only; the arrow shows the one after; Shift+Left goes back to the step's Start."
     yours, room, _ = tutored
     to_step_02(yours)
     yours.click("#move-modes button:has-text('Watch')")
     for page in (yours, room):
-        page.wait_for_function("document.querySelector('#notes .p-hint')?.textContent.startsWith('Watch:')")
-    assert sections_of(yours) == "ahead,ahead,ahead"
-    yours.locator("#notes .p-move").nth(1).locator("button:has-text('Show')").click()
+        page.wait_for_function("document.querySelector('#notes .p-hint')?.textContent.includes('Watch:')")
+    assert sections_of(yours) == "next,later,later"
+    assert yours.locator("#notes .p-move button:has-text('Show')").count() == 1
+    yours.locator("#notes .p-move").first.locator("button:has-text('Show')").click()
     for page in (yours, room):
-        shows(page, "#step-name", "step-02.2")
-    assert head(kit) == "step-02.2: a test of an empty text"
+        shows(page, "#step-name", "step-02.1")
+    assert head(kit) == "step-02.1: a test of counting"
     yours.wait_for_function("(want) => [...document.querySelectorAll('#notes .p-move')].map((s) => s.className.replace('p-move', '').trim()).join(',') === want",
-                            arg="done,here,ahead")
+                            arg="here,next,later")
     yours.locator("#moves .nav").last.click()
-    shows(room, "#step-name", "step-02.3")
-    assert head(kit).startswith("step-02:")
-    yours.keyboard.press("Shift+ArrowLeft")
     shows(room, "#step-name", "step-02.2")
-
+    assert head(kit) == "step-02.2: a test of an empty text"
+    yours.mouse.click(300, 400)
+    yours.keyboard.press("Shift+ArrowLeft")
+    shows(room, "#step-name", "step-02")
+    assert head(kit).startswith("step-01:"), "back is the step's Start"
 
 def test_watch_mode_slides_follow_the_moves(tutored) -> None:
     "In watch mode with sync, showing move 1 shows its own slide."
@@ -212,9 +225,10 @@ def test_apply_the_whole_move_then_the_files_match_and_the_move_is_done(tutored,
     yours.wait_for_selector("#notes .p-move.here .p-item")
     open_item(yours, "tests/test_count.py")
     yours.wait_for_selector("#apply-bar:not([hidden])")
+    yours.bring_to_front()   # a hidden window does not ask whether the files match, and the Room never marks Done
     yours.click("#apply-move")
-    for page in (yours, room):
-        page.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.2')", timeout=20000)
+    wait_for_done(yours, kit, "step-02.2")
+    room.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.2')")
     assert (kit / "repo-replay" / "tests" / "test_count.py").is_file()
     assert head(kit).startswith("step-01:"), "Apply makes edits; the code is still at the step's start"
 
@@ -258,16 +272,17 @@ def test_your_file_offers_your_own_editor(tutored) -> None:
     assert room.locator("#open-editor").is_hidden()
 
 
-def test_not_done_stays_after_the_files_matched(tutored, kit: Path) -> None:
-    "Apply, the files match, the move is done by itself; Not done then keeps the learner's choice, though the files still match."
+def test_back_to_the_start_puts_the_code_back_in_do_mode(tutored, kit: Path) -> None:
+    "After Apply and Done, Start puts the code back at the step's start, and no move is done: then just setup."
     yours, _, _ = tutored
     to_step_02(yours)
     yours.wait_for_selector("#notes .p-move.here .p-item")
     open_item(yours, "tests/test_count.py")
     yours.wait_for_selector("#apply-bar:not([hidden])")
+    yours.bring_to_front()   # a hidden window does not ask whether the files match, and the Room never marks Done
     yours.click("#apply-move")
-    yours.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.2')", timeout=20000)
-    yours.locator("#notes .p-move").first.locator("button:has-text('Not done')").click()
+    wait_for_done(yours, kit, "step-02.2")
+    yours.click("#moves button:has-text('Start')")
     yours.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.1')")
-    yours.wait_for_timeout(4500)   # two polls of files match
-    assert yours.evaluate("document.querySelector('#notes .p-move.here h3').textContent").startswith("step-02.1")
+    assert not (kit / "repo-replay" / "tests" / "test_count.py").exists(), "the applied file is gone, with --discard-edits"
+    assert "Run just setup first" in yours.locator("#notes .p-hint").inner_text()
