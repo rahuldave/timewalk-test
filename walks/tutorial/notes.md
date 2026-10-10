@@ -1,7 +1,7 @@
 # tally, one move at a time
 
-A tutorial: the tagged steps of tally, and the small commits between them. Each small commit is a move, one atomic
-action. In do mode, the default, you make each move by hand from its notes, run the command at its end, and press
+The walk is a tutorial through the tagged steps of tally, and the small commits between them. Each small commit is
+a move, one small action. In do mode, the default, you make each move by hand from its notes, run the command at its end, and press
 Done. In watch mode, Show checks out each move's commit instead. Either way, the command at the end of a move
 shows what the move did. Every command runs through uv.
 
@@ -9,8 +9,8 @@ shows what the move did. Every command runs through uv.
 
 $ just setup
 
-A uv project with a command that has nothing to count. This step has no moves: it is where the tutorial starts. Run
-just setup, then the command below, and go to the next step.
+The project is a uv project with a command that has nothing to count. The step has no moves, because the tutorial
+starts here. Run just setup, then the command below, and go to the next step.
 
 $ uv run tally
 
@@ -18,8 +18,8 @@ $ uv run tally
 
 $ just setup
 
-Two moves: first a function that counts, and then the command that uses it. Each move ends with a command that shows
-what it did.
+The step has two moves. The first adds a function that counts, and the second the command that uses it. Each move
+ends with a command that shows what it did.
 
 ### step-01.1 A function that counts
 
@@ -33,7 +33,7 @@ def count(text):
     return counts
 ```
 
-This is the file changed:
+The move changes one file:
 
 - `src/tally/__init__.py`: 7 lines added; adds `count`.
 
@@ -45,7 +45,7 @@ files:
 
 $ uv run python -c "from tally import count; print(count('a b a'))"
 
-The function works: `{'a': 2, 'b': 1}`. The command still has nothing to count.
+The function works, and prints `{'a': 2, 'b': 1}`. The command still has nothing to count.
 
 ### step-01.2 The command counts
 
@@ -59,7 +59,7 @@ def main() -> None:
         print(n, word)
 ```
 
-This is the file changed:
+The move changes one file:
 
 - `src/tally/__init__.py`: 5 lines added, 1 removed; changes `main`.
 
@@ -73,8 +73,8 @@ $ echo "a b a" | uv run tally
 
 $ just setup
 
-We add the tests one file at a time, and run them after each. The code starts as it was at step-01: it does not
-ignore case yet.
+We add the tests one file at a time, and run them after each. The code starts as it was at step-01, so it does
+not ignore case yet.
 
 ### step-02.1 A test of counting
 
@@ -94,11 +94,11 @@ class Count(unittest.TestCase):
         self.assertEqual(count("A a"), {"a": 2})
 ```
 
-This is the file changed:
+The move changes one file:
 
 - `tests/test_count.py`: a new file of 11 lines; adds `class Count`, `test_words` and `test_case`.
 
-The test that matters is `test_case`.
+The test to watch is `test_case`.
 
 files:
 - diff `tests/test_count.py`: two tests. The second asks for something the code cannot do yet.
@@ -106,7 +106,7 @@ files:
 
 $ uv run python -m unittest discover -s tests -q
 
-One test fails: `test_case` expects `{"a": 2}`, and gets `{"A": 1, "a": 1}`.
+One test fails. `test_case` expects `{"a": 2}`, and gets `{"A": 1, "a": 1}`.
 
 > Say: look, a failure. It is a question that the code has not answered yet.
 
@@ -125,7 +125,7 @@ class Empty(unittest.TestCase):
         self.assertEqual(count(""), {})
 ```
 
-This is the file changed:
+The move changes one file:
 
 - `tests/test_empty.py`: a new file of 8 lines; adds `class Empty` and `test_empty`.
 
@@ -142,7 +142,7 @@ The new test passes at once. `test_case` still fails.
 In `count`, in `src/tally/__init__.py`, change `text.split()` to `text.lower().split()`. This move is the tagged
 commit of the step.
 
-This is the file changed:
+The move changes one file:
 
 - `src/tally/__init__.py`: 1 line added, 1 removed; changes `count`.
 
@@ -161,7 +161,8 @@ All three tests pass, and "The the" is `2 the`.
 
 $ just setup
 
-One commit: ruff gets a line length, and `just setup` makes `data/corpus.txt`, an artifact that git does not hold.
+The step is one commit. ruff gets a line length, and `just setup` makes `data/corpus.txt`, an artifact that git does
+not hold.
 
 $ uv run tally data/corpus.txt | sort -rn | head -3
 
@@ -177,7 +178,7 @@ In `src/tally/__init__.py`, give `count` its types:
 def count(text: str) -> dict[str, int]:
 ```
 
-This is the file changed:
+The move changes one file:
 
 - `src/tally/__init__.py`: 1 line added, 1 removed; changes `count`, in its signature only.
 
@@ -187,7 +188,7 @@ files:
 
 $ uv run python -m unittest discover -s tests -q
 
-The tests pass as before: types change what the code says, not what it does.
+The tests pass as before, because types change what the code says, not what it does.
 
 ### step-04.2 A docstring
 
@@ -197,7 +198,7 @@ Under the signature of `count`, add one line:
     "How many times each word appears, ignoring case."
 ```
 
-This is the file changed:
+The move changes one file:
 
 - `src/tally/__init__.py`: 1 line added; changes `count`.
 
@@ -211,7 +212,8 @@ $ uv run python -c "import tally; print(tally.count.__doc__)"
 
 $ just setup
 
-Three moves: a function with its test, an option on the command, and a recipe that makes an artifact.
+The step has three moves. They add a function with its test, an option on the command, and a recipe that makes an
+artifact.
 
 ### step-05.1 A function for the most common words
 
@@ -234,7 +236,7 @@ class Top(unittest.TestCase):
         self.assertEqual(top({"a": 1, "b": 3, "c": 2}, 2), [("b", 3), ("c", 2)])
 ```
 
-These are the files changed:
+The move changes these files:
 
 - `src/tally/__init__.py`: 5 lines added; adds `top`.
 - `tests/test_top.py`: a new file of 8 lines; adds `class Top` and `test_most_common_first`.
@@ -248,10 +250,10 @@ $ uv run python -m unittest discover -s tests -q
 
 ### step-05.2 tally --top N
 
-Teach `main` an option: with `--top N`, print only the N most common words, with `top`. Open the move's change to
+Teach `main` an option, `--top N`, that prints only the N most common words with `top`. Open the move's change to
 see one way to write it.
 
-This is the file changed:
+The move changes one file:
 
 - `src/tally/__init__.py`: 8 lines added, 3 removed; changes `main`.
 
@@ -261,7 +263,7 @@ files:
 
 $ uv run tally --top 3 data/corpus.txt
 
-Three lines, the most common word first.
+The command prints three lines, the most common word first.
 
 ### step-05.3 A report, which just setup makes
 
@@ -275,7 +277,7 @@ report:
     uv run tally --top 10 data/corpus.txt > build/top.txt
 ```
 
-This is the file changed:
+The move changes one file:
 
 - `justfile`: 6 lines added; adds `recipe report`, and a line in `setup`.
 
@@ -287,4 +289,5 @@ files:
 $ just setup
 $ cat build/top.txt
 
-`build/top.txt` is an artifact: made by this step, ignored by git, and made again by `just setup` when it is missing.
+`build/top.txt` is an artifact. This step makes it, git ignores it, and `just setup` makes it again when it is
+missing.

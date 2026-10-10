@@ -1,6 +1,6 @@
 ## Hooks
 
-git runs a hook at a moment of its own: before a commit, before a push.
+git runs a hook at a moment of its own, for example before a commit or before a push.
 
 ---
 
@@ -12,7 +12,7 @@ The hook runs `just check`. If it fails, git refuses the commit.
 
 ## Install it
 
-Hooks are not cloned. `just setup` points git at `hooks/`.
+Hooks are not cloned. `just install-hook` points git at `hooks/`.
 
 ---
 

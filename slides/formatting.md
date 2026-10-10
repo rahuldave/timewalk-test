@@ -16,7 +16,7 @@ line-length = 100
 
 ## Why a document
 
-Some steps need more than a slide: a setup to follow, a table, a long example. A document holds all of it,
+Some steps need more than a slide, for example a setup to follow, a table or a long example. A document holds all of it,
 and the presenter scrolls it while the class reads.
 
 | Tool | Reads |

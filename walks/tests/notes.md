@@ -1,6 +1,6 @@
 # Only the tests
 
-A narrative on one part of tally: the three steps where the tests matter. It uses some of the steps of main, and
+The walk is a narrative on one part of tally, the three steps where the tests matter. It uses some of the steps of main, and
 borrows slides from the default walk. Every command runs through uv.
 
 ## step-01 Before any test
@@ -20,8 +20,8 @@ The second command counts "The" and "the" as two words. Nothing says whether tha
 
 $ just setup
 
-Two test files arrive: `tests/test_count.py` with two tests, and `tests/test_empty.py` with one. The case test
-failed until counting learned to ignore case, in the same step.
+`tests/test_count.py` arrives with two tests, and `tests/test_empty.py` with one. The case test failed until the
+code ignored case, in the same step.
 
 $ uv run python -m unittest discover -s tests -v
 $ echo "The the" | uv run tally
@@ -35,7 +35,7 @@ All three tests pass, and "The the" is now `2 the`.
 $ just setup
 
 Two steps later, `top` arrives with a test of its own, and the old tests still pass. The tests did not change
-when the types and the docstring arrived at step-04: they check what the code does, not how it says it.
+when the types and the docstring arrived at step-04. The tests check what the code does, not how it says it.
 
 $ uv run python -m unittest discover -s tests -v
 $ uv run tally --top 3 data/corpus.txt

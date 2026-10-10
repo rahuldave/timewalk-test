@@ -6,7 +6,7 @@ A word counter, built in six steps.
 
 ## Counting
 
-One line per word: the count, then the word.
+One line per word, with the count and then the word.
 
 ---
 

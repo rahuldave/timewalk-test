@@ -35,6 +35,18 @@ present walk="" *args:
 check: build
     {{ timewalk_run }} timewalk-check repo --toc toc.toml
 
+# The checker of the nossaifd writing guide, in the peer folder; just style_check=PATH style to use another
+style_check := "../nossaifd/check.py"
+
+# Check the prose of the READMEs, notes and slides by the nossaifd writing guide; -v adds the soft notes
+style *args:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    check="{{ style_check }}"
+    [ -f "$check" ] || check=../timewalk/docs/style/check.py
+    shopt -s nullglob
+    python3 "$check" "$@" README.md CLAUDE.md notes.md slides/*.md walks/*/notes.md walks/*/slides/*.md
+
 # Make the PDF of one walk's slides: just pdf tutorial
 pdf walk="narrative": build
     {{ timewalk_run }} timewalk-pdf --toc toc.toml --walk {{ walk }} -o build/{{ walk }}.pdf

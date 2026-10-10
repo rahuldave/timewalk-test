@@ -1,9 +1,11 @@
 # A git hook, one move at a time
 
-A tutorial on one part of tally, on a branch of its own: a hook that checks the code before each commit. Its tags
-are hooks-00 to hooks-02, and the small commits between them are the moves. This walk starts in watch mode: Show
-checks out each move's commit, and the command at the end of the move shows what it did. Switch to Do to make the
-moves by hand. The slides do not follow the moves here: sync is off for this walk in toc.toml.
+The walk is a tutorial on one part of tally, on a branch of its own. The part is a hook that checks the code before
+each commit. The tags are hooks-00 to hooks-02, and the small commits between them are the moves.
+
+The walk starts in watch mode. Show checks out each move's commit, and the command at the end of the move shows what
+it did. Switch to Do to make the moves by hand. The slides do not follow the moves here, because sync is off for this
+walk in toc.toml.
 
 ## hooks-00 Where the hooks start
 
@@ -17,7 +19,8 @@ $ just --list
 
 $ just setup
 
-We build the hook in three moves: a recipe, a script that runs it, and a recipe that installs it.
+We build the hook in three moves. The first adds a recipe, the second a script that runs it, and the third a recipe
+that installs it.
 
 ### hooks-01.1 A recipe that checks the code
 
@@ -30,7 +33,7 @@ check:
     uv run python -m py_compile src/tally/*.py
 ```
 
-This is the file changed:
+The move changes one file:
 
 - `justfile`: 4 lines added; adds `recipe check`.
 
@@ -51,12 +54,12 @@ and refuses the commit when it fails.
 just check
 ```
 
-This is the file changed:
+The move changes one file:
 
 - `hooks/pre-commit`: a new file of 3 lines.
 
 files:
-- file `hooks/pre-commit`: three lines; git runs it before a commit.
+- file `hooks/pre-commit`: three lines that git runs before a commit.
 - diff `hooks/pre-commit`: the hook only runs the check.
   show: `just check`
 
@@ -65,13 +68,13 @@ Run it by hand on a broken file, and see it refuse. Then remove the file:
 $ printf 'def (\n' > src/tally/broken.py; sh hooks/pre-commit; echo "the hook said $?"
 $ rm src/tally/broken.py
 
-The hook says 1: a commit would be refused.
+The hook says 1, so git would refuse a commit.
 
 ### hooks-01.3 Install it
 
-Hooks are not cloned with a repository: each copy installs its own. Add an `install-hook` recipe that tells git to
-use the `hooks` folder. It changes git's config, so it is a recipe of its own, and not part of `just setup`, which
-only makes the environment and the artifacts. This move is the tagged commit of the step.
+Hooks are not cloned with a repository, so each copy installs its own. Add an `install-hook` recipe that tells git
+to use the `hooks` folder. The recipe changes git's config, so it is a recipe of its own. It is not part of
+`just setup`, which only makes the environment and the artifacts. This move is the tagged commit of the step.
 
 ```just
 # Make git run the hooks in hooks/, before each commit
@@ -79,7 +82,7 @@ install-hook:
     git config core.hooksPath hooks
 ```
 
-This is the file changed:
+The move changes one file:
 
 - `justfile`: 4 lines added; adds `recipe install-hook`.
 
@@ -89,16 +92,16 @@ files:
 
 $ just install-hook && git config core.hooksPath
 
-It prints `hooks`: git now runs the hook before each commit.
+It prints `hooks`, and git now runs the hook before each commit.
 
-> Note: the replay copy is a git worktree, and a worktree shares the repository's config. So this setting reaches
-> the repository you started from too. That is harmless here: where `hooks/` does not exist, git runs nothing.
+> Note: the replay copy is a clone with a config of its own. So the setting stays in the copy, and the repository
+> you started from does not change.
 
 ## hooks-02 Tests in the hook
 
 $ just setup
 
-Two moves: a first test, and a hook that runs the tests too.
+The first move adds a test, and the second makes the hook run the tests too.
 
 ### hooks-02.1 A first test
 
@@ -115,7 +118,7 @@ class Count(unittest.TestCase):
         self.assertEqual(count("a b a"), {"a": 2, "b": 1})
 ```
 
-This is the file changed:
+The move changes one file:
 
 - `tests/test_count.py`: a new file of 9 lines; adds `class Count` and `test_words`.
 
@@ -133,7 +136,7 @@ Add one line to `hooks/pre-commit`, so that a failing test refuses a commit as w
 uv run python -m unittest discover -s tests -q
 ```
 
-This is the file changed:
+The move changes one file:
 
 - `hooks/pre-commit`: 1 line added.
 

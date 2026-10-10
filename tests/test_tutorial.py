@@ -408,7 +408,7 @@ def test_text_before_the_first_move_is_a_section_of_its_own(tutored) -> None:
     to_step(yours, "step-01")
     bridge = yours.locator("#notes .p-bridge")
     assert bridge.locator(".p-bridge-label").text_content() == "Before the moves"
-    assert "Two moves: first a function that counts" in bridge.inner_text()
+    assert "The step has two moves. The first adds a function that counts" in bridge.inner_text()
     assert bridge.locator(".p-commands button").first.inner_text().startswith("just setup")
     assert yours.evaluate("document.querySelector('#notes').firstElementChild.className") == "p-hint"
     assert yours.locator("#notes .p-move").count() == 2

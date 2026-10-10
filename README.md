@@ -10,6 +10,7 @@ just present tutorial   # start on another walk: narrative, tests, parts, tutori
 just check              # check the notes and slides of every walk against the steps
 just pdf hooks          # the PDF of one walk's slides, in build/
 just build              # build repo/ again, and start again from the first step
+just style              # check the prose of the README, CLAUDE.md, notes and slides by the nossaifd writing guide
 just test               # build a fresh copy, then run every test
 ```
 
@@ -19,12 +20,12 @@ repository does not touch.
 
 ## A tour
 
-Run `just present`. Two windows are useful: yours, and the **Room** window that its button opens. Change the
+Run `just present`. Open two windows, yours and the **Room** window that its button opens. Change the
 walk with the menu at the left of the step bar.
 
 | Walk | Kind | Try this |
 |---|---|---|
-| **tally, step by step** (`narrative`) | narrative, every step | Right and Left through the six steps. The notes use every kind of line: `time:` for the clock band, `>` cues, and commands for **At this step**, **Runs**, **Runs 2** and **Main**. step-01 has a picture slide. step-03 shows a whole document, and its command makes an edit: open `src/tally/__init__.py` and choose "Edits since the step". The recipe buttons above the terminal come from the project's justfile |
+| **tally, step by step** (`narrative`) | narrative, every step | Right and Left through the six steps. The notes use every kind of line: `time:` for the clock band, `>` cues, and commands for **At this step**, **Runs**, **Runs 2** and **Main**. step-01 has a picture slide. step-03 shows a whole document, and its command makes an edit: open `src/tally/__init__.py` and choose **Your edits**. The recipe buttons above the terminal come from the project's justfile |
 | **Only the tests** (`tests`) | narrative, some steps | Three of the six steps, with slides borrowed from the default walk's folder |
 | **Tests first, on the parts branch** (`parts`) | narrative, its own tags | Steps `parts-01` and `parts-02`, on another branch. The replay copy moves to that branch |
 | **tally, one move at a time** (`tutorial`) | tutorial | The band under the step bar says what to do. At step-01, make the first move by hand and press Done, or press Shift+Right. Each move is one small commit: the notes gray the moves still to come, `files:` opens what the move changed, and a move with slides of its own shows them. When every move is made, **Next step** ends the notes. At step-02.1, run the tests and see one fail |
@@ -45,9 +46,11 @@ notes column.
 | `tests/` | pytest and Playwright: two windows through every walk, step, move and slide, commands typed into a shell, the checks on broken copies of the class, and the PDF |
 
 **`just setup` starts every step, and it never touches git.** It makes the environment (`uv sync`) and the
-artifacts that the step needs: `data/corpus.txt` from step-03, and `build/top.txt` from step-05. Both are ignored by
-git, so they stay through every move, and `just setup` makes them again when they are missing. Anything that changes
-git, such as installing a hook in the hooks walk, is a recipe of its own, which the notes ask the learner to run.
+artifacts that the step needs. The artifacts are `data/corpus.txt` from step-03, and `build/top.txt` from step-05.
+git ignores both, so they stay through every move. `just setup` makes them again when they are missing.
+
+Anything that changes git, such as installing a hook in the hooks walk, is a recipe of its own. The notes ask the
+learner to run it.
 
 timewalk's site explains each part, in "Several walks" and "Build a class with several walks".
 
