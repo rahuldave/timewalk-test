@@ -33,9 +33,11 @@ def count(text):
     return counts
 ```
 
-What changed:
+This is the file changed:
 
-- `src/tally/__init__.py`: +7 -0; adds `count`. The command does not use it yet.
+- `src/tally/__init__.py`: 7 lines added; adds `count`.
+
+The command does not use it yet.
 
 files:
 - diff `src/tally/__init__.py`: a dictionary from each word to how many times it appears.
@@ -57,9 +59,9 @@ def main() -> None:
         print(n, word)
 ```
 
-What changed:
+This is the file changed:
 
-- `src/tally/__init__.py`: +5 -1; changes `main`.
+- `src/tally/__init__.py`: 5 lines added, 1 removed; changes `main`.
 
 files:
 - diff `src/tally/__init__.py`: `main` reads the text and prints the counts.
@@ -92,10 +94,11 @@ class Count(unittest.TestCase):
         self.assertEqual(count("A a"), {"a": 2})
 ```
 
-What changed:
+This is the file changed:
 
-- `tests/test_count.py`: new file, 11 lines; adds `class Count`, `test_words` and `test_case`. The test that
-  matters is `test_case`.
+- `tests/test_count.py`: a new file of 11 lines; adds `class Count`, `test_words` and `test_case`.
+
+The test that matters is `test_case`.
 
 files:
 - diff `tests/test_count.py`: two tests. The second asks for something the code cannot do yet.
@@ -122,9 +125,9 @@ class Empty(unittest.TestCase):
         self.assertEqual(count(""), {})
 ```
 
-What changed:
+This is the file changed:
 
-- `tests/test_empty.py`: new file, 8 lines; adds `class Empty` and `test_empty`.
+- `tests/test_empty.py`: a new file of 8 lines; adds `class Empty` and `test_empty`.
 
 files:
 - diff `tests/test_empty.py`: an empty text counts nothing.
@@ -139,9 +142,11 @@ The new test passes at once. `test_case` still fails.
 In `count`, in `src/tally/__init__.py`, change `text.split()` to `text.lower().split()`. This move is the tagged
 commit of the step.
 
-What changed:
+This is the file changed:
 
-- `src/tally/__init__.py`: +1 -1; changes `count`. One word, `lower()`, answers the failing test.
+- `src/tally/__init__.py`: 1 line added, 1 removed; changes `count`.
+
+One word, `lower()`, answers the failing test.
 
 files:
 - diff `src/tally/__init__.py`: one word, `lower()`, answers the failing test.
@@ -172,9 +177,9 @@ In `src/tally/__init__.py`, give `count` its types:
 def count(text: str) -> dict[str, int]:
 ```
 
-What changed:
+This is the file changed:
 
-- `src/tally/__init__.py`: +1 -1; changes `count`, in its signature only.
+- `src/tally/__init__.py`: 1 line added, 1 removed; changes `count`, in its signature only.
 
 files:
 - diff `src/tally/__init__.py`: the signature says what goes in and what comes out.
@@ -192,9 +197,9 @@ Under the signature of `count`, add one line:
     "How many times each word appears, ignoring case."
 ```
 
-What changed:
+This is the file changed:
 
-- `src/tally/__init__.py`: +1 -0; changes `count`.
+- `src/tally/__init__.py`: 1 line added; changes `count`.
 
 files:
 - diff `src/tally/__init__.py`: one line under the signature says what the function does.
@@ -229,10 +234,10 @@ class Top(unittest.TestCase):
         self.assertEqual(top({"a": 1, "b": 3, "c": 2}, 2), [("b", 3), ("c", 2)])
 ```
 
-What changed:
+These are the files changed:
 
-- `src/tally/__init__.py`: +5 -0; adds `top`.
-- `tests/test_top.py`: new file, 8 lines; adds `class Top` and `test_most_common_first`.
+- `src/tally/__init__.py`: 5 lines added; adds `top`.
+- `tests/test_top.py`: a new file of 8 lines; adds `class Top` and `test_most_common_first`.
 
 files:
 - diff `src/tally/__init__.py`: sort by count, most common first, then by the word.
@@ -246,9 +251,9 @@ $ uv run python -m unittest discover -s tests -q
 Teach `main` an option: with `--top N`, print only the N most common words, with `top`. Open the move's change to
 see one way to write it.
 
-What changed:
+This is the file changed:
 
-- `src/tally/__init__.py`: +8 -3; changes `main`.
+- `src/tally/__init__.py`: 8 lines added, 3 removed; changes `main`.
 
 files:
 - diff `src/tally/__init__.py`: `main` reads the option before the file name.
@@ -270,9 +275,9 @@ report:
     uv run tally --top 10 data/corpus.txt > build/top.txt
 ```
 
-What changed:
+This is the file changed:
 
-- `justfile`: +6 -0; adds `recipe report`, and a line in `setup`.
+- `justfile`: 6 lines added; adds `recipe report`, and a line in `setup`.
 
 files:
 - diff `justfile`: the report, and the line in `setup` that makes it when it is missing.

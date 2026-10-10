@@ -30,9 +30,9 @@ check:
     uv run python -m py_compile src/tally/*.py
 ```
 
-What changed:
+This is the file changed:
 
-- `justfile`: +4 -0; adds `recipe check`.
+- `justfile`: 4 lines added; adds `recipe check`.
 
 files:
 - diff `justfile`: the recipe compiles every Python file.
@@ -51,9 +51,9 @@ and refuses the commit when it fails.
 just check
 ```
 
-What changed:
+This is the file changed:
 
-- `hooks/pre-commit`: new file, 3 lines.
+- `hooks/pre-commit`: a new file of 3 lines.
 
 files:
 - file `hooks/pre-commit`: three lines; git runs it before a commit.
@@ -79,9 +79,9 @@ install-hook:
     git config core.hooksPath hooks
 ```
 
-What changed:
+This is the file changed:
 
-- `justfile`: +4 -0; adds `recipe install-hook`.
+- `justfile`: 4 lines added; adds `recipe install-hook`.
 
 files:
 - diff `justfile`: one line of git config, in a recipe of its own.
@@ -115,9 +115,9 @@ class Count(unittest.TestCase):
         self.assertEqual(count("a b a"), {"a": 2, "b": 1})
 ```
 
-What changed:
+This is the file changed:
 
-- `tests/test_count.py`: new file, 9 lines; adds `class Count` and `test_words`.
+- `tests/test_count.py`: a new file of 9 lines; adds `class Count` and `test_words`.
 
 files:
 - diff `tests/test_count.py`: one test of counting.
@@ -133,9 +133,9 @@ Add one line to `hooks/pre-commit`, so that a failing test refuses a commit as w
 uv run python -m unittest discover -s tests -q
 ```
 
-What changed:
+This is the file changed:
 
-- `hooks/pre-commit`: +1 -0.
+- `hooks/pre-commit`: 1 line added.
 
 files:
 - diff `hooks/pre-commit`: the tests run after the check.
