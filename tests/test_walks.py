@@ -13,8 +13,8 @@ from test_walk import output_of, shows
 
 @pytest.fixture
 def walked(browser, kit: Path, start):
-    "Your window and the Room on timewalk started with the table of contents, and --discard-edits."
-    context, yours, room = open_windows(browser, start("--toc", str(kit / "toc.toml"), "--discard-edits"))
+    "Your window and the Room on timewalk started with the table of contents."
+    context, yours, room = open_windows(browser, start("--toc", str(kit / "toc.toml")))
     yield yours, room
     context.close()
 
@@ -61,17 +61,18 @@ def test_a_walk_with_its_own_tags_moves_the_replay_copy_to_its_branch(walked, ki
         shows(page, "#step-name", "step-02")
 
 
-def test_a_change_of_walk_with_edits_asks_first(browser, kit: Path, start) -> None:
-    "Without --discard-edits, an edit stops the change of walk until you set it aside; then it is stashed, not lost."
-    context, yours, _ = open_windows(browser, start("--toc", str(kit / "toc.toml")))
+def test_a_change_of_walk_with_edits_keeps_them_on_a_branch(browser, kit: Path, start) -> None:
+    "An edit does not stop the change of walk: it is kept on timewalk/saved/step-00, and your window says so; the Room does not."
+    context, yours, room = open_windows(browser, start("--toc", str(kit / "toc.toml")))
     (kit / "repo-replay" / "README.md").write_text("an edit\n")
     yours.select_option("#walk-picker", "tests")
-    yours.wait_for_selector("#notice button:has-text('Set the edits aside')")
-    assert yours.locator("#walk-picker").input_value() == "narrative", "the picker shows the walk that is still on show"
-    yours.click("#notice button:has-text('Set the edits aside')")
     shows(yours, "#step-name", "step-01")
-    stash = subprocess.run(["git", "-C", str(kit / "repo-replay"), "stash", "list"], capture_output=True, text=True).stdout
-    assert "timewalk: edits made at step-00" in stash
+    yours.wait_for_selector("#notice:not([hidden]):has-text('timewalk/saved/step-00')")
+    assert "git show timewalk/saved/step-00" in yours.locator("#notice").inner_text()
+    assert room.locator("#notice").is_hidden(), "the class does not see the notice"
+    kept = subprocess.run(["git", "-C", str(kit / "repo-replay"), "show", "timewalk/saved/step-00:README.md"], capture_output=True, text=True).stdout
+    assert kept == "an edit\n"
+    assert subprocess.run(["git", "-C", str(kit / "repo-replay"), "stash", "list"], capture_output=True, text=True).stdout == ""
     context.close()
 
 
@@ -188,3 +189,25 @@ def test_next_step_on_the_last_slide_of_a_narrative(walked) -> None:
     yours.click("#slide-step")
     for page in (yours, room):
         shows(page, "#step-name", "step-02")
+
+
+def test_an_svg_slide_is_inverted_in_the_dark_theme(walked) -> None:
+    "step-01's second slide is an SVG with no background: as it is in the light theme, inverted in the dark one."
+    yours, _ = walked
+    yours.keyboard.press("ArrowRight")
+    shows(yours, "#step-name", "step-01")
+    yours.keyboard.press("ArrowDown")
+    yours.wait_for_selector("#slide img.svg")
+    filter_of = "getComputedStyle(document.querySelector('#slide img.svg')).filter"
+    assert yours.evaluate(filter_of) == "none"
+    yours.click("#theme")
+    yours.wait_for_function(f"{filter_of}.includes('invert')")
+
+
+def test_the_notes_title_keeps_one_line(walked) -> None:
+    "A long title is cut with an ellipsis, whole in its tooltip; it never wraps under the Top button."
+    yours, _ = walked
+    yours.wait_for_selector("#notes-title strong")
+    title = yours.locator("#notes-title")
+    assert title.evaluate("(t) => getComputedStyle(t).whiteSpace") == "nowrap"
+    assert title.get_attribute("title").startswith("step-00 ")

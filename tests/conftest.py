@@ -56,8 +56,8 @@ def start(kit: Path):
 
 @pytest.fixture
 def served(kit: Path, start) -> str:
-    "timewalk on the kit, without a table: the notes and slides of the default walk, and --discard-edits."
-    return start("--notes", str(kit / "notes.md"), "--slides", str(kit / "slides" / "slides.toml"), "--discard-edits")
+    "timewalk on the kit, without a table: the notes and slides of the default walk."
+    return start("--notes", str(kit / "notes.md"), "--slides", str(kit / "slides" / "slides.toml"))
 
 
 @pytest.fixture(scope="session")

@@ -10,8 +10,8 @@ from test_walk import shows
 
 @pytest.fixture
 def tutored(browser, kit: Path, start):
-    "Your window and the Room on the tutorial walk, which starts in do mode, with --discard-edits."
-    address = start("--toc", str(kit / "toc.toml"), "--walk", "tutorial", "--discard-edits")
+    "Your window and the Room on the tutorial walk, which starts in do mode."
+    address = start("--toc", str(kit / "toc.toml"), "--walk", "tutorial")
     context, yours, room = open_windows(browser, address)
     yield yours, room, address
     context.close()
@@ -176,7 +176,7 @@ def test_alt_shift_right_in_the_notes_editor_selects_and_does_not_move(tutored, 
 
 def test_the_hooks_walk_starts_in_watch_mode_on_tags_of_its_own(browser, kit: Path, start) -> None:
     "The hooks walk: moves between hooks-00 and hooks-01 on its branch, in watch mode; with sync off, Down pages the slides only."
-    context, yours, room = open_windows(browser, start("--toc", str(kit / "toc.toml"), "--walk", "hooks", "--discard-edits"))
+    context, yours, room = open_windows(browser, start("--toc", str(kit / "toc.toml"), "--walk", "hooks"))
     shows(yours, "#step-name", "hooks-00")
     yours.mouse.click(300, 400)
     yours.keyboard.press("ArrowRight")
@@ -311,7 +311,11 @@ def test_back_to_the_start_puts_the_code_back_in_do_mode(tutored, kit: Path) -> 
     wait_for_done(yours, kit, "step-02.2")
     yours.click("#moves button:has-text('Start')")
     yours.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.1')")
-    assert not (kit / "repo-replay" / "tests" / "test_count.py").exists(), "the applied file is gone, with --discard-edits"
+    assert not (kit / "repo-replay" / "tests" / "test_count.py").exists(), "the applied file is gone from the copy"
+    saved = subprocess.run(["git", "-C", str(kit / "repo-replay"), "for-each-ref", "--format=%(refname:short)", "refs/heads/timewalk/saved"],
+                           capture_output=True, text=True).stdout.split()
+    assert len(saved) == 1 and "def test_case" in subprocess.run(
+        ["git", "-C", str(kit / "repo-replay"), "show", f"{saved[0]}:tests/test_count.py"], capture_output=True, text=True).stdout, "and kept"
     assert yours.locator("#notes .p-hint").inner_text().startswith("Run just setup. Then make step-02.1 by hand")
 
 ABOUT_DO = ("Build tally yourself, one small commit at a time: a function, its tests, types, and a report. A tutorial has one or more "
@@ -458,3 +462,48 @@ def test_step_01_moves_in_do_mode_by_hand_and_when_the_files_match(tutored, kit:
     shows(yours, "#status", "Tutorial, do mode · step-01, step 2 of 6 · 2 of 2 moves made · Every move is made. "
           "Press Next step, at the end of the notes, or the Right arrow, for the next step.")
     yours.wait_for_selector("#notes .p-next-step button:has-text('Next step: step-02')")
+
+
+def saved_branches(kit: Path) -> list[str]:
+    "The branches timewalk/saved/... in the replay copy, where the learner's work is kept."
+    out = subprocess.run(["git", "-C", str(kit / "repo-replay"), "for-each-ref", "--format=%(refname:short)", "refs/heads/timewalk/saved"],
+                         capture_output=True, text=True, check=True).stdout
+    return out.split()
+
+
+def test_catch_me_up_over_a_file_made_by_hand_keeps_it_and_goes_on(tutored, kit: Path) -> None:
+    """Do mode at step-02: the learner writes the move's new file by hand, then Catch me up. The move's file takes its place,
+    and the learner's is kept on timewalk/saved/<place>; your window says where, and the Room does not."""
+    yours, room, _ = tutored
+    to_step_02(yours)
+    yours.wait_for_selector("#notes .p-move.here button:has-text('Catch me up')")
+    (kit / "repo-replay" / "tests").mkdir(exist_ok=True)
+    (kit / "repo-replay" / "tests" / "test_count.py").write_text("# my own try\n")
+    yours.click("#notes .p-move.here button:has-text('Catch me up')")
+    for page in (yours, room):
+        shows(page, "#step-name", "step-02.1")
+    assert head(kit) == "step-02.1: a test of counting"
+    assert "def test_case" in (kit / "repo-replay" / "tests" / "test_count.py").read_text()
+    [branch] = saved_branches(kit)
+    kept = subprocess.run(["git", "-C", str(kit / "repo-replay"), "show", f"{branch}:tests/test_count.py"], capture_output=True, text=True).stdout
+    assert kept == "# my own try\n"
+    yours.wait_for_selector(f"#notice:not([hidden]):has-text('{branch}')")
+    assert room.locator("#notice").is_hidden()
+
+
+def test_restart_step_keeps_the_edits_made_by_hand(tutored, kit: Path) -> None:
+    "Do mode at step-01: an edit by hand, Done, then Restart step. The code is the step's Start, and the edit is on a saved branch."
+    yours, room, _ = tutored
+    to_step(yours, "step-01")
+    init = kit / "repo-replay" / "src" / "tally" / "__init__.py"
+    init.write_text(init.read_text() + "\n# my edit\n")
+    yours.click("#notes .p-move.here button.primary:has-text('Done')")
+    yours.wait_for_selector("#notes .p-move.done .p-restart button")
+    yours.click("#notes .p-move.done .p-restart button")
+    for page in (yours, room):
+        page.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-01.1')")
+    assert "# my edit" not in init.read_text()
+    [branch] = saved_branches(kit)
+    assert "# my edit" in subprocess.run(["git", "-C", str(kit / "repo-replay"), "show", f"{branch}:src/tally/__init__.py"],
+                                         capture_output=True, text=True).stdout
+    yours.wait_for_selector(f"#notice:not([hidden]):has-text('{branch}')")

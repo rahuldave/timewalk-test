@@ -29,7 +29,7 @@ present walk="" *args:
     [ -d repo ] || uv run python history/build.py   # build once; just build starts again from the first step
     {{ timewalk_run }} timewalk-check repo --toc toc.toml
     walk="{{ walk }}"
-    {{ timewalk_run }} timewalk repo --toc toc.toml ${walk:+--walk "$walk"} --discard-edits --clock {{ args }}
+    {{ timewalk_run }} timewalk repo --toc toc.toml ${walk:+--walk "$walk"} --clock {{ args }}
 
 # Check the notes and slides of every walk against the steps
 check: build
