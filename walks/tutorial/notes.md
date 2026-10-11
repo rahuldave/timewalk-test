@@ -250,8 +250,28 @@ $ uv run python -m unittest discover -s tests -q
 
 ### step-05.2 tally --top N
 
-Teach `main` an option, `--top N`, that prints only the N most common words with `top`. Open the move's change to
-see one way to write it.
+Teach `main` an option, `--top N`, that prints only the N most common words with `top`.
+
+::: do
+In `src/tally/__init__.py`, write `main` again:
+
+```python
+def main() -> None:
+    "Count the words of a file, or of the standard input. With --top N, only the N most common."
+    args, n = sys.argv[1:], None
+    if args[:1] == ["--top"]:
+        n, args = int(args[1]), args[2:]
+    text = open(args[0]).read() if args else sys.stdin.read()
+    counts = count(text)
+    for word, times in top(counts, n) if n else sorted(counts.items()):
+        print(times, word)
+```
+:::
+
+::: watch
+`main` now reads the option before the file name. With `--top N`, it prints the counts that `top` gives, and
+without it, every count as before.
+:::
 
 The move changes one file:
 

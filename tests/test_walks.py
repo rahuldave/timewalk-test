@@ -211,3 +211,20 @@ def test_the_notes_title_keeps_one_line(walked) -> None:
     title = yours.locator("#notes-title")
     assert title.evaluate("(t) => getComputedStyle(t).whiteSpace") == "nowrap"
     assert title.get_attribute("title").startswith("step-00 ")
+
+
+def test_timewalk_tutorial_writes_both_modes_and_a_site_that_builds(kit: Path, tmp_path: Path) -> None:
+    "The tutorial walk as TUTORIAL-do.md and TUTORIAL-watch.md, and as a website that smalldocs builds with no broken link."
+    out, site = tmp_path / "md", tmp_path / "site"
+    done = subprocess.run([sys.executable, "-c", "from timewalk.tutorial import main; main()", str(kit / "repo"), "--toc", str(kit / "toc.toml"),
+                           "--walk", "tutorial", "--markdown", str(out), "--site", str(site), "--github", "https://github.com/o/tally"],
+                          capture_output=True, text=True)
+    assert done.returncode == 0, done.stderr
+    do, watch = (out / "TUTORIAL-do.md").read_text(), (out / "TUTORIAL-watch.md").read_text()
+    assert "if args[:1] == [\"--top\"]:" in do and "now reads the option before the file name" not in do
+    assert "now reads the option before the file name" in watch and "write `main` again" not in watch
+    assert "> Say:" not in do + watch, "the presenter's cues stay in the class"
+    shutil.copy(kit / "walks" / "tutorial" / "notes.md", site / "notes.md")   # the notes beside the site never become a page
+    built = subprocess.run(["uvx", "--from", "smalldocs==0.1.3", "smalldocs", "check"], cwd=site, capture_output=True, text=True)
+    assert built.returncode == 0, built.stdout + built.stderr
+    assert "0 thing(s) to look at" in built.stdout + built.stderr

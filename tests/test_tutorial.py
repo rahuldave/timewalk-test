@@ -507,3 +507,24 @@ def test_restart_step_keeps_the_edits_made_by_hand(tutored, kit: Path) -> None:
     assert "# my edit" in subprocess.run(["git", "-C", str(kit / "repo-replay"), "show", f"{branch}:src/tally/__init__.py"],
                                          capture_output=True, text=True).stdout
     yours.wait_for_selector(f"#notice:not([hidden]):has-text('{branch}')")
+
+
+def test_the_blocks_of_a_mode_show_only_in_that_mode_in_both_windows(tutored) -> None:
+    "step-05.2 has a ::: do block with the code to type and a ::: watch block that explains it; the switch Do / Watch swaps them."
+    yours, room, _ = tutored
+    to_step(yours, "step-05")
+    do_words, watch_words = "write `main` again", "now reads the option before the file name"
+    notes = "(w) => document.querySelector('#notes').textContent.includes(w)"
+    for page in (yours, room):
+        notes_of(page, "step-05")
+        page.wait_for_function(notes, arg=do_words.replace("`", ""))
+        assert watch_words not in page.locator("#notes").inner_text()
+        assert "--top" in page.locator("#notes").inner_text(), "the text outside the blocks shows in both modes"
+    yours.click("#move-modes button:has-text('Watch')")
+    for page in (yours, room):
+        page.wait_for_function(notes, arg=watch_words)
+        assert do_words.replace("`", "") not in page.locator("#notes").inner_text()
+        assert "--top" in page.locator("#notes").inner_text()
+        shows(page, "#step-name", "step-05")
+    yours.click("#move-modes button:has-text('Do')")
+    room.wait_for_function(notes, arg=do_words.replace("`", ""))
