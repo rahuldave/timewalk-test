@@ -26,7 +26,7 @@ def steps_of(page) -> list[str]:
 def test_the_picker_changes_the_walk_in_every_window(walked) -> None:
     "Your window lists the walks; a change gives both windows that walk's steps, notes and slides. The Room shows the title."
     yours, room = walked
-    assert yours.evaluate("[...document.querySelectorAll('#walk-picker option')].map((o) => o.value)") == ["narrative", "tests", "parts", "tutorial", "hooks"]
+    assert yours.evaluate("[...document.querySelectorAll('#walk-picker option')].map((o) => o.value)") == ["narrative", "tests", "parts", "story", "tutorial", "hooks", "small"]
     assert room.locator("#walk-picker").is_hidden() and room.locator("#walk-title").inner_text() == "tally, step by step (narrative)"
     yours.select_option("#walk-picker", "tests")
     for page in (yours, room):
@@ -94,7 +94,7 @@ def test_the_checks_pass_this_class(kit: Path) -> None:
     "timewalk-check finds nothing wrong with the walks of this class."
     done = check(kit)
     assert done.returncode == 0, done.stdout
-    assert "5 walks, 0 errors, 0 warnings" in done.stdout
+    assert "7 walks, 0 errors, 0 warnings" in done.stdout
 
 
 BROKEN = [
@@ -148,7 +148,7 @@ def test_the_menu_groups_the_walks_by_kind_and_names_the_kind_on_show(walked) ->
     "Narratives and tutorials each have a group in the menu; a label beside it says the kind of the walk on show."
     yours, room = walked
     groups = yours.evaluate("[...document.querySelectorAll('#walk-picker optgroup')].map((g) => g.label + ': ' + [...g.children].map((o) => o.value).join(' '))")
-    assert groups == ["Narratives: narrative tests parts", "Tutorials: tutorial hooks"]
+    assert groups == ["Narratives: narrative tests parts story", "Tutorials: tutorial hooks small"]
     shows(yours, "#walk-kind", "Narrative")
     yours.select_option("#walk-picker", "hooks")
     shows(yours, "#walk-kind", "Tutorial")
@@ -228,3 +228,21 @@ def test_timewalk_tutorial_writes_both_modes_and_a_site_that_builds(kit: Path, t
     built = subprocess.run(["uvx", "--from", "smalldocs==0.1.3", "smalldocs", "check"], cwd=site, capture_output=True, text=True)
     assert built.returncode == 0, built.stdout + built.stderr
     assert "0 thing(s) to look at" in built.stdout + built.stderr
+
+
+def test_timewalk_tutorial_writes_the_small_walks_and_their_sites_build(kit: Path, tmp_path: Path) -> None:
+    "The small tutorial has a copy for each mode, the small narrative one; each starts with its intro, and smalldocs builds each site."
+    for walk, files in (("small", ["TUTORIAL-do.md", "TUTORIAL-watch.md"]), ("story", ["TUTORIAL.md"])):
+        out, site = tmp_path / walk / "md", tmp_path / walk / "site"
+        done = subprocess.run([sys.executable, "-c", "from timewalk.tutorial import main; main()", str(kit / "repo"), "--toc", str(kit / "toc.toml"),
+                               "--walk", walk, "--markdown", str(out), "--site", str(site), "--github", "https://github.com/o/tally"],
+                              capture_output=True, text=True)
+        assert done.returncode == 0, done.stderr
+        assert sorted(p.name for p in out.iterdir()) == files
+        text = (out / files[0]).read_text()
+        intro = (kit / "walks" / walk / "intro.md").read_text().split("\n")[0]
+        assert intro in text and "The walk is a tutorial through the tagged steps" not in text, "the walk's intro, in place of the notes' opening"
+        built = subprocess.run(["uvx", "--from", "smalldocs==0.1.3", "smalldocs", "check"], cwd=site, capture_output=True, text=True)
+        assert built.returncode == 0 and "0 thing(s) to look at" in built.stdout + built.stderr, built.stdout + built.stderr
+    small = (tmp_path / "small" / "md" / "TUTORIAL-watch.md").read_text()
+    assert "## step-02.2 to step-02.3" in small and "[The code at its Start]" in small and "### step-02.1" not in small

@@ -528,3 +528,52 @@ def test_the_blocks_of_a_mode_show_only_in_that_mode_in_both_windows(tutored) ->
         shows(page, "#step-name", "step-05")
     yours.click("#move-modes button:has-text('Do')")
     room.wait_for_function(notes, arg=do_words.replace("`", ""))
+
+
+
+def test_a_small_walk_starts_each_small_step_at_the_commit_before_its_first_move(browser, kit: Path, start) -> None:
+    "The small walk takes step-02.2 to step-02.3, then step-05.1: each starts before its first move, with just setup, and its moves' notes."
+    context, yours, room = open_windows(browser, start("--toc", str(kit / "toc.toml"), "--walk", "small"))
+    try:
+        for page in (yours, room):
+            shows(page, "#step-name", "step-02.2 to step-02.3")
+            notes_of(page, "step-02.2 to step-02.3")
+        assert head(kit).startswith("step-02.1:"), "the Start of a small step is the commit before its first move"
+        notes = yours.locator("#notes").inner_text()
+        assert "just setup" in notes and "step-02.2" in notes and "step-02.3" in notes
+        assert "step-02.1" not in notes and "one file at a time" not in notes, "not the step's own text, nor a move it does not take"
+        assert yours.locator("#notes-edit").is_hidden(), "a small step's notes are edited in the step they come from"
+        assert yours.evaluate("[...document.querySelectorAll('#step-list button')].map((b) => b.title.split(':')[0])") == ["step-02.2 to step-02.3", "step-05.1"]
+        yours.click("#move-modes button:has-text('Watch')")
+        yours.locator("#notes .p-move", has_text="step-02.2").locator("button:has-text('Show')").click()
+        for page in (yours, room):
+            shows(page, "#step-name", "step-02.2")
+        assert head(kit).startswith("step-02.2:")
+        yours.mouse.click(300, 400)
+        yours.keyboard.press("ArrowRight")
+        for page in (yours, room):
+            shows(page, "#step-name", "step-05.1")
+            notes_of(page, "step-05.1")
+        assert head(kit).startswith("step-04:"), "a small step of a first move starts at the tag before it"
+        assert "def top(" in yours.locator("#notes").inner_text()
+    finally:
+        context.close()
+
+
+def test_a_small_narrative_stops_at_moves_and_at_steps(browser, kit: Path, start) -> None:
+    "The story walk stops at step-01.1, step-02 and step-05.2: a move shows its own section, a step its text before the moves."
+    context, yours, room = open_windows(browser, start("--toc", str(kit / "toc.toml"), "--walk", "story"))
+    try:
+        notes_of(yours, "step-01.1")
+        yours.wait_for_function("() => document.querySelector('#notes').textContent.includes('above main, add count')")
+        assert head(kit).startswith("step-01.1:")
+        yours.mouse.click(300, 400)
+        yours.keyboard.press("ArrowRight")
+        for page in (yours, room):
+            notes_of(page, "step-02")
+            page.wait_for_function("() => document.querySelector('#notes').textContent.includes('one file at a time')")
+        notes = yours.locator("#notes").inner_text()
+        assert "one file at a time" in notes and "Make tests/test_count.py" not in notes, "a narrative's step stops before its moves"
+        assert head(kit).startswith("step-02:")
+    finally:
+        context.close()
