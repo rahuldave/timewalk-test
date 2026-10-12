@@ -213,28 +213,31 @@ def test_the_notes_title_keeps_one_line(walked) -> None:
     assert title.get_attribute("title").startswith("step-00 ")
 
 
-def test_timewalk_tutorial_writes_both_modes_and_a_site_that_builds(kit: Path, tmp_path: Path) -> None:
+def test_timewalk_export_writes_both_modes_and_a_site_that_builds(kit: Path, tmp_path: Path) -> None:
     "The tutorial walk as TUTORIAL-do.md and TUTORIAL-watch.md, and as a website that smalldocs builds with no broken link."
     out, site = tmp_path / "md", tmp_path / "site"
-    done = subprocess.run([sys.executable, "-c", "from timewalk.tutorial import main; main()", str(kit / "repo"), "--toc", str(kit / "toc.toml"),
+    done = subprocess.run([sys.executable, "-c", "from timewalk.export import main; main()", str(kit / "repo"), "--toc", str(kit / "toc.toml"),
                            "--walk", "tutorial", "--markdown", str(out), "--site", str(site), "--github", "https://github.com/o/tally"],
                           capture_output=True, text=True)
     assert done.returncode == 0, done.stderr
     do, watch = (out / "TUTORIAL-do.md").read_text(), (out / "TUTORIAL-watch.md").read_text()
-    assert "if args[:1] == [\"--top\"]:" in do and "now reads the option before the file name" not in do
-    assert "now reads the option before the file name" in watch and "write `main` again" not in watch
+    words = "the three lines under the docstring read the option"   # the watch block of step-05.2
+    assert "if args[:1] == [\"--top\"]:" in do and words not in do
+    assert words in watch and "write `main` again" not in watch
+    assert "Now we teach `main` an option" in do and "Now we teach `main` an option" in watch, "the plan of a move is in both"
+    assert "mkdir -p tests" in do and "mkdir -p tests" not in watch, "a do block's commands, in do mode only"
     assert "> Say:" not in do + watch, "the presenter's cues stay in the class"
     shutil.copy(kit / "walks" / "tutorial" / "notes.md", site / "notes.md")   # the notes beside the site never become a page
-    built = subprocess.run(["uvx", "--from", "smalldocs==0.1.3", "smalldocs", "check"], cwd=site, capture_output=True, text=True)
+    built = subprocess.run(["uvx", "--from", "smalldocs>=0.1.4,<0.2", "smalldocs", "check"], cwd=site, capture_output=True, text=True)
     assert built.returncode == 0, built.stdout + built.stderr
     assert "0 thing(s) to look at" in built.stdout + built.stderr
 
 
-def test_timewalk_tutorial_writes_the_small_walks_and_their_sites_build(kit: Path, tmp_path: Path) -> None:
+def test_timewalk_export_writes_the_small_walks_and_their_sites_build(kit: Path, tmp_path: Path) -> None:
     "The small tutorial has a copy for each mode, the small narrative one; each starts with its intro, and smalldocs builds each site."
     for walk, files in (("small", ["TUTORIAL-do.md", "TUTORIAL-watch.md"]), ("story", ["TUTORIAL.md"])):
         out, site = tmp_path / walk / "md", tmp_path / walk / "site"
-        done = subprocess.run([sys.executable, "-c", "from timewalk.tutorial import main; main()", str(kit / "repo"), "--toc", str(kit / "toc.toml"),
+        done = subprocess.run([sys.executable, "-c", "from timewalk.export import main; main()", str(kit / "repo"), "--toc", str(kit / "toc.toml"),
                                "--walk", walk, "--markdown", str(out), "--site", str(site), "--github", "https://github.com/o/tally"],
                               capture_output=True, text=True)
         assert done.returncode == 0, done.stderr
@@ -242,7 +245,7 @@ def test_timewalk_tutorial_writes_the_small_walks_and_their_sites_build(kit: Pat
         text = (out / files[0]).read_text()
         intro = (kit / "walks" / walk / "intro.md").read_text().split("\n")[0]
         assert intro in text and "The walk is a tutorial through the tagged steps" not in text, "the walk's intro, in place of the notes' opening"
-        built = subprocess.run(["uvx", "--from", "smalldocs==0.1.3", "smalldocs", "check"], cwd=site, capture_output=True, text=True)
+        built = subprocess.run(["uvx", "--from", "smalldocs>=0.1.4,<0.2", "smalldocs", "check"], cwd=site, capture_output=True, text=True)
         assert built.returncode == 0 and "0 thing(s) to look at" in built.stdout + built.stderr, built.stdout + built.stderr
     small = (tmp_path / "small" / "md" / "TUTORIAL-watch.md").read_text()
     assert "## step-02.2 to step-02.3" in small and "[The code at its Start]" in small and "### step-02.1" not in small

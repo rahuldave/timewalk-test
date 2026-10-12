@@ -510,10 +510,10 @@ def test_restart_step_keeps_the_edits_made_by_hand(tutored, kit: Path) -> None:
 
 
 def test_the_blocks_of_a_mode_show_only_in_that_mode_in_both_windows(tutored) -> None:
-    "step-05.2 has a ::: do block with the code to type and a ::: watch block that explains it; the switch Do / Watch swaps them."
+    "step-05.2 has a ::: do block with the code to type and a ::: watch block that says what to look at; the switch Do / Watch swaps them."
     yours, room, _ = tutored
     to_step(yours, "step-05")
-    do_words, watch_words = "write `main` again", "now reads the option before the file name"
+    do_words, watch_words = "write `main` again", "the three lines under the docstring read the option"
     notes = "(w) => document.querySelector('#notes').textContent.includes(w)"
     for page in (yours, room):
         notes_of(page, "step-05")
@@ -529,6 +529,59 @@ def test_the_blocks_of_a_mode_show_only_in_that_mode_in_both_windows(tutored) ->
     yours.click("#move-modes button:has-text('Do')")
     room.wait_for_function(notes, arg=do_words.replace("`", ""))
 
+
+def commands_of(page, move: str) -> list[str]:
+    "The commands of a move's section in the notes, in order, each as its button reads."
+    section = page.locator("#notes .p-move", has=page.locator("h3", has_text=move))
+    return [text.strip() for text in section.locator(".p-commands button").all_inner_texts()]
+
+
+def runs_of(page, move: str) -> list[list[str]]:
+    "Each run of commands in a move's section, in order: the first words of each button, and '(anchor)' last for the anchor run."
+    return page.evaluate("""(move) => {
+        const section = [...document.querySelectorAll('#notes .p-move')].find((s) => s.querySelector('h3')?.textContent.startsWith(move));
+        return [...section.querySelectorAll(':scope > .p-commands')].map((run) =>
+            [...run.querySelectorAll('button')].map((b) => b.innerText.split('\\n')[0].trim().split(' ').slice(0, 2).join(' '))
+                .concat(run.classList.contains('p-anchor') ? ['(anchor)'] : []));
+    }""", move)
+
+
+def has_text(page, words: str) -> None:
+    "Wait until the notes column holds the words."
+    page.wait_for_function("(w) => document.querySelector('#notes').textContent.includes(w)", arg=words)
+
+
+def test_each_mode_shows_its_own_commands_and_the_checks_are_shared(tutored) -> None:
+    """step-02.1 has a do block with two commands together, then a shared check. In do mode the block's commands are a run of
+    their own, and the anchor holds only the check; watch mode shows only the check. step-05.3's commands are all shared."""
+    yours, room, _ = tutored
+    to_step_02(yours)
+    for page in (yours, room):
+        has_text(page, "Make the folder, and run the tests in it")
+        assert runs_of(page, "step-02.1") == [["mkdir -p", "uv run"], ["uv run", "(anchor)"]], "the do block's run, then the shared check alone"
+        anchor = page.locator("#notes .p-move", has=page.locator("h3", has_text="step-02.1")).locator(".p-anchor button").all_inner_texts()
+        assert [a.split("\n")[0].strip() for a in anchor] == ["uv run python -m unittest discover -s tests -q"], "every button of the anchor is the shared check"
+        assert page.locator("#notes .p-move", has=page.locator("h3", has_text="step-02.1")).locator(".p-anchor-label").count() == 1
+    yours.click("#move-modes button:has-text('Watch')")
+    for page in (yours, room):
+        has_text(page, "Read the two tests in the change of tests/test_count.py")
+        assert "mkdir -p tests" not in page.locator("#notes").inner_text()
+        assert runs_of(page, "step-02.1") == [["uv run", "(anchor)"]], "watch: the check only"
+    yours.click("#move-modes button:has-text('Do')")
+    yours.mouse.click(300, 400)
+    for number in (3, 4, 5):   # on from step-02 to step-05
+        yours.keyboard.press("ArrowRight")
+        shows(yours, "#step-name", f"step-{number:02d}")
+    shared = [["rm -f", "just setup", "cat build/top.txt", "(anchor)"]]
+    for page in (yours, room):
+        notes_of(page, "step-05")
+        has_text(page, "At the end of the justfile, add the recipe")
+        assert runs_of(page, "step-05.3") == shared
+    yours.click("#move-modes button:has-text('Watch')")
+    for page in (yours, room):
+        has_text(page, "Read the recipe and the new line of setup in the change of the justfile")
+        assert "At the end of the justfile, add the recipe" not in page.locator("#notes").inner_text()
+        assert runs_of(page, "step-05.3") == shared, "the same commands in both modes"
 
 
 def test_a_small_walk_starts_each_small_step_at_the_commit_before_its_first_move(browser, kit: Path, start) -> None:
@@ -555,7 +608,8 @@ def test_a_small_walk_starts_each_small_step_at_the_commit_before_its_first_move
             shows(page, "#step-name", "step-05.1")
             notes_of(page, "step-05.1")
         assert head(kit).startswith("step-04:"), "a small step of a first move starts at the tag before it"
-        assert "def top(" in yours.locator("#notes").inner_text()
+        notes = yours.locator("#notes").inner_text()
+        assert "Now we add top" in notes and "def top(" not in notes, "watch mode: the plan of the move, and not the code to type"
     finally:
         context.close()
 
@@ -565,7 +619,10 @@ def test_a_small_narrative_stops_at_moves_and_at_steps(browser, kit: Path, start
     context, yours, room = open_windows(browser, start("--toc", str(kit / "toc.toml"), "--walk", "story"))
     try:
         notes_of(yours, "step-01.1")
-        yours.wait_for_function("() => document.querySelector('#notes').textContent.includes('above main, add count')")
+        yours.wait_for_function("() => document.querySelector('#notes').textContent.includes('Read count in the change of src/tally/__init__.py')")
+        notes = yours.locator("#notes").inner_text()
+        assert "It goes in src/tally/__init__.py, above main" in notes, "the shared text of the move"
+        assert "above main, add count" not in notes and "def count(text):" not in notes, "a narrative shows the watch blocks, and not the do blocks"
         assert head(kit).startswith("step-01.1:")
         yours.mouse.click(300, 400)
         yours.keyboard.press("ArrowRight")
