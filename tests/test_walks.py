@@ -141,7 +141,7 @@ def test_a_class_without_a_table_is_as_before(kit: Path) -> None:
     (kit / "toc.toml").unlink()
     out = kit / "build" / "slides.pdf"
     subprocess.run([sys.executable, "-m", "timewalk.slides_pdf", str(kit / "slides" / "slides.toml"), "-o", str(out)], check=True, capture_output=True)
-    assert len(PdfReader(out).pages) == 8
+    assert len(PdfReader(out).pages) == 9
 
 
 def test_the_menu_groups_the_walks_by_kind_and_names_the_kind_on_show(walked) -> None:
@@ -162,13 +162,13 @@ def test_the_status_band_of_a_narrative(walked) -> None:
         page.wait_for_selector("#about:not([hidden])")
         assert page.locator("#about").inner_text().startswith("How tally, a word counter, was built: one tagged step at a time")
         assert "A narrative goes from tag to tag" in page.locator("#about").inner_text()
-        shows(page, "#status", "Narrative · step-00, step 1 of 6 · Press Next step, at the end of the notes, or the Right arrow, for the next step.")
+        shows(page, "#status", "Narrative · step-00, step 1 of 7 · Press Next step, at the end of the notes, or the Right arrow, for the next step.")
     yours.mouse.click(300, 400)
     for step in ("step-01", "step-02"):
         yours.keyboard.press("ArrowRight")
         shows(yours, "#step-name", step)
     for page in (yours, room):
-        shows(page, "#status", "Narrative · step-02, step 3 of 6 · Press Next step, at the end of the notes, or the Right arrow, for the next step.")
+        shows(page, "#status", "Narrative · step-02, step 3 of 7 · Press Next step, at the end of the notes, or the Right arrow, for the next step.")
         assert page.locator("#about").is_hidden()
         shows(page, "#tag", "Tests — Two tests, one failing, and the fix.")
         assert page.locator("#tag strong").inner_text() == "Tests"
@@ -227,8 +227,10 @@ def test_timewalk_export_writes_both_modes_and_a_site_that_builds(kit: Path, tmp
     assert "Now we teach `main` an option" in do and "Now we teach `main` an option" in watch, "the plan of a move is in both"
     assert "mkdir -p tests" in do and "mkdir -p tests" not in watch, "a do block's commands, in do mode only"
     assert "> Say:" not in do + watch, "the presenter's cues stay in the class"
+    assert "The move ran: `uv add --dev ruff`" in watch and "\nuv add --dev ruff\n" in do, "step-03.1's do$ line follows the mode of the copy"
+    assert '  - look at: ``"How many times each word of `text` appears, ignoring case."``' in watch, "a quote with a backtick, in two"
     shutil.copy(kit / "walks" / "tutorial" / "notes.md", site / "notes.md")   # the notes beside the site never become a page
-    built = subprocess.run(["uvx", "--from", "smalldocs>=0.1.4,<0.2", "smalldocs", "check"], cwd=site, capture_output=True, text=True)
+    built = subprocess.run(["uvx", "--from", "smalldocs>=0.1.5,<0.2", "smalldocs", "check"], cwd=site, capture_output=True, text=True)
     assert built.returncode == 0, built.stdout + built.stderr
     assert "0 thing(s) to look at" in built.stdout + built.stderr
 
@@ -245,7 +247,9 @@ def test_timewalk_export_writes_the_small_walks_and_their_sites_build(kit: Path,
         text = (out / files[0]).read_text()
         intro = (kit / "walks" / walk / "intro.md").read_text().split("\n")[0]
         assert intro in text and "The walk is a tutorial through the tagged steps" not in text, "the walk's intro, in place of the notes' opening"
-        built = subprocess.run(["uvx", "--from", "smalldocs>=0.1.4,<0.2", "smalldocs", "check"], cwd=site, capture_output=True, text=True)
+        built = subprocess.run(["uvx", "--from", "smalldocs>=0.1.5,<0.2", "smalldocs", "check"], cwd=site, capture_output=True, text=True)
         assert built.returncode == 0 and "0 thing(s) to look at" in built.stdout + built.stderr, built.stdout + built.stderr
     small = (tmp_path / "small" / "md" / "TUTORIAL-watch.md").read_text()
-    assert "## step-02.2 to step-02.3" in small and "[The code at its Start]" in small and "### step-02.1" not in small
+    assert "## step-02.2 to step-02.3 An empty text, and case" in small, "the title of the range, from select"
+    assert "[The code at its Start]" in small and "### step-02.1" not in small
+    assert "The walk leaves out these moves" in small and "> Say:" not in small, "the intro, without its cue"

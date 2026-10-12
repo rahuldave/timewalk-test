@@ -13,7 +13,7 @@ time: 0:00
 
 $ just setup
 
-> Say: we build a word counter in six steps. Ask the class what it should do before we write any of it.
+> Say: we build a word counter in seven steps. Ask the class what it should do before we write any of it.
 
 The project is a uv project, as `uv init --package` makes one. Open `pyproject.toml`. Its `[project.scripts]`
 table makes a command called `tally`. Its `[build-system]` table lets uv install the project into its own
@@ -78,10 +78,17 @@ time: 0:15
 
 $ just setup
 
-ruff gets a line length in `pyproject.toml`. And `just setup` now makes an artifact, `data/corpus.txt`, a text of
-2000 words, from `scripts/corpus.py`. An artifact is a file that a step needs and git
-does not hold. `.gitignore` lists `data/`, so the corpus is untracked, and it stays through every move.
+ruff arrives as a tool for development. `uv add --dev ruff` wrote it into the group `dev` of `pyproject.toml`, and
+into `uv.lock`, and `just setup` installs it. Then ruff gets a line length in `pyproject.toml`. And `just setup` now
+makes an artifact, `data/corpus.txt`, a text of 2000 words, from `scripts/corpus.py`. An artifact is a file that a
+step needs and git does not hold. `.gitignore` lists `data/`, so the corpus is untracked, and it stays through every
+move.
 
+files:
+- diff `pyproject.toml`: the group `dev`, with ruff, and the line length.
+  show: `line-length = 100`
+
+$ uv run ruff format --check
 $ head -3 data/corpus.txt
 $ uv run tally data/corpus.txt | sort -rn | head -5
 $ just setup
@@ -131,3 +138,19 @@ runs2$ for i in 1 2 3; do echo "sweep $i"; sleep 2; done
 > Say: delete the report, run just setup, and it comes back.
 
 $ rm build/top.txt; just setup; ls build
+
+## step-06 How to run it
+time: 0:30
+
+$ just setup
+
+The README now says how to run tally, its tests and its report. Only `README.md` changes, so the code is as it was
+at step-05.
+
+files:
+- diff `README.md`: a section, "Run it", with the commands that a new user needs first.
+  show: `## Run it`
+
+$ uv run tally --top 3 data/corpus.txt
+
+> Ask: what else would a new user ask before they run it?

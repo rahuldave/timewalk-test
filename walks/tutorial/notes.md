@@ -218,10 +218,107 @@ All three tests pass, and "The the" is `2 the`.
 
 $ just setup
 
-The step is one commit. ruff gets a line length, and `just setup` makes `data/corpus.txt`, an artifact that git does
-not hold.
+The step has three moves. The first adds ruff, a formatter and linter, with `uv add`. The second gives ruff a line
+length. The third makes `just setup` write `data/corpus.txt`, an artifact that git does not hold.
 
+### step-03.1 ruff, a tool for development
+
+Now we add ruff, the formatter and linter, to the group `dev` of the project. One command does it all. `uv add`
+writes ruff into `pyproject.toml` and `uv.lock`, and installs it in `.venv`. The group `dev` is for the people who
+work on tally. A user who installs tally does not get ruff.
+
+do$ uv add --dev ruff
+
+::: watch
+Read the new group `dev` in the change of `pyproject.toml`, and then find ruff in the change of `uv.lock`.
+:::
+
+The move changes these files:
+
+- `pyproject.toml`: 5 lines added; adds the group `dev`.
+- `uv.lock`: 35 lines added; adds ruff, and the files of each of its versions for each system.
+
+files:
+- diff `pyproject.toml`: ruff, in a group of its own. The version is the newest on the day of the move.
+  show: `"ruff>=0.17.0",`
+- diff `uv.lock`: the exact version of ruff, which every learner gets with `just setup`.
+  show: `name = "ruff"`
+
+On a later day, `uv add` gets a newer ruff, so your files can name another version than the commit. timewalk
+compares these two files by the names of their packages, and not their versions. So your files still match.
+
+$ uv run ruff format --check
+
+ruff reads every Python file of the project, and says that each one is already formatted.
+
+### step-03.2 A line length for ruff
+
+Now we give ruff a line length of 100, in a table `[tool.ruff]` of `pyproject.toml`. Every editor and every run of
+ruff then agree on how long a line can be.
+
+::: do
+At the end of `pyproject.toml`, add the table:
+
+```toml
+[tool.ruff]
+line-length = 100
+```
+:::
+
+::: watch
+Read the table at the end of the change of `pyproject.toml`.
+:::
+
+The move changes one file:
+
+- `pyproject.toml`: 3 lines added; adds the table `[tool.ruff]`.
+
+files:
+- diff `pyproject.toml`: one setting, for the linter and the formatter both.
+  show: `line-length = 100`
+
+$ uv run ruff check --show-settings src | grep line_length
+$ uv run ruff format --check
+
+The first command prints `linter.line_length = 100`, so ruff reads the setting. The code still fits, and every file
+is already formatted.
+
+### step-03.3 A corpus, which just setup makes
+
+Now `just setup` makes an artifact, `data/corpus.txt`, a text of 2000 words to count. A new script,
+`scripts/corpus.py`, writes it. git ignores the folder `data/`, so the corpus stays through every move. This move is
+the tagged commit of the step.
+
+::: do
+Make `scripts/corpus.py`: open its change with its item below, and press **Apply this file**. Then add `data/` to
+`.gitignore`, and add a line to the recipe `setup` of the `justfile`, after `uv sync`:
+
+```just
+    uv run python scripts/corpus.py data/corpus.txt
+```
+:::
+
+::: watch
+Read the new line of `setup` in the change of the `justfile`, and then open `scripts/corpus.py`.
+:::
+
+The move changes these files:
+
+- `scripts/corpus.py`: a new file of 25 lines; adds `main`.
+- `.gitignore`: 3 lines added; ignores `data/`.
+- `justfile`: 1 line added; changes `setup`.
+
+files:
+- diff `justfile`: `just setup` now makes the corpus too.
+  show: `uv run python scripts/corpus.py data/corpus.txt`
+- diff `scripts/corpus.py`: the script writes the same 2000 words each time, and leaves a corpus that is there alone.
+- diff `.gitignore`: git does not hold the corpus.
+  show: `data/`
+
+$ just setup
 $ uv run tally data/corpus.txt | sort -rn | head -3
+
+`just setup` writes the corpus once. tally prints the three most common words of it.
 
 ## step-04 Types, then a docstring
 
@@ -265,7 +362,7 @@ in `count.__doc__`.
 Under the signature of `count`, add one line:
 
 ```python
-    "How many times each word appears, ignoring case."
+    "How many times each word of `text` appears, ignoring case."
 ```
 :::
 
@@ -279,7 +376,7 @@ The move changes one file:
 
 files:
 - diff `src/tally/__init__.py`: one line under the signature says what the function does.
-  show: `"How many times each word appears, ignoring case."`
+  show: ``"How many times each word of `text` appears, ignoring case."``
 
 $ uv run python -c "import tally; print(tally.count.__doc__)"
 
@@ -422,3 +519,23 @@ $ just setup
 $ cat build/top.txt
 
 The file has ten lines, the most common word first.
+
+## step-06 How to run it
+
+$ just setup
+
+The step is one commit, with no moves. The step bar stands on its tag, so the code is already there in both modes.
+The README gets a section, "Run it", that says how to run tally, its tests and its report.
+
+The step changes one file:
+
+- `README.md`: 10 lines added; adds the section "Run it".
+
+files:
+- diff `README.md`: the commands that a new user needs first, in the order to run them.
+  show: `## Run it`
+
+$ uv run tally --top 3 data/corpus.txt
+$ just test
+
+The command prints the three most common words of the corpus, and the tests pass. step-06 is the last step.

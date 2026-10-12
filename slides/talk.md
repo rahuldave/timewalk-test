@@ -1,6 +1,6 @@
 ## tally
 
-A word counter, built in six steps.
+A word counter, built in seven steps.
 
 ---
 
@@ -37,3 +37,9 @@ The signature says what goes in and what comes out.
 ## The most common words
 
 Sorted by count, then by the word.
+
+---
+
+## How to run it
+
+The README says how, in two commands.

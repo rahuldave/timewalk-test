@@ -3,7 +3,7 @@
 
 set positional-arguments
 
-# The timewalk of pyproject.toml (the walks branch on GitHub), brought up to date; or TIMEWALK_LOCAL, a working copy
+# The timewalk of pyproject.toml (main on GitHub), brought up to date; or TIMEWALK_LOCAL, a working copy
 timewalk_run := if env("TIMEWALK_LOCAL", "") == "" { "uv lock -q --upgrade-package timewalk && uv run --refresh-package timewalk" } else { "uv run --with-editable " + env("TIMEWALK_LOCAL") }
 
 default:
@@ -45,7 +45,7 @@ style *args:
     check="{{ style_check }}"
     [ -f "$check" ] || check=../timewalk/docs/style/check.py
     shopt -s nullglob
-    python3 "$check" "$@" README.md CLAUDE.md notes.md slides/*.md walks/*/notes.md walks/*/slides/*.md
+    python3 "$check" "$@" README.md CLAUDE.md notes.md slides/*.md walks/*/notes.md walks/*/intro.md walks/*/slides/*.md
 
 # Make the PDF of one walk's slides: just pdf tutorial
 pdf walk="narrative": build

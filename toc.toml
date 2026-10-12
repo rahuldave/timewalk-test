@@ -31,6 +31,9 @@ title = "tally, one move at a time"
 description = "Build tally yourself, one small commit at a time: a function, its tests, types, and a report."
 kind = "tutorial"                 # the tagged steps, and the small commits between them
 folder = "walks/tutorial"         # starts in do mode, the default: the learner makes each move by hand
+# step-03.1 is made with uv add --dev ruff. A learner who runs it on a later day gets a newer ruff than the commit, so
+# do mode compares these two files by the names of their packages, and not by their versions.
+loose = ["pyproject.toml", "uv.lock"]
 
 [[walk]]
 id = "hooks"
@@ -50,7 +53,8 @@ kind = "tutorial"
 notes = "walks/tutorial/notes.md"   # the notes of the whole tutorial
 slides = "walks/tutorial/slides/slides.toml"
 intro = "walks/small/intro.md"    # what its copies say before the first step
-select = ["step-02.2..step-02.3", "step-05.1"]   # a range of moves, and one move: each a small step
+# a range of moves with a title, and one move: each a small step
+select = [{ range = "step-02.2..step-02.3", title = "An empty text, and case" }, "step-05.1"]
 
 [[walk]]
 id = "story"

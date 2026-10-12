@@ -69,14 +69,29 @@ def browser():
         chrome.close()
 
 
+def hears_events(page) -> list:
+    "Keep each frame that the page's events socket receives, from the first: the server says hello once the window is on its list."
+    frames = []
+    page.on("websocket", lambda ws: ws.on("framereceived", lambda frame: frames.append(frame)) if "/ws/events" in ws.url else None)
+    return frames
+
+
 def open_windows(browser, address: str):
-    "Your window and the Room window on the page, each ready."
+    """Your window and the Room window on the page, each ready: drawn, and on the server's list of windows. The page opens
+    its events socket after it first draws, and a move before the server lists the window does not reach it."""
     context = browser.new_context(viewport={"width": 1400, "height": 900})
     yours, room = context.new_page(), context.new_page()
+    heard = [hears_events(yours), hears_events(room)]
     yours.goto(address)
     room.goto(address + "&room=1")
-    for page in (yours, room):
+    for page, frames in zip((yours, room), heard):
         page.wait_for_selector("#tabs button")
+        for _ in range(300):
+            if any('"hello"' in str(frame) for frame in frames):
+                break
+            page.wait_for_timeout(50)
+        else:
+            raise AssertionError("the events socket of the window said no hello")
     return context, yours, room
 
 

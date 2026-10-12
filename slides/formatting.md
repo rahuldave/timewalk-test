@@ -7,7 +7,7 @@ that is exactly three dashes is a rule here, not a new slide.
 
 ## What changed
 
-`pyproject.toml` gets a line length for ruff:
+`uv add --dev ruff` puts ruff in the group `dev` of `pyproject.toml`. Then ruff gets a line length:
 
 ```toml
 [tool.ruff]

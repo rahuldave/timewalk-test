@@ -45,14 +45,18 @@ $ just check && echo "the code compiles"
 
 ### hooks-01.2 A hook script
 
-Make `hooks/pre-commit`, and make it executable with `chmod +x hooks/pre-commit`. git runs it before each commit,
-and refuses the commit when it fails.
+Now we add the hook, `hooks/pre-commit`. git runs it before each commit, and refuses the commit when it fails.
+The file has three lines:
 
 ```sh
 #!/bin/sh
 # Run before each commit: refuse it if the code does not compile.
 just check
 ```
+
+git runs a hook only if the hook is executable. This command makes it so:
+
+do$ chmod +x hooks/pre-commit
 
 The move changes one file:
 

@@ -4,9 +4,11 @@
 
 The project is `tally`, a small word counter. Its history has what every kind of walk needs:
 
-- tagged steps on main, step-00 to step-05, each an annotated tag whose message is the step's note;
-- small commits before step-01, step-02, step-04 and step-05, for a tutorial; step-00 and step-03 have none. Their subjects
-  start with `step-02.1:` and so on. The last commit of a step has the plain `step-NN:` subject and the tag;
+- tagged steps on main, step-00 to step-06, each an annotated tag whose message is the step's note;
+- small commits before step-01, step-02, step-03, step-04 and step-05, for a tutorial. Their subjects start with
+  `step-02.1:` and so on. The last commit of a step has the plain `step-NN:` subject and the tag. step-03.1 is what
+  `uv add --dev ruff` made: its pyproject.toml, and its uv.lock, which is kept in step-03.1-uv.lock;
+- two steps of one commit, with no moves: step-00, the first step, and step-06, a step after it that stands on its tag;
 - a branch `parts` from step-00 with its own tags, `parts-01` and `parts-02`, for a walk on one part;
 - a branch `hooks` from step-01 with its own tags, `hooks-00` to `hooks-02`, and small commits between them, for a
   tutorial on one part: a git hook that checks the code before each commit.
@@ -108,6 +110,11 @@ class Empty(unittest.TestCase):
     def test_empty(self):
         self.assertEqual(count(""), {})
 '''
+# step-03.1: what `uv add --dev ruff` wrote, run with uv 0.12.13 on the project at step-02. uv put ruff in the group dev of
+# pyproject.toml, and ruff and its wheels in uv.lock. The lock is kept beside this file, so every build gives the same hashes.
+DEV_RUFF = PYPROJECT + '\n[dependency-groups]\ndev = [\n    "ruff>=0.17.0",\n]\n'
+UV_LOCK_RUFF = (HERE / "step-03.1-uv.lock").read_text()
+assert '\nname = "ruff"\nversion = "0.17.0"\n' in UV_LOCK_RUFF
 RUFF = "\n[tool.ruff]\nline-length = 100\n"
 # step-03 stages an artifact: data/corpus.txt, a text to count, made by a script and ignored by git. just setup makes it
 # when it is missing, so a fresh clone, or a jump to a later step, has it too.
@@ -129,7 +136,8 @@ def main() -> None:
         seed = (seed * 1103515245 + 12345) % 2**31
         words.append(WORDS[seed % len(WORDS)])
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text("\\n".join(" ".join(words[i:i + 12]) for i in range(0, len(words), 12)) + "\\n")
+    lines = (" ".join(words[i : i + 12]) for i in range(0, len(words), 12))
+    target.write_text("\\n".join(lines) + "\\n")
     print(f"wrote {target}: {len(words)} words")
 
 
@@ -139,7 +147,8 @@ if __name__ == "__main__":
 GITIGNORE_DATA = GITIGNORE + "\n# Artifacts that just setup makes: they are not in git\ndata/\n"
 JUSTFILE_DATA = JUSTFILE.replace("setup:\n    uv sync\n", "setup:\n    uv sync\n    uv run python scripts/corpus.py data/corpus.txt\n")
 TYPED = COUNT_2.replace("def count(text):", "def count(text: str) -> dict[str, int]:")
-DOCS = TYPED.replace("def count(text: str) -> dict[str, int]:\n", 'def count(text: str) -> dict[str, int]:\n    "How many times each word appears, ignoring case."\n')
+# step-04.2: a docstring with a word in backticks, which the notes quote with a show: line in two backticks
+DOCS = TYPED.replace("def count(text: str) -> dict[str, int]:\n", 'def count(text: str) -> dict[str, int]:\n    "How many times each word of `text` appears, ignoring case."\n')
 TOP = DOCS.replace("\n\ndef main", '''
 
 def top(counts: dict[str, int], n: int) -> list[tuple[str, int]]:
@@ -176,6 +185,19 @@ JUSTFILE_REPORT = JUSTFILE_DATA.replace("    uv run python scripts/corpus.py dat
                                         "    uv run python scripts/corpus.py data/corpus.txt\n    test -f build/top.txt || just report\n") + \
     "\n# Write the ten most common words of the corpus to build/top.txt\nreport:\n    mkdir -p build\n    uv run tally --top 10 data/corpus.txt > build/top.txt\n"
 
+# step-06: one commit, with no moves. The README says how to run tally, its tests and its report.
+README_RUN = README + """
+## Run it
+
+Make the environment, the corpus and the report first. Then count the words of a file:
+
+    just setup
+    uv run tally data/corpus.txt
+
+`uv run tally --top 10 data/corpus.txt` prints only the ten most common words. `just test` runs the tests, and
+`just report` writes the ten most common words of the corpus to `build/top.txt`.
+"""
+
 # (subject, files written, the tag and its note or None)
 MAIN = [
     ("step-00: the project, with a command that has nothing to count",
@@ -189,9 +211,10 @@ MAIN = [
     ("step-02.2: a test of an empty text", {"tests/test_empty.py": TEST_EMPTY}, None),
     ("step-02: case does not matter, and the tests pass", {"src/tally/__init__.py": COUNT_2},
      ("step-02", "Tests\n\nTwo tests, one failing, and the fix.")),
-    ("step-03: a line length for ruff, and a corpus to count", {"pyproject.toml": PYPROJECT + RUFF, "scripts/corpus.py": CORPUS,
-                                                             ".gitignore": GITIGNORE_DATA, "justfile": JUSTFILE_DATA},
-     ("step-03", "Formatting, and a corpus\n\nruff gets a line length, and just setup makes data/corpus.txt.")),
+    ("step-03.1: ruff, a tool for development, added with uv add --dev ruff", {"pyproject.toml": DEV_RUFF, "uv.lock": UV_LOCK_RUFF}, None),
+    ("step-03.2: a line length for ruff", {"pyproject.toml": DEV_RUFF + RUFF}, None),
+    ("step-03: a corpus to count, which just setup makes", {"scripts/corpus.py": CORPUS, ".gitignore": GITIGNORE_DATA, "justfile": JUSTFILE_DATA},
+     ("step-03", "Formatting, and a corpus\n\nuv adds ruff as a tool for development, ruff gets a line length, and just setup makes data/corpus.txt.")),
     ("step-04.1: types", {"src/tally/__init__.py": TYPED}, None),
     ("step-04: a docstring", {"src/tally/__init__.py": DOCS},
      ("step-04", "Types and docs\n\nThe function says what it takes, returns and does.")),
@@ -199,6 +222,8 @@ MAIN = [
     ("step-05.2: tally --top N", {"src/tally/__init__.py": TOP_CLI}, None),
     ("step-05: a report of the corpus, which just setup makes", {"justfile": JUSTFILE_REPORT},
      ("step-05", "The most common words\n\nA function, an option, and a report that just setup makes.")),
+    ("step-06: the README says how to run tally", {"README.md": README_RUN},
+     ("step-06", "How to run it\n\nThe README says how to run tally, its tests and its report.")),
 ]
 # Commits on the branch `parts`, from step-00: only the tests, for a walk on one part.
 PARTS = [

@@ -12,8 +12,8 @@ dev = ["pytest>=8", "pytest-timeout>=2.3"]
 package = false
 
 [tool.uv.sources]
-# The branch under test. Students use main, so the work in progress lives on its own branch.
-timewalk = { git = "https://github.com/rahuldave/timewalk", branch = "walks" }
+# The branch under test: main, which students use. For work in progress, point this at its branch.
+timewalk = { git = "https://github.com/rahuldave/timewalk", branch = "main" }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
