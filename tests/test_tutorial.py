@@ -736,6 +736,67 @@ def test_a_small_walk_says_what_it_leaves_out_at_its_first_stop_and_names_its_ti
         context.close()
 
 
+def test_a_walk_with_its_own_notes_has_its_words_around_the_moves_it_includes(browser, kit: Path, start) -> None:
+    """The testing walk has notes of its own: an intro, and at each stop its own words before, between and after the move
+    sections that it includes from the tutorial. Each stop starts before its first move, as a small step does."""
+    context, yours, room = open_windows(browser, start("--toc", str(kit / "toc.toml"), "--walk", "testing"))
+    try:
+        for page in (yours, room):
+            shows(page, "#step-name", "step-02.1 to step-02.3")
+            notes_of(page, "step-02.1 to step-02.3")
+            shows(page, "#notes-title", "step-02.1 to step-02.3 Three tests of counting")
+            assert "This walk takes only the tests of tally" in page.locator("#notes .p-intro").inner_text()
+        assert head(kit).startswith("step-01:"), "the stop starts before step-02.1, at the tag before it"
+        assert yours.locator("#notes .p-intro blockquote").is_visible() and room.locator("#notes .p-intro blockquote").is_hidden()
+        notes = yours.evaluate("[...document.querySelectorAll('#notes > :not(.p-intro)')].map((e) => e.innerText).join('\\n')")
+        order = ["just setup", "tally counts words already", "A test of counting", "The first test is the pattern", "A test of an empty text",
+                 "Case does not matter", "Three tests now say what"]
+        assert [notes.index(text) for text in order] == sorted(notes.index(text) for text in order), notes
+        assert "one file at a time" not in notes, "the step's own text in the tutorial is not included"
+        assert yours.locator("#notes-edit").is_hidden(), "its notes are made from two files, and edited in an editor"
+        yours.click("#move-modes button:has-text('Watch')")
+        has_text(yours, "The first test is the pattern")
+        yours.mouse.click(300, 400)
+        yours.keyboard.press("ArrowRight")
+        for page in (yours, room):
+            shows(page, "#step-name", "step-05.1")
+            notes_of(page, "step-05.1")
+            has_text(page, "Since the last stop, the walk leaves out step-03 and step-04")
+            has_text(page, "The walk stops here")
+        assert head(kit).startswith("step-04:"), "a stop of a first move starts at the tag before it"
+    finally:
+        context.close()
+
+
+def test_a_walk_with_its_own_notes_includes_a_whole_step_and_one_move(browser, kit: Path, start) -> None:
+    """The finish walk includes all of step-04, which stands at the tag before it with the step's own text, then step-05.3
+    alone, after a gap. Its own blocks keep to their modes."""
+    context, yours, room = open_windows(browser, start("--toc", str(kit / "toc.toml"), "--walk", "finish"))
+    try:
+        for page in (yours, room):
+            shows(page, "#step-name", "step-04")
+            notes_of(page, "step-04")
+            shows(page, "#notes-title", "step-04 Types and a docstring")
+        assert head(kit).startswith("step-03:"), "a whole step with moves starts at the tag before it"
+        notes = yours.evaluate("[...document.querySelectorAll('#notes > :not(.p-intro)')].map((e) => e.innerText).join('\\n')")
+        order = ["This stop is all of step-04", "just setup\nat this step", "Types", "A docstring", "now says what it takes"]
+        assert [notes.index(text) for text in order] == sorted(notes.index(text) for text in order), notes
+        yours.mouse.click(300, 400)
+        yours.keyboard.press("ArrowRight")
+        for page in (yours, room):
+            shows(page, "#step-name", "step-05.3")
+            notes_of(page, "step-05.3")
+            has_text(page, "Since the last stop, the walk leaves out step-05.1 and step-05.2")
+        assert head(kit).startswith("step-05.2:"), "a stop of one move starts at the commit before it"
+        has_text(yours, "Open build/top.txt")
+        assert "the same list that" not in yours.locator("#notes").inner_text(), "do mode: not the watch block"
+        yours.click("#move-modes button:has-text('Watch')")
+        has_text(yours, "the same list that --top 10 prints")
+        assert "Open build/top.txt" not in yours.locator("#notes").inner_text()
+    finally:
+        context.close()
+
+
 def test_a_step_without_moves_after_the_first_stands_on_its_tag(tutored, kit: Path) -> None:
     """step-06 is one commit: once the three moves of step-05 are made, Next step goes to it in both windows. It stands on its
     tag in do mode, has no moves row and no move sections, and, as the last step, no Next step."""

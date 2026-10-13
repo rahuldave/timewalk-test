@@ -26,7 +26,7 @@ def steps_of(page) -> list[str]:
 def test_the_picker_changes_the_walk_in_every_window(walked) -> None:
     "Your window lists the walks; a change gives both windows that walk's steps, notes and slides. The Room shows the title."
     yours, room = walked
-    assert yours.evaluate("[...document.querySelectorAll('#walk-picker option')].map((o) => o.value)") == ["narrative", "tests", "parts", "story", "tutorial", "hooks", "small"]
+    assert yours.evaluate("[...document.querySelectorAll('#walk-picker option')].map((o) => o.value)") == ["narrative", "tests", "parts", "story", "tutorial", "hooks", "small", "testing", "finish"]
     assert room.locator("#walk-picker").is_hidden() and room.locator("#walk-title").inner_text() == "tally, step by step (narrative)"
     yours.select_option("#walk-picker", "tests")
     for page in (yours, room):
@@ -94,7 +94,7 @@ def test_the_checks_pass_this_class(kit: Path) -> None:
     "timewalk-check finds nothing wrong with the walks of this class."
     done = check(kit)
     assert done.returncode == 0, done.stdout
-    assert "7 walks, 0 errors, 0 warnings" in done.stdout
+    assert "9 walks, 0 errors, 0 warnings" in done.stdout
 
 
 BROKEN = [
@@ -148,7 +148,7 @@ def test_the_menu_groups_the_walks_by_kind_and_names_the_kind_on_show(walked) ->
     "Narratives and tutorials each have a group in the menu; a label beside it says the kind of the walk on show."
     yours, room = walked
     groups = yours.evaluate("[...document.querySelectorAll('#walk-picker optgroup')].map((g) => g.label + ': ' + [...g.children].map((o) => o.value).join(' '))")
-    assert groups == ["Narratives: narrative tests parts story", "Tutorials: tutorial hooks small"]
+    assert groups == ["Narratives: narrative tests parts story", "Tutorials: tutorial hooks small testing finish"]
     shows(yours, "#walk-kind", "Narrative")
     yours.select_option("#walk-picker", "hooks")
     shows(yours, "#walk-kind", "Tutorial")
@@ -253,3 +253,29 @@ def test_timewalk_export_writes_the_small_walks_and_their_sites_build(kit: Path,
     assert "## step-02.2 to step-02.3 An empty text, and case" in small, "the title of the range, from select"
     assert "[The code at its Start]" in small and "### step-02.1" not in small
     assert "The walk leaves out these moves" in small and "> Say:" not in small, "the intro, without its cue"
+
+
+def test_timewalk_export_writes_the_walks_with_their_own_notes(kit: Path, tmp_path: Path) -> None:
+    "The testing walk's copies have its intro, and at each stop its own words around the move sections it includes; its site builds."
+    out, site = tmp_path / "md", tmp_path / "site"
+    done = subprocess.run([sys.executable, "-c", "from timewalk.export import main; main()", str(kit / "repo"), "--toc", str(kit / "toc.toml"),
+                           "--walk", "testing", "--markdown", str(out), "--site", str(site), "--github", "https://github.com/o/tally"],
+                          capture_output=True, text=True)
+    assert done.returncode == 0, done.stderr
+    for name in ("TUTORIAL-do.md", "TUTORIAL-watch.md"):
+        text = (out / name).read_text()
+        assert text.index("This walk takes only the tests of tally") < text.index("## step-02.1 to step-02.3 Three tests of counting")
+        assert "> Say:" not in text and "{{include" not in text
+        order = ["tally counts words already", "### step-02.1", "The first test is the pattern", "### step-02.2", "### step-02.3",
+                 "Three tests now say what", "## step-05.1 A test of the most common words", "Since the last stop", "### step-05.1", "The walk stops here"]
+        assert [text.index(t) for t in order] == sorted(text.index(t) for t in order)
+        assert "### step-05.2" not in text and "one file at a time" not in text
+    built = subprocess.run(["uvx", "--from", "smalldocs>=0.1.5,<0.2", "smalldocs", "check"], cwd=site, capture_output=True, text=True)
+    assert built.returncode == 0 and "0 thing(s) to look at" in built.stdout + built.stderr, built.stdout + built.stderr
+    out = tmp_path / "finish"
+    done = subprocess.run([sys.executable, "-c", "from timewalk.export import main; main()", str(kit / "repo"), "--toc", str(kit / "toc.toml"),
+                           "--walk", "finish", "--markdown", str(out), "--github", "https://github.com/o/tally"], capture_output=True, text=True)
+    assert done.returncode == 0, done.stderr
+    do, watch = ((out / name).read_text() for name in ("TUTORIAL-do.md", "TUTORIAL-watch.md"))
+    assert "## step-04 Types and a docstring\n\n[The code at its Start]" in do and "### step-04.1" in do and "### step-04.2" in do
+    assert "Open `build/top.txt`" in do and "Open `build/top.txt`" not in watch and "the same list that" in watch

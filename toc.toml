@@ -57,6 +57,24 @@ intro = "walks/small/intro.md"    # what its copies say before the first step
 select = [{ range = "step-02.2..step-02.3", title = "An empty text, and case" }, "step-05.1"]
 
 [[walk]]
+id = "testing"
+title = "The tests of tally, with notes of its own"
+description = "A small tutorial with its own words at each stop: what it leaves out, and what the moves did."
+kind = "tutorial"
+notes = "walks/testing/notes.md"    # its own notes: an intro, and a ## stop for each place, with its includes
+shared = "walks/tutorial/notes.md"  # the notes that its {{include ...}} lines take move sections from
+slides = "walks/tutorial/slides/slides.toml"
+
+[[walk]]
+id = "finish"
+title = "Types, then the report, with notes of its own"
+description = "A small tutorial with its own words: a whole step, then one move after a gap, and a word at the end."
+kind = "tutorial"
+notes = "walks/finish/notes.md"     # an include of a whole step, and an include of one move
+shared = "walks/tutorial/notes.md"
+slides = "walks/tutorial/slides/slides.toml"
+
+[[walk]]
 id = "story"
 title = "How tally counts, in three stops"
 description = "A small narrative taken out of the tutorial: a move, a step, and a move."
