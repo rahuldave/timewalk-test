@@ -43,7 +43,7 @@ walk with the menu at the left of the step bar.
 | **Two parts of tally, one move at a time** (`small`) | tutorial, some moves | A small tutorial taken out of the big one. Its first part is a range of moves with a title. "About this walk" names the moves that it leaves out between its parts |
 | **The tests of tally, with notes of its own** (`testing`) | tutorial, some moves, notes of its own | A small tutorial with its own notes, `walks/testing/notes.md`. Its `{{include ...}}` lines take the move sections from the tutorial's notes. Each stop runs `$ just setup`, and has its own words between and after the moves: what the walk leaves out, and what the moves did |
 | **Types, then the report, with notes of its own** (`finish`) | tutorial, a step and a move, notes of its own | A stop with a whole step, `{{include step-04}}`, which brings the step's `$ just setup` with it, then a stop of one move after a gap, `{{include step-05.3}}`. Its own text has a block for each mode |
-| **A git hook, one move at a time** (`hooks`) | tutorial, its own tags, sync off | A tutorial on one part, on the branch `hooks`. At move hooks-01.2, the hook refuses a broken file. Up and Down page through the slides without making moves |
+| **A git hook, one move at a time** (`hooks`) | tutorial, its own tags, sync off | A tutorial on one part, on the branch `hooks`. At move hooks-01.3, the hook refuses a broken file. Up and Down page through the slides without making moves |
 
 ### An example of each feature
 
@@ -52,7 +52,7 @@ walk with the menu at the left of the step bar.
 | A block for one mode, `::: do` and `::: watch` | Every move of the tutorial. step-05.2 has one block for each mode, then one important command that both modes run |
 | Several minor commands in one `do` block, then a shared check | step-02.1: `mkdir -p tests` and a first test run, then the tests |
 | Shared commands, the same in both modes | step-05.3 |
-| A `do$` line, a command that makes the move | step-03.1, `do$ uv add --dev ruff`, and hooks-01.2, `do$ chmod +x hooks/pre-commit` |
+| A `do$` line, a command that makes the move | step-03.1, `do$ uv add --dev ruff`, and hooks-01.3, `do$ chmod +x hooks/pre-commit`, a move with no subject |
 | `loose`, files that match by the names of their packages | The tutorial in `toc.toml`, for the `pyproject.toml` and `uv.lock` of step-03.1 |
 | A `show:` line in two backticks, for a line with a backtick in it | step-04.2, which quotes the docstring of `count` |
 | `select`, with a range of moves and a title | The walk `small` in `toc.toml` |
@@ -62,7 +62,8 @@ walk with the menu at the left of the step bar.
 | Blocks for one mode in a walk's own text | The second stop of `finish` |
 | A step of one commit, without moves, after the first step | step-06. It stands on its tag, and step-05 ends with **Next step: step-06** |
 | A document in place of slides | step-03 of the default walk, `slides/formatting.md` |
-| A file to take whole, with **Apply this file** in the shared text | step-03.3, for `scripts/corpus.py` |
+| A `patch$` line for each file that a move changes by hand, in the shared text: **Apply patch** in do mode, a pointer to the diff in watch mode | Every move of the tutorials, for example step-03.3, with three |
+| A move of one command on a file of a patch, with no subject | hooks-01.3, `do$ chmod +x hooks/pre-commit` after hooks-01.2 brings the file in |
 | The checks of a move, under "Check it" | The last shared commands of every move, for example `$ uv run python -m unittest discover -s tests -q` |
 | The text of a step before its first move, under the step's title | The text of each step of the tutorial, after `$ just setup` |
 | `files:` last, with an item and words for every file | Every move of every tutorial, `uv.lock` too at step-03.1 |
@@ -97,9 +98,10 @@ Real classes copy these notes, so they keep the rules of timewalk's "What a narr
   `### step-02.1 Title` keeps its name for timewalk, and only its title is for the reader. A cue, `> Say:` or
   `> Note:`, is for the presenter alone, and can say anything.
 - **A step opens with what we build, and why.** A move opens with the problem, and the change that solves it.
-- **Then the change, piece by piece.** A `do` block gives the exact lines, and where they go. A `do$` line gives each
-  command that makes the change. A `watch` block says what the change does, and where to see it.
-- **A file to take whole is said in the shared text,** with **Apply this file**, so that both ways of reading link it.
+- **Then the change, piece by piece.** Each file of a move comes from a `do$` line, the command that writes it, or a
+  `patch$` line, the diff of the move's commit. The notes copy no code. A `do` block says where the patch goes, and a
+  `watch` block says what the change does, and where to see it.
+- **A move does one thing,** a patch or a command. A command on a file that a patch brings in gets a move of its own.
 - **Then the check,** with what it prints. The page shows it under "Check it".
 - **Last, `files:`,** with an item and words for every file of the change. No list of the files in the text.
 

@@ -4,7 +4,11 @@ We build tally, a small word counter, one change at a time. It begins as a comma
 end, it counts the words of a file, has tests and types, and writes a report of the most common words. Every
 command runs through uv, in the project's own environment.
 
-Each change first says what problem it solves. Then it gives the change, piece by piece. Last, a command checks the
+We make tally in moves. A move is one small change, made by one patch or by one command. A patch changes a file, and
+a command such as `uv add` writes the files it needs. You make each move, and the page checks your files against it.
+When they match, the move is made, and the next one starts.
+
+Each move first says what problem it solves. Then it gives the change, piece by piece. Last, a command checks the
 result, and a list names each file that changed, with what to look for in it.
 
 ## step-00 Where it starts
@@ -41,18 +45,10 @@ reads a text, and prints what the function counts.
 A word counter needs a way to count. A function, `count`, takes a text and gives a dictionary from each word to how
 many times it appears. It goes in `src/tally/__init__.py`, above `main`. The command does not use it yet.
 
+patch$ src/tally/__init__.py
+
 ::: do
-In `src/tally/__init__.py`, put these lines above the line `def main() -> None:`
-
-```python
-def count(text):
-    counts = {}
-    for word in text.split():
-        counts[word] = counts.get(word, 0) + 1
-    return counts
-```
-
-Keep two blank lines between `count` and `main`.
+The patch puts `count` above the line `def main() -> None:`, with two blank lines between them.
 :::
 
 ::: watch
@@ -75,21 +71,10 @@ files:
 counts. It reads the file that the command names, or the standard input when the command names no file. The module
 `sys` gives both the arguments of the command and the standard input.
 
+patch$ src/tally/__init__.py
+
 ::: do
-In `src/tally/__init__.py`, add this line under the docstring of the module, with a blank line before it:
-
-```python
-import sys
-```
-
-Then write `main` again, in place of the old one:
-
-```python
-def main() -> None:
-    text = open(sys.argv[1]).read() if len(sys.argv) > 1 else sys.stdin.read()
-    for word, n in sorted(count(text).items()):
-        print(n, word)
-```
+The patch adds `import sys` under the docstring of the module, and writes `main` again, in place of the old one.
 :::
 
 ::: watch
@@ -131,22 +116,10 @@ $ uv run python -m unittest discover -s tests -q
 The first file of tests, `tests/test_count.py`, has two tests. `test_words` counts `a b a`. `test_case` counts
 `A a`, and expects the one word `a`, twice. The code cannot do this yet.
 
+patch$ tests/test_count.py
+
 ::: do
-Make the file `tests/test_count.py`, with these lines:
-
-```python
-import unittest
-
-from tally import count
-
-
-class Count(unittest.TestCase):
-    def test_words(self):
-        self.assertEqual(count("a b a"), {"a": 2, "b": 1})
-
-    def test_case(self):
-        self.assertEqual(count("A a"), {"a": 2})
-```
+The patch makes the file `tests/test_count.py`, with the class `Count` and its two tests.
 :::
 
 ::: watch
@@ -169,19 +142,10 @@ files:
 An empty file is a text with no words. `count` must give an empty dictionary for it, and not fail. A test in a
 file of its own, `tests/test_empty.py`, says so, and keeps it true after later changes.
 
+patch$ tests/test_empty.py
+
 ::: do
-Make the file `tests/test_empty.py`, with these lines:
-
-```python
-import unittest
-
-from tally import count
-
-
-class Empty(unittest.TestCase):
-    def test_empty(self):
-        self.assertEqual(count(""), {})
-```
+The patch makes the file `tests/test_empty.py`, with the class `Empty` and its test.
 :::
 
 ::: watch
@@ -202,12 +166,10 @@ files:
 `test_case` fails, because `count` counts `A` and `a` as two words. When `count` puts the text in lower case before
 it splits it, every word is counted in lower case. One word in the loop of `count`, `lower()`, does it.
 
-::: do
-In `count`, in `src/tally/__init__.py`, put this line in place of the line `for word in text.split():`
+patch$ src/tally/__init__.py
 
-```python
-    for word in text.lower().split():
-```
+::: do
+In `count`, the patch puts `text.lower().split()` in place of `text.split()`.
 :::
 
 ::: watch
@@ -268,13 +230,10 @@ files:
 ruff and each editor have their own idea of how long a line can be. A setting in `pyproject.toml` makes them agree.
 It is a table `[tool.ruff]`, with a line length of 100.
 
-::: do
-At the end of `pyproject.toml`, after the group `dev`, add these lines, with a blank line before them:
+patch$ pyproject.toml
 
-```toml
-[tool.ruff]
-line-length = 100
-```
+::: do
+The patch adds the table `[tool.ruff]` at the end of `pyproject.toml`, after the group `dev`.
 :::
 
 ::: watch
@@ -296,29 +255,26 @@ files:
 
 A count of `a b a` shows little. tally needs a long text to count, the same for every learner. A script,
 `scripts/corpus.py`, writes `data/corpus.txt`, 2000 words from a short list, in the same order each time. The
-script is too long to type, so take the whole file `scripts/corpus.py` with **Apply this file**.
+script comes whole, as a patch.
+
+patch$ scripts/corpus.py
 
 The corpus is an artifact, a file that the project makes and git does not hold. So `.gitignore` names the folder
 `data/`. git leaves an ignored file alone, so the corpus stays when the code changes.
 
-::: do
-At the end of `.gitignore`, add these lines, with a blank line before them:
+patch$ .gitignore
 
-```gitignore
-# Artifacts that just setup makes: they are not in git
-data/
-```
+::: do
+The patch adds the folder `data/` at the end of `.gitignore`, under a comment.
 :::
 
 `just setup` makes the environment, and now it runs the script too. So every learner has the corpus. The script
 leaves a corpus that is there alone, so a second `just setup` writes nothing.
 
-::: do
-In the recipe `setup` of the `justfile`, add this line after the line `uv sync`:
+patch$ justfile
 
-```just
-    uv run python scripts/corpus.py data/corpus.txt
-```
+::: do
+In the recipe `setup`, the patch adds the line that runs the script, after the line `uv sync`.
 :::
 
 ::: watch
@@ -354,12 +310,10 @@ what `count` does, so the tests pass as before.
 The signature `def count(text):` does not say what `text` is, or what `count` gives back. Types say it. `count`
 takes a `str`, and gives a `dict[str, int]`, a dictionary from words to counts. The body stays the same.
 
-::: do
-In `src/tally/__init__.py`, put this line in place of the line `def count(text):`
+patch$ src/tally/__init__.py
 
-```python
-def count(text: str) -> dict[str, int]:
-```
+::: do
+The patch writes the signature of `count` again, with its types.
 :::
 
 ::: watch
@@ -380,12 +334,10 @@ files:
 The types say what `count` takes and gives, but not what it does with the text. A docstring says it. It is a string on
 the first line of a function. Python keeps it in `count.__doc__`, and `help(count)` prints it.
 
-::: do
-In `src/tally/__init__.py`, add this line under the signature of `count`, before the line `counts = {}`:
+patch$ src/tally/__init__.py
 
-```python
-    "How many times each word of `text` appears, ignoring case."
-```
+::: do
+The patch adds the docstring under the signature of `count`, before the line `counts = {}`.
 :::
 
 ::: watch
@@ -414,31 +366,18 @@ report of the ten most common words of the corpus.
 first, and keep the first few. A function, `top`, does it. It sorts by count, highest first, and then by the
 word, so that two words with the same count keep one order. Then it keeps the first `n`.
 
-::: do
-In `src/tally/__init__.py`, add `top` after `count` and before `main`, with two blank lines around it:
+patch$ src/tally/__init__.py
 
-```python
-def top(counts: dict[str, int], n: int) -> list[tuple[str, int]]:
-    "The n most common words, most common first."
-    return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]
-```
+::: do
+The patch puts `top` after `count` and before `main`, with two blank lines around it.
 :::
 
 A test says what `top` must give. It gives `top` three words with their counts, and asks for the two most common.
 
+patch$ tests/test_top.py
+
 ::: do
-Make the file `tests/test_top.py`, with these lines:
-
-```python
-import unittest
-
-from tally import top
-
-
-class Top(unittest.TestCase):
-    def test_most_common_first(self):
-        self.assertEqual(top({"a": 1, "b": 3, "c": 2}, 2), [("b", 3), ("c", 2)])
-```
+The patch makes the file `tests/test_top.py`, with its one test.
 :::
 
 ::: watch
@@ -462,20 +401,10 @@ tally prints every word of a text, and the corpus fills the screen. An option, `
 `N` most common words, with `top`. Without the option, `main` prints every count, as before. `main` reads the
 option before the name of the file, so the command is `tally --top 3 data/corpus.txt`.
 
-::: do
-In `src/tally/__init__.py`, write `main` again, in place of the old one:
+patch$ src/tally/__init__.py
 
-```python
-def main() -> None:
-    "Count the words of a file, or of the standard input. With --top N, only the N most common."
-    args, n = sys.argv[1:], None
-    if args[:1] == ["--top"]:
-        n, args = int(args[1]), args[2:]
-    text = open(args[0]).read() if args else sys.stdin.read()
-    counts = count(text)
-    for word, times in top(counts, n) if n else sorted(counts.items()):
-        print(times, word)
-```
+::: do
+The patch writes `main` again, in place of the old one.
 :::
 
 ::: watch
@@ -502,15 +431,10 @@ prints each line before it runs it. The second line has two parts.
 - **`uv run tally --top 10 data/corpus.txt`** counts the corpus, and keeps the ten most common words.
 - **`> build/top.txt`** sends what tally prints to the file, in place of the terminal.
 
-::: do
-At the end of the `justfile`, add the recipe, with a blank line before it:
+patch$ justfile
 
-```just
-# Write the ten most common words of the corpus to build/top.txt
-report:
-    mkdir -p build
-    uv run tally --top 10 data/corpus.txt > build/top.txt
-```
+::: do
+The patch adds the recipe `report` at the end of the `justfile`.
 :::
 
 The report is an artifact, as the corpus is. git ignores the folder `build/`, so git holds the recipe, and not the
@@ -518,11 +442,7 @@ report. `just setup` makes the report when the file is missing. `test -f build/t
 there, and `||` runs `just report` only when it is not.
 
 ::: do
-Then, in the recipe `setup`, add this line after the line that makes the corpus:
-
-```just
-    test -f build/top.txt || just report
-```
+The same patch adds a line to the recipe `setup`, after the line that makes the corpus.
 :::
 
 ::: watch
@@ -552,19 +472,7 @@ A new user of tally does not know which commands to run, or in which order. The 
 that says how to run tally, its tests and its report. The code does not change.
 
 ::: do
-In `README.md`, add these lines after the line `Count the words in a text.`, with a blank line before them:
-
-```markdown
-## Run it
-
-Make the environment, the corpus and the report first. Then count the words of a file:
-
-    just setup
-    uv run tally data/corpus.txt
-
-`uv run tally --top 10 data/corpus.txt` prints only the ten most common words. `just test` runs the tests, and
-`just report` writes the ten most common words of the corpus to `build/top.txt`.
-```
+The change adds the section "Run it" to `README.md`, after the line `Count the words in a text.`
 :::
 
 ::: watch

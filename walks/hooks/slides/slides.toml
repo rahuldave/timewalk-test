@@ -3,5 +3,5 @@
 [slides]
 hooks-00 = ["../../../slides/talk.md#2"]
 hooks-01 = ["hooks.md#1-2"]
-"hooks-01.3" = ["hooks.md#3"]
+"hooks-01.4" = ["hooks.md#3"]
 hooks-02 = ["hooks.md#4"]

@@ -188,7 +188,7 @@ def test_the_hooks_walk_starts_in_watch_mode_on_tags_of_its_own(browser, kit: Pa
     for page in (yours, room):
         shows(page, "#step-name", "hooks-01.1")
     assert head(kit) == "hooks-01.1: a recipe that checks the code"
-    yours.wait_for_function("[...document.querySelectorAll('#notes .p-move.here .p-item-path')].map((b) => b.textContent).join() === 'justfile'")
+    yours.wait_for_function("[...document.querySelectorAll('#notes .p-move.here .p-item .p-item-path')].map((b) => b.textContent).join() === 'justfile'")
     shows(yours, "#slide-count", "Slide 1 of 3")
     yours.keyboard.press("ArrowDown")
     yours.keyboard.press("ArrowDown")
@@ -248,34 +248,46 @@ def test_an_item_says_see_diff_and_its_excerpt_opens_the_change_too(tutored) -> 
     shows(yours, "#file-path", "tests/test_count.py")
 
 
-def test_apply_the_whole_move_then_the_files_match_and_the_move_is_done(tutored, kit: Path) -> None:
-    "Apply types git cherry-pick into the shell; the files then match step-02.1, and move 1 is marked done by itself."
+def apply_patch(page) -> None:
+    "Click the button of the patch$ line of the move being worked on, once it fits the learner's file."
+    page.bring_to_front()   # a hidden window does not ask whether the files match, and the Room never marks Done
+    page.wait_for_function("(() => { const b = document.querySelector('#notes .p-move.here .p-patch-act'); return b && !b.disabled; })()")
+    page.locator("#notes .p-move.here .p-patch-act").click()
+
+
+def test_apply_patch_then_the_files_match_and_the_move_is_done(tutored, kit: Path) -> None:
+    """step-02.1's patch$ line: Apply patch types git apply into the shell; the files then match step-02.1, and move 1 is
+    marked done by itself. Nothing is staged, and the Room window has no button that acts."""
     yours, room, _ = tutored
     to_step_02(yours)
-    yours.wait_for_selector("#notes .p-move.here .p-item")
-    open_item(yours, "tests/test_count.py")
-    yours.wait_for_selector("#apply-bar:not([hidden])")
-    yours.bring_to_front()   # a hidden window does not ask whether the files match, and the Room never marks Done
-    yours.click("#apply-move")
+    room.wait_for_selector("#notes .p-move.here .p-patch")
+    assert room.locator("#notes .p-patch-act").count() == 0, "the Room watches"
+    assert yours.locator("#notes .p-move.here .p-patch-act").inner_text() == "⇣ Apply patch tests/test_count.py"
+    apply_patch(yours)
     wait_for_done(yours, kit, "step-02.2")
     room.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.2')")
     assert (kit / "repo-replay" / "tests" / "test_count.py").is_file()
-    assert head(kit).startswith("step-01:"), "Apply makes edits; the code is still at the step's start"
+    assert head(kit).startswith("step-01:"), "a patch makes edits; the code is still at the step's start"
+    staged = subprocess.run(["git", "-C", str(kit / "repo-replay"), "diff", "--cached", "--name-only"], capture_output=True, text=True).stdout
+    assert staged == "", "git apply stages nothing"
 
 
-def test_apply_is_disabled_on_a_file_the_learner_changed(tutored, kit: Path) -> None:
-    "The learner made tests/test_count.py their own way: Apply is disabled, and says what to do instead."
+def test_a_changed_file_offers_replace_and_keeps_the_learners_version(tutored, kit: Path) -> None:
+    """The learner made tests/test_count.py their own way: the patch$ button says Replace with the move's file. It keeps the
+    learner's version on a saved branch, then takes the move's file, so the move is made."""
     yours, _, _ = tutored
     to_step_02(yours)
     (kit / "repo-replay" / "tests").mkdir(exist_ok=True)
     (kit / "repo-replay" / "tests" / "test_count.py").write_text("# my own try\n")
-    subprocess.run(["git", "-C", str(kit / "repo-replay"), "add", "-N", "tests/test_count.py"], check=True)
-    yours.wait_for_selector("#notes .p-move.here .p-item")
-    yours.wait_for_function("document.querySelector('#tree')?.innerText.includes('test_count.py')")
-    open_item(yours, "tests/test_count.py")
-    yours.wait_for_selector("#apply-bar:not([hidden])")
-    yours.wait_for_function("document.getElementById('apply-move').disabled")
-    assert "Catch me up" in yours.locator("#apply-note").inner_text()
+    yours.wait_for_function("document.querySelector('#notes .p-move.here .p-patch-act')?.textContent.startsWith('⇄ Replace with the move')")
+    apply_patch(yours)
+    wait_for_done(yours, kit, "step-02.2")
+    assert "def test_case" in (kit / "repo-replay" / "tests" / "test_count.py").read_text()
+    [branch] = saved_branches(kit)
+    assert branch.startswith("timewalk/saved/step-02.1-yours")
+    assert subprocess.run(["git", "-C", str(kit / "repo-replay"), "show", f"{branch}:tests/test_count.py"],
+                          capture_output=True, text=True).stdout == "# my own try\n"
+    yours.wait_for_selector(f"#notice:not([hidden]):has-text('{branch}')")
 
 
 def test_a_file_item_of_a_move_not_made_shows_the_answer(tutored) -> None:
@@ -300,14 +312,10 @@ def test_your_file_offers_your_own_editor(tutored) -> None:
 
 
 def test_back_to_the_start_puts_the_code_back_in_do_mode(tutored, kit: Path) -> None:
-    "After Apply and Done, Start puts the code back at the step's start, and no move is done: then just setup."
+    "After Apply patch and Done, Start puts the code back at the step's start, and no move is done: then just setup."
     yours, _, _ = tutored
     to_step_02(yours)
-    yours.wait_for_selector("#notes .p-move.here .p-item")
-    open_item(yours, "tests/test_count.py")
-    yours.wait_for_selector("#apply-bar:not([hidden])")
-    yours.bring_to_front()   # a hidden window does not ask whether the files match, and the Room never marks Done
-    yours.click("#apply-move")
+    apply_patch(yours)
     wait_for_done(yours, kit, "step-02.2")
     yours.click("#moves button:has-text('Start')")
     yours.wait_for_function("document.querySelector('#notes .p-move.here h3')?.textContent.startsWith('step-02.1')")
@@ -510,10 +518,10 @@ def test_restart_step_keeps_the_edits_made_by_hand(tutored, kit: Path) -> None:
 
 
 def test_the_blocks_of_a_mode_show_only_in_that_mode_in_both_windows(tutored) -> None:
-    "step-05.2 has a ::: do block with the code to type and a ::: watch block that says what to look at; the switch Do / Watch swaps them."
+    "step-05.2 has a ::: do block that says where the patch goes and a ::: watch block that says what to look at; the switch Do / Watch swaps them."
     yours, room, _ = tutored
     to_step(yours, "step-05")
-    do_words, watch_words = "write `main` again", "the three lines under the docstring read the option"
+    do_words, watch_words = "The patch writes `main` again", "the three lines under the docstring read the option"
     notes = "(w) => document.querySelector('#notes').textContent.includes(w)"
     for page in (yours, room):
         notes_of(page, "step-05")
@@ -565,6 +573,7 @@ def test_each_mode_shows_its_own_commands_and_the_checks_are_shared(tutored) -> 
     yours.click("#move-modes button:has-text('Watch')")
     for page in (yours, room):
         has_text(page, "In the change of tests/test_count.py, look at test_case")
+        assert "The patch makes the file tests/test_count.py" not in page.locator("#notes").inner_text()
         assert "mkdir -p tests" not in page.locator("#notes").inner_text()
         assert runs_of(page, "step-02.1") == [["uv run", "(anchor)"]], "watch: the check only"
     yours.click("#move-modes button:has-text('Do')")
@@ -575,12 +584,12 @@ def test_each_mode_shows_its_own_commands_and_the_checks_are_shared(tutored) -> 
     shared = [["rm -f", "just setup", "cat build/top.txt", "(anchor)"]]
     for page in (yours, room):
         notes_of(page, "step-05")
-        has_text(page, "At the end of the justfile, add the recipe")
+        has_text(page, "The patch adds the recipe report at the end of the justfile")
         assert runs_of(page, "step-05.3") == shared
     yours.click("#move-modes button:has-text('Watch')")
     for page in (yours, room):
         has_text(page, "the new recipe report makes the folder build")
-        assert "At the end of the justfile, add the recipe" not in page.locator("#notes").inner_text()
+        assert "The patch adds the recipe report" not in page.locator("#notes").inner_text()
         assert runs_of(page, "step-05.3") == shared, "the same commands in both modes"
 
 
@@ -637,7 +646,7 @@ def test_a_small_narrative_stops_at_moves_and_at_steps(browser, kit: Path, start
 
 
 def test_a_do_line_runs_in_do_mode_and_shows_what_the_move_ran_in_watch_mode(browser, kit: Path, start) -> None:
-    "hooks-01.2's do$ chmod line: in watch mode, 'The move ran:' with nothing to click; in do mode, a run of its own, never the anchor."
+    "hooks-01.3's do$ chmod line: in watch mode, 'The move ran:' with nothing to click; in do mode, a run of its own, never the anchor."
     context, yours, room = open_windows(browser, start("--toc", str(kit / "toc.toml"), "--walk", "hooks"))
     try:
         yours.mouse.click(300, 400)
@@ -645,11 +654,11 @@ def test_a_do_line_runs_in_do_mode_and_shows_what_the_move_ran_in_watch_mode(bro
         for page in (yours, room):
             notes_of(page, "hooks-01")
             has_text(page, "The move ran: chmod +x hooks/pre-commit")
-            assert not any("chmod" in run for runs in runs_of(page, "hooks-01.2") for run in runs), "watch mode has nothing to run"
+            assert not any("chmod" in run for runs in runs_of(page, "hooks-01.3") for run in runs), "watch mode has nothing to run"
         yours.locator("#move-modes button", has_text="Do").click()
         for page in (yours, room):
             page.wait_for_function("() => !document.querySelector('#notes').textContent.includes('The move ran:')")
-            runs = runs_of(page, "hooks-01.2")
+            runs = runs_of(page, "hooks-01.3")
             assert ["chmod +x"] in runs, runs
             assert runs[-1][-1] == "(anchor)" and "chmod +x" not in runs[-1], "the anchor is the shared check after it"
     finally:

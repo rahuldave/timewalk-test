@@ -6,7 +6,7 @@ The project is `tally`, a small word counter. Its history has what every kind of
 
 - tagged steps on main, step-00 to step-06, each an annotated tag whose message is the step's note;
 - small commits before step-01, step-02, step-03, step-04 and step-05, for a tutorial. Their subjects start with
-  `step-02.1:` and so on. The last commit of a step has the plain `step-NN:` subject and the tag. step-03.1 is what
+  `step-02.1:` and so on, though timewalk names a move by its place: the chmod move of hooks-01 has no subject. The last commit of a step has the plain `step-NN:` subject and the tag. step-03.1 is what
   `uv add --dev ruff` made: its pyproject.toml, and its uv.lock, which is kept in step-03.1-uv.lock;
 - two steps of one commit, with no moves: step-00, the first step, and step-06, a step after it that stands on its tag;
 - a branch `parts` from step-00 with its own tags, `parts-01` and `parts-02`, for a walk on one part;
@@ -23,6 +23,9 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+
+RUNNABLE = object()   # in place of a file's text: make the file that is there executable, as chmod +x does
+
 
 README = "# tally\n\nCount the words in a text.\n"
 # The project starts as `uv init --package --name tally` starts one: a pyproject.toml with an entry point and a
@@ -243,6 +246,7 @@ HOOK_TESTS = HOOK + "uv run python -m unittest discover -s tests -q\n"
 HOOKS = [
     ("hooks-01.1: a recipe that checks the code", {"justfile": CHECK}, None),
     ("hooks-01.2: a hook script that runs the check", {"hooks/pre-commit": HOOK}, None),
+    ("", {"hooks/pre-commit": RUNNABLE}, None),   # a move of one command, chmod +x, with no subject, as jj new leaves it
     ("hooks-01: a recipe that installs the hook", {"justfile": SETUP},
      ("hooks-01", "The hook\n\nA check before each commit, installed with just install-hook.")),
     ("hooks-02.1: a first test", {"tests/test_count.py": TEST_COUNT.replace("    def test_case(self):\n        self.assertEqual(count(\"A a\"), {\"a\": 2})\n", "")}, None),
@@ -265,11 +269,12 @@ def commit_all(dest: Path, commits: list, clock: int) -> int:
         for name, text in files.items():
             path = dest / name
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(text)
-            if name.startswith("hooks/"):
+            if text is RUNNABLE:
                 path.chmod(0o755)  # git runs a hook only if it can execute it
+                continue
+            path.write_text(text)   # a file that exists keeps its mode
         git(dest, "add", "-A", when=clock)
-        git(dest, "commit", "-q", "-m", subject, when=clock)
+        git(dest, "commit", "-q", "--allow-empty-message", "-m", subject, when=clock)
         if tag:
             git(dest, "tag", "-a", tag[0], "-m", tag[1], when=clock)
         clock += 1

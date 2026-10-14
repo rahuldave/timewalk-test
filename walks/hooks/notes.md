@@ -4,6 +4,9 @@ tally counts words, and nothing stops a broken file from going into git. We buil
 before each `git commit`. The hook checks that the code compiles, and later that the tests pass. When the check
 fails, git does not record the change.
 
+We build the hook in moves. A move is one small change, made by one patch or by one command. You make each move, and
+the page checks your files against it.
+
 > Note: the walk is on the branch `hooks`, with the tags hooks-00 to hooks-02. It starts in watch mode, and the
 > slides do not follow the moves, because `sync = false` in toc.toml.
 
@@ -32,14 +35,10 @@ Then a hook runs the recipe before each `git commit`, and a last recipe tells gi
 A file with a syntax error breaks tally, and nothing finds it before it goes into git. A recipe `check` compiles
 every Python file of tally. Python then reports a syntax error at once, without running the code.
 
-::: do
-At the end of the `justfile`, add the recipe, with a blank line before it:
+patch$ justfile
 
-```just
-# Check that every Python file compiles
-check:
-    uv run python -m py_compile src/tally/*.py
-```
+::: do
+The patch adds the recipe `check` at the end of the `justfile`.
 :::
 
 ::: watch
@@ -59,21 +58,29 @@ files:
 
 `just check` works only when someone runs it. A hook runs it every time. git runs the file `pre-commit` of its
 folder of hooks before each `git commit`, and stops the `git commit` when the file fails. The hook,
-`hooks/pre-commit`, has three lines. They name the shell that runs it, say what it does, and run the check.
+`hooks/pre-commit`, has three lines. They name the shell that runs it, say what it does, and run the check. The
+file comes whole, as a patch.
+
+patch$ hooks/pre-commit
 
 ::: do
-Make the file `hooks/pre-commit`, with these lines:
-
-```sh
-#!/bin/sh
-# Run before each commit: refuse it if the code does not compile.
-just check
-```
+Read its last line, `just check`. It is the whole of what the hook does.
 :::
 
 ::: watch
 The new file `hooks/pre-commit` runs `just check`, and nothing else. When `just check` fails, the hook fails too.
 :::
+
+$ sh hooks/pre-commit; echo "the hook said $?"
+
+The code compiles, so the hook says 0.
+
+files:
+- file `hooks/pre-commit`: three lines that git runs before a `git commit`.
+- diff `hooks/pre-commit`: the hook only runs the check.
+  show: `just check`
+
+### hooks-01.3 Make it runnable
 
 git runs a hook only if the hook is executable, so we make it executable.
 
@@ -81,31 +88,22 @@ do$ chmod +x hooks/pre-commit
 
 Run the hook by hand on a broken file, and see it fail. Then remove the file:
 
-$ printf 'def (\n' > src/tally/broken.py; sh hooks/pre-commit; echo "the hook said $?"
+$ printf 'def (\n' > src/tally/broken.py; ./hooks/pre-commit; echo "the hook said $?"
 $ rm src/tally/broken.py
 
 The hook says 1, so git would stop the `git commit`.
 
-files:
-- file `hooks/pre-commit`: three lines that git runs before a `git commit`.
-- diff `hooks/pre-commit`: the hook only runs the check.
-  show: `just check`
-
-### hooks-01.3 Install it
+### hooks-01.4 Install it
 
 git does not copy hooks with a repository, and does not look in the folder `hooks` unless it is told to. So each
 copy of the project installs the hook. A recipe `install-hook` sets `core.hooksPath`, the setting of git that names
 the folder of hooks. The recipe changes the settings of git, so it is a recipe of its own, and not a part of
 `just setup`. `just setup` only makes the environment and the artifacts.
 
-::: do
-At the end of the `justfile`, add the recipe, with a blank line before it:
+patch$ justfile
 
-```just
-# Make git run the hooks in hooks/, before each commit. This changes git's config, so it is not part of setup
-install-hook:
-    git config core.hooksPath hooks
-```
+::: do
+The patch adds the recipe `install-hook`, with its comment, at the end of the `justfile`.
 :::
 
 ::: watch
@@ -135,19 +133,10 @@ test, then the hook runs the tests after the check.
 The hook can run tests only if there are tests. A first test, in `tests/test_count.py`, checks that `count` counts
 the words of `a b a`.
 
+patch$ tests/test_count.py
+
 ::: do
-Make the file `tests/test_count.py`, with these lines:
-
-```python
-import unittest
-
-from tally import count
-
-
-class Count(unittest.TestCase):
-    def test_words(self):
-        self.assertEqual(count("a b a"), {"a": 2, "b": 1})
-```
+The patch makes the file `tests/test_count.py`, with the class `Count` and its test.
 :::
 
 ::: watch
@@ -167,12 +156,10 @@ files:
 The hook compiles the code, but a failing test does not stop a `git commit`. One more line in the hook runs the
 tests after the check.
 
-::: do
-At the end of `hooks/pre-commit`, after the line `just check`, add this line:
+patch$ hooks/pre-commit
 
-```sh
-uv run python -m unittest discover -s tests -q
-```
+::: do
+The patch adds one line at the end of `hooks/pre-commit`, after the line `just check`.
 :::
 
 ::: watch
