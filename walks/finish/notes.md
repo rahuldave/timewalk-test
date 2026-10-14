@@ -1,9 +1,9 @@
-This walk takes the end of tally. It adds types and a docstring, and then the report. It starts after step-03, where
-tally counts and has its tests, ruff and a corpus.
+This walk takes the end of tally. It adds types and a docstring, and then the report. It begins where tally counts,
+and has its tests, ruff and a corpus.
 
 ## Types and a docstring
 
-This stop is all of step-04, with its two moves.
+This part is whole. It adds the types, then the docstring.
 
 > Say: a whole step brings the text at the top of its section, so `$ just setup` comes with it.
 
@@ -16,13 +16,13 @@ so the tests pass as before.
 
 $ just setup
 
-Since the last stop, the walk leaves out step-05.1 and step-05.2. They add the function `top`, its test, and the
-option `--top`. This stop starts with their code.
+Since the last part, the walk leaves out the function `top`, its test, and the option `--top`. This part begins
+with their code.
 
 {{include step-05.3}}
 
 ::: do
-Open `build/top.txt`, and compare it with what `uv run tally --top 10` prints for the corpus.
+Open `build/top.txt`, and compare it with what `uv run tally --top 10 data/corpus.txt` prints.
 :::
 
 ::: watch

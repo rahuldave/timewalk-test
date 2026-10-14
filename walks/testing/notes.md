@@ -1,5 +1,5 @@
-This walk takes only the tests of tally. It starts after step-01, where tally can count the words of a text. It
-leaves out the formatting, the types and the report.
+This walk takes only the tests of tally. It begins where tally can already count the words of a text. It leaves out
+the formatting, the types and the report.
 
 > Say: this walk shows a small walk with notes of its own. Each stop takes the sections of its moves from the notes
 > of the tutorial, and has its own words around them.
@@ -8,7 +8,8 @@ leaves out the formatting, the types and the report.
 
 $ just setup
 
-tally counts words already. step-01 made the function `count` and the command, and this walk starts there.
+tally counts words already. The function `count` and the command are there, and this walk begins with them.
+Nothing checks yet that they count right.
 
 {{include step-02.1}}
 
@@ -22,8 +23,8 @@ Three tests now say what `count` does. It counts words, it gives nothing for an 
 
 $ just setup
 
-Since the last stop, the walk leaves out step-03 and step-04. They add ruff, the corpus, the types and a
-docstring, and they change no test. This stop starts with their code.
+Since the last part, the walk leaves out ruff, the corpus, the types and the docstring. None of them changes a
+test. This part begins with their code.
 
 {{include step-05.1}}
 

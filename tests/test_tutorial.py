@@ -114,7 +114,7 @@ def test_a_moves_last_commands_are_its_anchor(tutored) -> None:
     to_step_02(yours)
     yours.wait_for_selector("#notes .p-move .p-anchor")
     assert yours.locator("#notes .p-move").count() == yours.locator("#notes .p-move .p-anchor").count() == 3
-    assert yours.locator("#notes .p-move").first.locator(".p-anchor-label").inner_text() == "After this move, run:"
+    assert yours.locator("#notes .p-move").first.locator(".p-anchor-label").inner_text() == "Check it"
 
 
 def test_watch_mode_shows_the_moves_in_order_and_goes_back_to_the_start(tutored, kit: Path) -> None:
@@ -401,14 +401,14 @@ def test_restart_step_in_do_mode_undoes_the_moves_marked_done(tutored) -> None:
 
 
 def test_text_before_the_first_move_is_a_section_of_its_own(tutored) -> None:
-    "At step-01, just setup and the words before step-01.1 are in Before the moves; step-00 has no moves, and no such section."
+    "At step-01, just setup and the words before step-01.1 are in a section under the step's title; step-00 has no moves, and no such section."
     yours, _, _ = tutored
     yours.wait_for_selector("#notes .p-hint")
     assert yours.locator("#notes .p-bridge").count() == 0
     to_step(yours, "step-01")
     bridge = yours.locator("#notes .p-bridge")
-    assert bridge.locator(".p-bridge-label").text_content() == "Before the moves"
-    assert "The step has two moves. The first adds a function that counts" in bridge.inner_text()
+    assert bridge.locator(".p-bridge-label").text_content() == "Counting"
+    assert "First we write a function that counts, and try it alone" in bridge.inner_text()
     assert bridge.locator(".p-commands button").first.inner_text().startswith("just setup")
     assert yours.evaluate("document.querySelector('#notes').firstElementChild.className") == "p-hint"
     assert yours.locator("#notes .p-move").count() == 2
@@ -564,7 +564,7 @@ def test_each_mode_shows_its_own_commands_and_the_checks_are_shared(tutored) -> 
         assert page.locator("#notes .p-move", has=page.locator("h3", has_text="step-02.1")).locator(".p-anchor-label").count() == 1
     yours.click("#move-modes button:has-text('Watch')")
     for page in (yours, room):
-        has_text(page, "Read the two tests in the change of tests/test_count.py")
+        has_text(page, "In the change of tests/test_count.py, look at test_case")
         assert "mkdir -p tests" not in page.locator("#notes").inner_text()
         assert runs_of(page, "step-02.1") == [["uv run", "(anchor)"]], "watch: the check only"
     yours.click("#move-modes button:has-text('Do')")
@@ -579,7 +579,7 @@ def test_each_mode_shows_its_own_commands_and_the_checks_are_shared(tutored) -> 
         assert runs_of(page, "step-05.3") == shared
     yours.click("#move-modes button:has-text('Watch')")
     for page in (yours, room):
-        has_text(page, "Read the recipe and the new line of setup in the change of the justfile")
+        has_text(page, "the new recipe report makes the folder build")
         assert "At the end of the justfile, add the recipe" not in page.locator("#notes").inner_text()
         assert runs_of(page, "step-05.3") == shared, "the same commands in both modes"
 
@@ -609,7 +609,7 @@ def test_a_small_walk_starts_each_small_step_at_the_commit_before_its_first_move
             notes_of(page, "step-05.1")
         assert head(kit).startswith("step-04:"), "a small step of a first move starts at the tag before it"
         notes = yours.locator("#notes").inner_text()
-        assert "Now we add top" in notes and "def top(" not in notes, "watch mode: the plan of the move, and not the code to type"
+        assert "A function, top, does it" in notes and "def top(" not in notes, "watch mode: the problem and the change, and not the code to type"
     finally:
         context.close()
 
@@ -619,10 +619,10 @@ def test_a_small_narrative_stops_at_moves_and_at_steps(browser, kit: Path, start
     context, yours, room = open_windows(browser, start("--toc", str(kit / "toc.toml"), "--walk", "story"))
     try:
         notes_of(yours, "step-01.1")
-        yours.wait_for_function("() => document.querySelector('#notes').textContent.includes('Read count in the change of src/tally/__init__.py')")
+        yours.wait_for_function("() => document.querySelector('#notes').textContent.includes('count now stands above main')")
         notes = yours.locator("#notes").inner_text()
         assert "It goes in src/tally/__init__.py, above main" in notes, "the shared text of the move"
-        assert "above main, add count" not in notes and "def count(text):" not in notes, "a narrative shows the watch blocks, and not the do blocks"
+        assert "put these lines above the line" not in notes and "def count(text):" not in notes, "a narrative shows the watch blocks, and not the do blocks"
         assert head(kit).startswith("step-01.1:")
         yours.mouse.click(300, 400)
         yours.keyboard.press("ArrowRight")
@@ -630,7 +630,7 @@ def test_a_small_narrative_stops_at_moves_and_at_steps(browser, kit: Path, start
             notes_of(page, "step-02")
             page.wait_for_function("() => document.querySelector('#notes').textContent.includes('one file at a time')")
         notes = yours.locator("#notes").inner_text()
-        assert "one file at a time" in notes and "Make tests/test_count.py" not in notes, "a narrative's step stops before its moves"
+        assert "one file at a time" in notes and "Make the file tests/test_count.py" not in notes, "a narrative's step stops before its moves"
         assert head(kit).startswith("step-02:")
     finally:
         context.close()
@@ -690,14 +690,14 @@ def test_the_uv_add_line_runs_in_do_mode_and_shows_what_the_move_ran_in_watch_mo
     to_step(yours, "step-03")
     for page in (yours, room):
         notes_of(page, "step-03")
-        has_text(page, "Now we add ruff, the formatter and linter")
+        has_text(page, "The group dev is for the people who work on tally")
         assert runs_of(page, "step-03.1") == [["uv add"], ["uv run", "(anchor)"]], "the do$ line, then the shared check alone as the anchor"
         assert "The move ran:" not in page.locator("#notes").inner_text()
     yours.click("#move-modes button:has-text('Watch')")
     for page in (yours, room):
         has_text(page, "The move ran: uv add --dev ruff")
         assert runs_of(page, "step-03.1") == [["uv run", "(anchor)"]], "watch mode has only the check to run"
-        assert "Read the new group dev in the change of pyproject.toml" in page.locator("#notes").inner_text()
+        assert "a new table [dependency-groups] has the group dev" in page.locator("#notes").inner_text()
 
 
 def test_a_show_line_in_two_backticks_quotes_a_line_with_a_backtick(tutored) -> None:
@@ -722,7 +722,7 @@ def test_a_small_walk_says_what_it_leaves_out_at_its_first_stop_and_names_its_ti
             intro = page.locator("#notes .p-intro")
             intro.wait_for()
             assert intro.locator(".p-bridge-label").text_content() == "About this walk"
-            assert "The walk leaves out these moves" in intro.inner_text() and "All of step-03 and step-04" in intro.inner_text()
+            assert "The walk leaves out the rest of tally" in intro.inner_text() and "Between the two parts, it leaves out ruff" in intro.inner_text()
             shows(page, "#notes-title", "step-02.2 to step-02.3 An empty text, and case")
         assert yours.locator("#notes .p-intro blockquote").is_visible(), "your window shows the cue of the intro"
         assert room.locator("#notes .p-intro blockquote").is_hidden(), "the Room hides it"
@@ -761,7 +761,7 @@ def test_a_walk_with_its_own_notes_has_its_words_around_the_moves_it_includes(br
         for page in (yours, room):
             shows(page, "#step-name", "step-05.1")
             notes_of(page, "step-05.1")
-            has_text(page, "Since the last stop, the walk leaves out step-03 and step-04")
+            has_text(page, "Since the last part, the walk leaves out ruff")
             has_text(page, "The walk stops here")
         assert head(kit).startswith("step-04:"), "a stop of a first move starts at the tag before it"
     finally:
@@ -779,14 +779,14 @@ def test_a_walk_with_its_own_notes_includes_a_whole_step_and_one_move(browser, k
             shows(page, "#notes-title", "step-04 Types and a docstring")
         assert head(kit).startswith("step-03:"), "a whole step with moves starts at the tag before it"
         notes = yours.evaluate("[...document.querySelectorAll('#notes > :not(.p-intro)')].map((e) => e.innerText).join('\\n')")
-        order = ["This stop is all of step-04", "just setup\nat this step", "Types", "A docstring", "now says what it takes"]
+        order = ["This part is whole", "just setup\nat this step", "Types", "A docstring", "now says what it takes"]
         assert [notes.index(text) for text in order] == sorted(notes.index(text) for text in order), notes
         yours.mouse.click(300, 400)
         yours.keyboard.press("ArrowRight")
         for page in (yours, room):
             shows(page, "#step-name", "step-05.3")
             notes_of(page, "step-05.3")
-            has_text(page, "Since the last stop, the walk leaves out step-05.1 and step-05.2")
+            has_text(page, "Since the last part, the walk leaves out the function top")
         assert head(kit).startswith("step-05.2:"), "a stop of one move starts at the commit before it"
         has_text(yours, "Open build/top.txt")
         assert "the same list that" not in yours.locator("#notes").inner_text(), "do mode: not the watch block"
@@ -810,9 +810,9 @@ def test_a_step_without_moves_after_the_first_stands_on_its_tag(tutored, kit: Pa
     for page in (yours, room):
         shows(page, "#step-name", "step-06")
         notes_of(page, "step-06")
-        has_text(page, "The step is one commit, with no moves")
+        has_text(page, "The README gets a section")
         assert page.locator("#moves").is_hidden() and page.locator("#notes .p-move").count() == 0
-        assert page.locator("#notes .p-bridge").count() == 0, "no moves, so no section Before the moves"
+        assert page.locator("#notes .p-bridge").count() == 0, "no moves, so no section of the text before them"
     assert head(kit) == "step-06: the README says how to run tally", "a step without moves stands on its tag, in do mode too"
     assert "## Run it" in (kit / "repo-replay" / "README.md").read_text()
     yours.wait_for_function("document.getElementById('status').textContent.includes('step-06, step 7 of 7 · no moves')")

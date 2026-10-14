@@ -14,6 +14,16 @@ just style              # check the prose of the README, CLAUDE.md, notes and sl
 just test               # build a fresh copy, then run every test
 ```
 
+The pages that students read are made from the facts of each walk, by `render.py` of the `walk` skill. To check them
+too, run this in the class folder:
+
+```
+TIMEWALK=~/Projects/timewalk python3 ~/Projects/walk-kit/scripts/render.py --class . --repo repo --github https://github.com/o/tally
+```
+
+It must report 0 problems and 0 warnings for every walk. It reports a file that the do mode does not give in full.
+It also reports the words of timewalk, such as "step", "move" and "commit", in the text that a reader reads.
+
 `pyproject.toml` takes timewalk from its `walks` branch on GitHub. To use a working copy of timewalk instead,
 put `TIMEWALK_LOCAL=~/Projects/timewalk` before any recipe. Students use timewalk's `main`, which this
 repository does not touch.
@@ -52,6 +62,10 @@ walk with the menu at the left of the step bar.
 | Blocks for one mode in a walk's own text | The second stop of `finish` |
 | A step of one commit, without moves, after the first step | step-06. It stands on its tag, and step-05 ends with **Next step: step-06** |
 | A document in place of slides | step-03 of the default walk, `slides/formatting.md` |
+| A file to take whole, with **Apply this file** in the shared text | step-03.3, for `scripts/corpus.py` |
+| The checks of a move, under "Check it" | The last shared commands of every move, for example `$ uv run python -m unittest discover -s tests -q` |
+| The text of a step before its first move, under the step's title | The text of each step of the tutorial, after `$ just setup` |
+| `files:` last, with an item and words for every file | Every move of every tutorial, `uv.lock` too at step-03.1 |
 
 Also try **Shell** (Alt+Enter), the layouts (Alt+1, Alt+2, Alt+3), the notes (Alt+\\), and **Edit** in the
 notes column.
@@ -66,7 +80,7 @@ notes column.
 | `notes.md`, `slides/` | The default walk: its notes, and its manifest with the slide files |
 | `walks/NAME/` | Each other walk: `notes.md`, and `slides/slides.toml` with its own slide files. The small walks `small` and `story` have only an `intro.md`, and read the notes and slides of the tutorial. The small walks `testing` and `finish` have only a `notes.md` of their own, and read the move sections and the slides of the tutorial |
 | `justfile` | The recipes above |
-| `tests/` | pytest and Playwright: two windows through every walk, step, move and slide, commands typed into a shell, the checks on broken copies of the class, and the PDF |
+| `tests/` | pytest and Playwright: two windows through every walk, step, move and slide, commands typed into a shell, the checks on broken copies of the class, and the PDF. `tests/test_facts.py` checks the facts that `timewalk-export --json` writes, for a tutorial, a narrative, the small walks with `select` and with notes of their own, and a narrative that stops at moves, against timewalk's `facts.schema.json` |
 
 **`just setup` starts every step, and it never touches git.** It makes the environment (`uv sync`) and the
 artifacts that the step needs. The artifacts are `data/corpus.txt` from step-03, and `build/top.txt` from step-05.
@@ -74,6 +88,20 @@ git ignores both, so they stay through every move. `just setup` makes them again
 
 Anything that changes git, such as installing a hook in the hooks walk, is a recipe of its own. The notes ask the
 learner to run it.
+
+## How the notes are written
+
+Real classes copy these notes, so they keep the rules of timewalk's "What a narrative and a tutorial need":
+
+- **The reader never meets timewalk's words.** The text says no "step", "move", "commit" or "Start". The heading
+  `### step-02.1 Title` keeps its name for timewalk, and only its title is for the reader. A cue, `> Say:` or
+  `> Note:`, is for the presenter alone, and can say anything.
+- **A step opens with what we build, and why.** A move opens with the problem, and the change that solves it.
+- **Then the change, piece by piece.** A `do` block gives the exact lines, and where they go. A `do$` line gives each
+  command that makes the change. A `watch` block says what the change does, and where to see it.
+- **A file to take whole is said in the shared text,** with **Apply this file**, so that both ways of reading link it.
+- **Then the check,** with what it prints. The page shows it under "Check it".
+- **Last, `files:`,** with an item and words for every file of the change. No list of the files in the text.
 
 timewalk's site explains each part, in "Several walks" and "Build a class with several walks".
 

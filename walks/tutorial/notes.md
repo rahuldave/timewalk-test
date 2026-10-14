@@ -1,37 +1,48 @@
 # tally, one move at a time
 
-The walk is a tutorial through the tagged steps of tally, and the small commits between them. Each small commit is
-a move, one small action. In do mode, the default, you make each move by hand from its notes, run the command at its end, and press
-Done. In watch mode, Show checks out each move's commit instead. Either way, the command at the end of a move
-shows what the move did. Every command runs through uv.
+We build tally, a small word counter, one change at a time. It begins as a command with nothing to count. At the
+end, it counts the words of a file, has tests and types, and writes a report of the most common words. Every
+command runs through uv, in the project's own environment.
 
-Each move first says what it does. In do mode, the notes then give the code to write and the commands to run. In
-watch mode, they say what to look at. The files of the move, their changes and the commands that check the move
-are the same in both modes.
+Each change first says what problem it solves. Then it gives the change, piece by piece. Last, a command checks the
+result, and a list names each file that changed, with what to look for in it.
 
 ## step-00 Where it starts
 
 $ just setup
 
-The project is a uv project with a command that has nothing to count. The step has no moves, because the tutorial
-starts here. Run just setup, then the command below, and go to the next step.
+tally is a uv project with one command, `tally`, which has nothing to count yet. `just setup` makes the
+environment of the project, `.venv`, with `uv sync`. Run the command, to see where we begin.
 
 $ uv run tally
+
+It prints `tally: nothing to count yet`.
+
+files:
+- file `pyproject.toml`: the project, and the table `[project.scripts]` that makes the command `tally`.
+  show: `tally = "tally:main"`
+- file `src/tally/__init__.py`: `main`, which has nothing to count yet.
+- file `src/tally/__main__.py`: lets `python -m tally` run `main` too.
+- file `justfile`: the recipes, with `setup` first.
+- file `.python-version`: the version of Python that uv uses.
+- file `uv.lock`: the exact packages, the same for every learner.
+- file `.gitignore`: the files that git does not hold, such as `.venv`.
+- file `README.md`: one line about tally.
 
 ## step-01 Counting
 
 $ just setup
 
-The step has two moves. The first adds a function that counts, and the second the command that uses it. Each move
-ends with a command that shows what it did.
+tally must count the words of a text. First we write a function that counts, and try it alone. Then the command
+reads a text, and prints what the function counts.
 
 ### step-01.1 A function that counts
 
-Now we add `count`, a function that counts the words of a text. It goes in `src/tally/__init__.py`, above `main`.
-`count` makes a dictionary from each word to how many times it appears. The command does not use it yet.
+A word counter needs a way to count. A function, `count`, takes a text and gives a dictionary from each word to how
+many times it appears. It goes in `src/tally/__init__.py`, above `main`. The command does not use it yet.
 
 ::: do
-In `src/tally/__init__.py`, above `main`, add `count`:
+In `src/tally/__init__.py`, put these lines above the line `def main() -> None:`
 
 ```python
 def count(text):
@@ -40,34 +51,38 @@ def count(text):
         counts[word] = counts.get(word, 0) + 1
     return counts
 ```
+
+Keep two blank lines between `count` and `main`.
 :::
 
 ::: watch
-Read `count` in the change of `src/tally/__init__.py`.
+In `src/tally/__init__.py`, `count` now stands above `main`. It splits the text at each space. For each word, it
+adds 1 to the count so far, and `counts.get(word, 0)` gives 0 for a word it has not seen.
 :::
 
-The move changes one file:
+$ uv run python -c "from tally import count; print(count('a b a'))"
 
-- `src/tally/__init__.py`: 7 lines added; adds `count`.
-
-The line to read first is the one that adds 1 to the count of a word.
+It prints `{'a': 2, 'b': 1}`, two of `a` and one of `b`. So the function works, though the command still has
+nothing to count.
 
 files:
 - diff `src/tally/__init__.py`: a dictionary from each word to how many times it appears.
   show: `counts[word] = counts.get(word, 0) + 1`
 
-$ uv run python -c "from tally import count; print(count('a b a'))"
-
-The function works, and prints `{'a': 2, 'b': 1}`. The command still has nothing to count.
-
 ### step-01.2 The command counts
 
-Now the command counts. `main` reads a file, or the standard input when no file is given. Then it prints each word
-with its count, and it needs `import sys` under the docstring of the module. This move is the tagged commit of the step.
+`count` works, but the command still prints that it has nothing to count. `main` must read a text and print the
+counts. It reads the file that the command names, or the standard input when the command names no file. The module
+`sys` gives both the arguments of the command and the standard input.
 
 ::: do
-In `src/tally/__init__.py`, add `import sys` under the docstring of the module, with a blank line before it. Then
-write `main` again:
+In `src/tally/__init__.py`, add this line under the docstring of the module, with a blank line before it:
+
+```python
+import sys
+```
+
+Then write `main` again, in place of the old one:
 
 ```python
 def main() -> None:
@@ -78,30 +93,33 @@ def main() -> None:
 :::
 
 ::: watch
-Read the new `main` in the change of `src/tally/__init__.py`.
+In `src/tally/__init__.py`, `import sys` now stands under the docstring of the module. The first line of `main`
+reads the text, from the file named in `sys.argv[1]` or from the standard input. The loop prints each word with
+its count, in the order of the words.
 :::
 
-The move changes one file:
+$ echo "a b a" | uv run tally
 
-- `src/tally/__init__.py`: 5 lines added, 1 removed; changes `main`.
+It prints `2 a` and then `1 b`. The command now counts.
 
 files:
 - diff `src/tally/__init__.py`: `main` reads the text and prints the counts.
   show: `for word, n in sorted(count(text).items()):`
 
-$ echo "a b a" | uv run tally
-
 ## step-02 Tests, one at a time
 
 $ just setup
 
-We add the tests one file at a time, and run them after each. The code starts as it was at step-01, so it does
-not ignore case yet.
+We cannot tell whether `count` still works after a change, unless we try it by hand each time. Tests try it for us.
+Each test gives `count` a text, and compares what it gives back with what we expect.
+We add the tests one file at a time, and run them after each. One test asks for something that `count` cannot do yet. It asks `count` to count
+"The" and "the" as one word.
 
 ### step-02.1 A test of counting
 
-Now we start the tests. They go in a new folder, `tests`. The first file, `tests/test_count.py`, has two tests. The
-second test asks for something that the code cannot do yet. It expects `count` to ignore case.
+Nothing checks yet that `count` gives the right counts. A test of `unittest`, the test library of Python, calls
+`count` on a short text and compares the result with the dictionary that it expects. The tests go in a new folder,
+`tests`.
 
 ::: do
 Make the folder, and run the tests in it. The folder has no tests yet, so unittest prints `NO TESTS RAN`.
@@ -110,10 +128,11 @@ $ mkdir -p tests
 $ uv run python -m unittest discover -s tests -q
 :::
 
-Each test calls `count` on a short text, and compares the result with the dictionary that it expects.
+The first file of tests, `tests/test_count.py`, has two tests. `test_words` counts `a b a`. `test_case` counts
+`A a`, and expects the one word `a`, twice. The code cannot do this yet.
 
 ::: do
-Make `tests/test_count.py`:
+Make the file `tests/test_count.py`, with these lines:
 
 ```python
 import unittest
@@ -131,32 +150,27 @@ class Count(unittest.TestCase):
 :::
 
 ::: watch
-Read the two tests in the change of `tests/test_count.py`.
+In the change of `tests/test_count.py`, look at `test_case`. It is the test that fails below.
 :::
 
-The move changes one file:
+$ uv run python -m unittest discover -s tests -q
 
-- `tests/test_count.py`: a new file of 11 lines; adds `class Count`, `test_words` and `test_case`.
+One test fails. `test_case` expects `{'a': 2}`, and gets `{'A': 1, 'a': 1}`. The failure is a question that the
+code has not answered yet.
 
-The test to watch is `test_case`.
+> Say: look, a failure. Ask the class what the smallest change is that makes it pass.
 
 files:
 - diff `tests/test_count.py`: two tests. The second asks for something the code cannot do yet.
   show: `self.assertEqual(count("A a"), {"a": 2})`
 
-$ uv run python -m unittest discover -s tests -q
-
-One test fails. `test_case` expects `{"a": 2}`, and gets `{"A": 1, "a": 1}`.
-
-> Say: look, a failure. It is a question that the code has not answered yet.
-
 ### step-02.2 A test of an empty text
 
-Now we test an empty text, in a new file, `tests/test_empty.py`. An empty text has no words, so `count` must give
-an empty dictionary.
+An empty file is a text with no words. `count` must give an empty dictionary for it, and not fail. A test in a
+file of its own, `tests/test_empty.py`, says so, and keeps it true after later changes.
 
 ::: do
-Make `tests/test_empty.py`:
+Make the file `tests/test_empty.py`, with these lines:
 
 ```python
 import unittest
@@ -171,93 +185,91 @@ class Empty(unittest.TestCase):
 :::
 
 ::: watch
-Read the test in the change of `tests/test_empty.py`.
+The new file `tests/test_empty.py` holds one test, `test_empty`. It gives `count` the empty text `""`, and
+expects the empty dictionary `{}`.
 :::
 
-The move changes one file:
+$ uv run python -m unittest discover -s tests -q
 
-- `tests/test_empty.py`: a new file of 8 lines; adds `class Empty` and `test_empty`.
+The new test passes at once, because `split()` finds no words in an empty text. `test_case` still fails.
 
 files:
 - diff `tests/test_empty.py`: an empty text counts nothing.
   show: `self.assertEqual(count(""), {})`
 
-$ uv run python -m unittest discover -s tests -q
-
-The new test passes at once. `test_case` still fails.
-
 ### step-02.3 Case does not matter
 
-Now we answer the failing test, `test_case`. In `count`, in `src/tally/__init__.py`, `text.split()` becomes
-`text.lower().split()`. So `count` reads every word in lower case. This move is the tagged commit of the step.
+`test_case` fails, because `count` counts `A` and `a` as two words. When `count` puts the text in lower case before
+it splits it, every word is counted in lower case. One word in the loop of `count`, `lower()`, does it.
 
 ::: do
-Add `.lower()` after `text`, in the loop of `count`.
+In `count`, in `src/tally/__init__.py`, put this line in place of the line `for word in text.split():`
+
+```python
+    for word in text.lower().split():
+```
 :::
 
 ::: watch
-Find `lower()` in the change of `src/tally/__init__.py`.
+In `count`, in `src/tally/__init__.py`, the loop now splits `text.lower()`, and not `text`. So `A` and `a` are
+the same word.
 :::
 
-The move changes one file:
+$ uv run python -m unittest discover -s tests -q
+$ echo "The the" | uv run tally
 
-- `src/tally/__init__.py`: 1 line added, 1 removed; changes `count`.
-
-One word, `lower()`, answers the failing test.
+All three tests pass, and the command prints `2 the` for "The the".
 
 files:
 - diff `src/tally/__init__.py`: one word, `lower()`, answers the failing test.
   show: `for word in text.lower().split():`
 
-$ uv run python -m unittest discover -s tests -q
-$ echo "The the" | uv run tally
-
-All three tests pass, and "The the" is `2 the`.
-
 ## step-03 Formatting, and a corpus
 
 $ just setup
 
-The step has three moves. The first adds ruff, a formatter and linter, with `uv add`. The second gives ruff a line
-length. The third makes `just setup` write `data/corpus.txt`, an artifact that git does not hold.
+tally works, and it has tests. Two things help the work ahead. Code in one style is easier to read and to change,
+so we install ruff, a formatter and linter. And a count of three words shows little, so `just setup` makes a
+corpus, a text of 2000 words to count.
 
 ### step-03.1 ruff, a tool for development
 
-Now we add ruff, the formatter and linter, to the group `dev` of the project. One command does it all. `uv add`
-writes ruff into `pyproject.toml` and `uv.lock`, and installs it in `.venv`. The group `dev` is for the people who
-work on tally. A user who installs tally does not get ruff.
+Each person writes code in a style of their own, with other quotes, blank lines and lengths of line. A formatter
+writes every file in one style. A linter reads the code, and reports mistakes that the tests do not find. ruff is
+both. It goes in the group `dev` of the project. The group `dev` is for the people who work on tally, so a user
+who installs tally does not get ruff.
+
+One command does it all. `uv add` writes ruff into `pyproject.toml` and `uv.lock`, and installs it in `.venv`:
 
 do$ uv add --dev ruff
 
-::: watch
-Read the new group `dev` in the change of `pyproject.toml`, and then find ruff in the change of `uv.lock`.
+::: do
+On a later day, `uv add` gets a newer ruff, and your two files name another version than the ones here. The
+version is then the only difference, and that is correct.
 :::
 
-The move changes these files:
+::: watch
+In `pyproject.toml`, a new table `[dependency-groups]` has the group `dev`, with the line `"ruff>=0.17.0",`. In
+`uv.lock`, the entry `name = "ruff"` gives the exact version, and the files of ruff for each system.
+:::
 
-- `pyproject.toml`: 5 lines added; adds the group `dev`.
-- `uv.lock`: 35 lines added; adds ruff, and the files of each of its versions for each system.
+$ uv run ruff format --check
+
+ruff reads every Python file of the project, and prints `5 files already formatted`.
 
 files:
-- diff `pyproject.toml`: ruff, in a group of its own. The version is the newest on the day of the move.
+- diff `pyproject.toml`: ruff, in a group of its own. The version is the newest on the day that ruff was added.
   show: `"ruff>=0.17.0",`
 - diff `uv.lock`: the exact version of ruff, which every learner gets with `just setup`.
   show: `name = "ruff"`
 
-On a later day, `uv add` gets a newer ruff, so your files can name another version than the commit. timewalk
-compares these two files by the names of their packages, and not their versions. So your files still match.
-
-$ uv run ruff format --check
-
-ruff reads every Python file of the project, and says that each one is already formatted.
-
 ### step-03.2 A line length for ruff
 
-Now we give ruff a line length of 100, in a table `[tool.ruff]` of `pyproject.toml`. Every editor and every run of
-ruff then agree on how long a line can be.
+ruff and each editor have their own idea of how long a line can be. A setting in `pyproject.toml` makes them agree.
+It is a table `[tool.ruff]`, with a line length of 100.
 
 ::: do
-At the end of `pyproject.toml`, add the table:
+At the end of `pyproject.toml`, after the group `dev`, add these lines, with a blank line before them:
 
 ```toml
 [tool.ruff]
@@ -266,16 +278,9 @@ line-length = 100
 :::
 
 ::: watch
-Read the table at the end of the change of `pyproject.toml`.
+At the end of `pyproject.toml`, the table `[tool.ruff]` sets `line-length = 100`. The linter and the formatter
+both read it.
 :::
-
-The move changes one file:
-
-- `pyproject.toml`: 3 lines added; adds the table `[tool.ruff]`.
-
-files:
-- diff `pyproject.toml`: one setting, for the linter and the formatter both.
-  show: `line-length = 100`
 
 $ uv run ruff check --show-settings src | grep line_length
 $ uv run ruff format --check
@@ -283,15 +288,33 @@ $ uv run ruff format --check
 The first command prints `linter.line_length = 100`, so ruff reads the setting. The code still fits, and every file
 is already formatted.
 
+files:
+- diff `pyproject.toml`: one setting, for the linter and the formatter both.
+  show: `line-length = 100`
+
 ### step-03.3 A corpus, which just setup makes
 
-Now `just setup` makes an artifact, `data/corpus.txt`, a text of 2000 words to count. A new script,
-`scripts/corpus.py`, writes it. git ignores the folder `data/`, so the corpus stays through every move. This move is
-the tagged commit of the step.
+A count of `a b a` shows little. tally needs a long text to count, the same for every learner. A script,
+`scripts/corpus.py`, writes `data/corpus.txt`, 2000 words from a short list, in the same order each time. The
+script is too long to type, so take the whole file `scripts/corpus.py` with **Apply this file**.
+
+The corpus is an artifact, a file that the project makes and git does not hold. So `.gitignore` names the folder
+`data/`. git leaves an ignored file alone, so the corpus stays when the code changes.
 
 ::: do
-Make `scripts/corpus.py`: open its change with its item below, and press **Apply this file**. Then add `data/` to
-`.gitignore`, and add a line to the recipe `setup` of the `justfile`, after `uv sync`:
+At the end of `.gitignore`, add these lines, with a blank line before them:
+
+```gitignore
+# Artifacts that just setup makes: they are not in git
+data/
+```
+:::
+
+`just setup` makes the environment, and now it runs the script too. So every learner has the corpus. The script
+leaves a corpus that is there alone, so a second `just setup` writes nothing.
+
+::: do
+In the recipe `setup` of the `justfile`, add this line after the line `uv sync`:
 
 ```just
     uv run python scripts/corpus.py data/corpus.txt
@@ -299,38 +322,40 @@ Make `scripts/corpus.py`: open its change with its item below, and press **Apply
 :::
 
 ::: watch
-Read the new line of `setup` in the change of the `justfile`, and then open `scripts/corpus.py`.
+The new file `scripts/corpus.py` picks each word from the list `WORDS`, with a number that it works out from the
+number before it. The first number is always 7, so the words are the same each time. `.gitignore` now ends with
+`data/`, and the recipe `setup` of the `justfile` runs the script after `uv sync`.
 :::
 
-The move changes these files:
+$ just setup
+$ uv run tally data/corpus.txt | sort -rn | head -3
 
-- `scripts/corpus.py`: a new file of 25 lines; adds `main`.
-- `.gitignore`: 3 lines added; ignores `data/`.
-- `justfile`: 1 line added; changes `setup`.
+`just setup` prints `wrote data/corpus.txt: 2000 words`. tally prints the three most common words of the corpus,
+`127 line`, `126 class` and `125 word`.
 
 files:
 - diff `justfile`: `just setup` now makes the corpus too.
   show: `uv run python scripts/corpus.py data/corpus.txt`
 - diff `scripts/corpus.py`: the script writes the same 2000 words each time, and leaves a corpus that is there alone.
+  show: `if target.exists():`
 - diff `.gitignore`: git does not hold the corpus.
   show: `data/`
-
-$ just setup
-$ uv run tally data/corpus.txt | sort -rn | head -3
-
-`just setup` writes the corpus once. tally prints the three most common words of it.
 
 ## step-04 Types, then a docstring
 
 $ just setup
 
+To learn what `count` takes and what it gives, a reader must now read its body. Its signature can say it at a
+glance, and an editor can check it. One line under the signature can say what the function does. Neither changes
+what `count` does, so the tests pass as before.
+
 ### step-04.1 Types
 
-Now `count` gets types. Its signature says that it takes a `str`, and gives a `dict[str, int]`. The body stays
-the same.
+The signature `def count(text):` does not say what `text` is, or what `count` gives back. Types say it. `count`
+takes a `str`, and gives a `dict[str, int]`, a dictionary from words to counts. The body stays the same.
 
 ::: do
-In `src/tally/__init__.py`, change the signature of `count` to this line:
+In `src/tally/__init__.py`, put this line in place of the line `def count(text):`
 
 ```python
 def count(text: str) -> dict[str, int]:
@@ -338,28 +363,25 @@ def count(text: str) -> dict[str, int]:
 :::
 
 ::: watch
-Compare the old signature with the new one in the change of `src/tally/__init__.py`.
+In `src/tally/__init__.py`, the signature of `count` now says `text: str`, and `-> dict[str, int]` for what it
+gives back. The body is the same.
 :::
 
-The move changes one file:
+$ uv run python -m unittest discover -s tests -q
 
-- `src/tally/__init__.py`: 1 line added, 1 removed; changes `count`, in its signature only.
+The three tests pass as before, because types change what the code says, not what it does.
 
 files:
 - diff `src/tally/__init__.py`: the signature says what goes in and what comes out.
   show: `def count(text: str) -> dict[str, int]:`
 
-$ uv run python -m unittest discover -s tests -q
-
-The tests pass as before, because types change what the code says, not what it does.
-
 ### step-04.2 A docstring
 
-Now `count` gets a docstring, one line under its signature that says what the function does. Python keeps the line
-in `count.__doc__`.
+The types say what `count` takes and gives, but not what it does with the text. A docstring says it. It is a string on
+the first line of a function. Python keeps it in `count.__doc__`, and `help(count)` prints it.
 
 ::: do
-Under the signature of `count`, add one line:
+In `src/tally/__init__.py`, add this line under the signature of `count`, before the line `counts = {}`:
 
 ```python
     "How many times each word of `text` appears, ignoring case."
@@ -367,42 +389,45 @@ Under the signature of `count`, add one line:
 :::
 
 ::: watch
-Read the new line under the signature in the change of `src/tally/__init__.py`.
+In `src/tally/__init__.py`, the first line of `count` is now its docstring. It says that `count` ignores case.
 :::
 
-The move changes one file:
+$ uv run python -c "import tally; print(tally.count.__doc__)"
 
-- `src/tally/__init__.py`: 1 line added; changes `count`.
+It prints the docstring, ``How many times each word of `text` appears, ignoring case.``
 
 files:
 - diff `src/tally/__init__.py`: one line under the signature says what the function does.
   show: ``"How many times each word of `text` appears, ignoring case."``
 
-$ uv run python -c "import tally; print(tally.count.__doc__)"
-
 ## step-05 The most common words, and a report
 
 $ just setup
 
-The step has three moves. They add a function with its test, an option on the command, and a recipe that makes an
-artifact.
+tally prints a line for every word, in the order of the words. A reader of a long text wants the most common words
+first, and only a few of them. A function finds them, and an option of the command prints them. A recipe writes a
+report of the ten most common words of the corpus.
 
 ### step-05.1 A function for the most common words
 
-Now we add `top`, a function that gives the n most common words, and its test. `top` goes in
-`src/tally/__init__.py`, after `count`. It sorts the counts by count, most common first, and then by the word. Then
-it keeps the first n. The test, in a new file `tests/test_top.py`, gives `top` three words.
+`count` gives the counts in no useful order. To find the most common words, tally must sort the counts, most common
+first, and keep the first few. A function, `top`, does it. It sorts by count, highest first, and then by the
+word, so that two words with the same count keep one order. Then it keeps the first `n`.
 
 ::: do
-Add `top` to `src/tally/__init__.py`, after `count`:
+In `src/tally/__init__.py`, add `top` after `count` and before `main`, with two blank lines around it:
 
 ```python
 def top(counts: dict[str, int], n: int) -> list[tuple[str, int]]:
     "The n most common words, most common first."
     return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]
 ```
+:::
 
-Then make `tests/test_top.py`:
+A test says what `top` must give. It gives `top` three words with their counts, and asks for the two most common.
+
+::: do
+Make the file `tests/test_top.py`, with these lines:
 
 ```python
 import unittest
@@ -417,28 +442,28 @@ class Top(unittest.TestCase):
 :::
 
 ::: watch
-Read `top` in the change of `src/tally/__init__.py`, and then open its test, `tests/test_top.py`.
+In `src/tally/__init__.py`, `top` stands between `count` and `main`. It sorts with the key `(-pair[1], pair[0])`.
+The key is the count with a minus sign, so that the highest count comes first, and then the word. The new file
+`tests/test_top.py` has one test, `test_most_common_first`.
 :::
 
-The move changes these files:
+$ uv run python -m unittest discover -s tests -q
 
-- `src/tally/__init__.py`: 5 lines added; adds `top`.
-- `tests/test_top.py`: a new file of 8 lines; adds `class Top` and `test_most_common_first`.
+The four tests pass.
 
 files:
 - diff `src/tally/__init__.py`: sort by count, most common first, then by the word.
   show: `return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]`
 - file `tests/test_top.py`: its test, with three words.
 
-$ uv run python -m unittest discover -s tests -q
-
 ### step-05.2 tally --top N
 
-Now we teach `main` an option, `--top N`. With the option, `main` prints only the N most common words, with `top`.
-Without it, `main` prints every count, as before. `main` reads the option before the file name.
+tally prints every word of a text, and the corpus fills the screen. An option, `--top N`, makes `main` print only the
+`N` most common words, with `top`. Without the option, `main` prints every count, as before. `main` reads the
+option before the name of the file, so the command is `tally --top 3 data/corpus.txt`.
 
 ::: do
-In `src/tally/__init__.py`, write `main` again:
+In `src/tally/__init__.py`, write `main` again, in place of the old one:
 
 ```python
 def main() -> None:
@@ -454,29 +479,31 @@ def main() -> None:
 :::
 
 ::: watch
-In the change of `src/tally/__init__.py`, the three lines under the docstring read the option.
+In `src/tally/__init__.py`, `main` now has a docstring, and the three lines under the docstring read the option.
+When the first argument is `--top`, the second is the number `N`, and the name of the file comes after them. The
+loop prints `top(counts, n)` when there is an `N`, and every count when there is not.
 :::
-
-The move changes one file:
-
-- `src/tally/__init__.py`: 8 lines added, 3 removed; changes `main`.
-
-files:
-- diff `src/tally/__init__.py`: `main` reads the option before the file name.
-  show: `if args[:1] == ["--top"]:`
 
 $ uv run tally --top 3 data/corpus.txt
 
-The command prints three lines, the most common word first.
+The command prints three lines, the most common word first. They are `127 line`, `126 class` and `125 word`.
+
+files:
+- diff `src/tally/__init__.py`: `main` reads the option before the name of the file.
+  show: `if args[:1] == ["--top"]:`
 
 ### step-05.3 A report, which just setup makes
 
-Now we add a report of the corpus. A new recipe in the `justfile`, `report`, writes the ten most common words to
-`build/top.txt`. Also, `just setup` runs `report` when that file is missing. This move is the tagged commit of the
-step.
+The most common words of the corpus make a report, which others want to read without running tally. A recipe of
+the `justfile`, `report`, writes the ten most common words to `build/top.txt`. The recipe has two lines, and `just`
+prints each line before it runs it. The second line has two parts.
+
+- **`mkdir -p build`** makes the folder `build`, and does nothing when the folder is there.
+- **`uv run tally --top 10 data/corpus.txt`** counts the corpus, and keeps the ten most common words.
+- **`> build/top.txt`** sends what tally prints to the file, in place of the terminal.
 
 ::: do
-At the end of the `justfile`, add the recipe:
+At the end of the `justfile`, add the recipe, with a blank line before it:
 
 ```just
 # Write the ten most common words of the corpus to build/top.txt
@@ -484,8 +511,14 @@ report:
     mkdir -p build
     uv run tally --top 10 data/corpus.txt > build/top.txt
 ```
+:::
 
-Then, in the recipe `setup`, add a line after the line that makes the corpus:
+The report is an artifact, as the corpus is. git ignores the folder `build/`, so git holds the recipe, and not the
+report. `just setup` makes the report when the file is missing. `test -f build/top.txt` is true when the file is
+there, and `||` runs `just report` only when it is not.
+
+::: do
+Then, in the recipe `setup`, add this line after the line that makes the corpus:
 
 ```just
     test -f build/top.txt || just report
@@ -493,26 +526,12 @@ Then, in the recipe `setup`, add a line after the line that makes the corpus:
 :::
 
 ::: watch
-Read the recipe and the new line of `setup` in the change of the `justfile`.
+At the end of the `justfile`, the new recipe `report` makes the folder `build`, and writes the report into it. In
+the recipe `setup`, the new last line runs `just report` when `build/top.txt` is missing.
 :::
 
-The move changes one file:
-
-- `justfile`: 6 lines added; adds `recipe report`, and a line in `setup`.
-
-files:
-- diff `justfile`: the report, and the line in `setup` that makes it when it is missing.
-  show: `uv run tally --top 10 data/corpus.txt > build/top.txt`
-  show: `test -f build/top.txt || just report`
-
-The recipe has two lines, and `just` prints each line before it runs it.
-
-- **`mkdir -p build`** makes the folder `build`, and does nothing when the folder is there.
-- **`uv run tally --top 10 data/corpus.txt`** counts the corpus, and keeps the ten most common words.
-- **`> build/top.txt`** sends what tally prints to the file, in place of the terminal.
-
-git ignores `build/`, so the report is an artifact. The commit holds the recipe, and not the report. A report from an
-earlier pass stays through every move. So remove the report first, and then `just setup` makes it again:
+A report from an earlier run stays, because git ignores it. So remove the report first, and then `just setup` makes
+it again:
 
 $ rm -f build/top.txt
 $ just setup
@@ -520,22 +539,44 @@ $ cat build/top.txt
 
 The file has ten lines, the most common word first.
 
+files:
+- diff `justfile`: the report, and the line in `setup` that makes it when it is missing.
+  show: `uv run tally --top 10 data/corpus.txt > build/top.txt`
+  show: `test -f build/top.txt || just report`
+
 ## step-06 How to run it
 
 $ just setup
 
-The step is one commit, with no moves. The step bar stands on its tag, so the code is already there in both modes.
-The README gets a section, "Run it", that says how to run tally, its tests and its report.
+A new user of tally does not know which commands to run, or in which order. The README gets a section, "Run it",
+that says how to run tally, its tests and its report. The code does not change.
 
-The step changes one file:
+::: do
+In `README.md`, add these lines after the line `Count the words in a text.`, with a blank line before them:
 
-- `README.md`: 10 lines added; adds the section "Run it".
+```markdown
+## Run it
 
-files:
-- diff `README.md`: the commands that a new user needs first, in the order to run them.
-  show: `## Run it`
+Make the environment, the corpus and the report first. Then count the words of a file:
+
+    just setup
+    uv run tally data/corpus.txt
+
+`uv run tally --top 10 data/corpus.txt` prints only the ten most common words. `just test` runs the tests, and
+`just report` writes the ten most common words of the corpus to `build/top.txt`.
+```
+:::
+
+::: watch
+At the end of `README.md`, the new section "Run it" gives the two commands to run first, `just setup` and then
+tally on the corpus. Under them, it names the option `--top`, the tests and the report.
+:::
 
 $ uv run tally --top 3 data/corpus.txt
 $ just test
 
-The command prints the three most common words of the corpus, and the tests pass. step-06 is the last step.
+The command prints the three most common words of the corpus, and the tests pass. tally is finished.
+
+files:
+- diff `README.md`: the commands that a new user needs first, in the order to run them.
+  show: `## Run it`

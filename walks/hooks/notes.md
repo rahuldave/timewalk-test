@@ -1,115 +1,142 @@
 # A git hook, one move at a time
 
-The walk is a tutorial on one part of tally, on a branch of its own. The part is a hook that checks the code before
-each commit. The tags are hooks-00 to hooks-02, and the small commits between them are the moves.
+tally counts words, and nothing stops a broken file from going into git. We build a hook, a script that git runs
+before each `git commit`. The hook checks that the code compiles, and later that the tests pass. When the check
+fails, git does not record the change.
 
-The walk starts in watch mode. Show checks out each move's commit, and the command at the end of the move shows what
-it did. Switch to Do to make the moves by hand. The slides do not follow the moves here, because sync is off for this
-walk in toc.toml.
+> Note: the walk is on the branch `hooks`, with the tags hooks-00 to hooks-02. It starts in watch mode, and the
+> slides do not follow the moves, because `sync = false` in toc.toml.
 
 ## hooks-00 Where the hooks start
 
 $ just setup
 
-tally counts words, and nothing checks the code before a commit. This step is step-01 of main, with another name.
+tally counts the words of a text. Nothing checks the code before a `git commit`, so a file with a syntax error can
+go into git. The recipes of the `justfile` show what the project can do now.
+
+> Note: hooks-00 is the same code as step-01 of main, with another name.
 
 $ just --list
+
+It lists the recipes of tally, and none of them checks the code.
 
 ## hooks-01 The hook
 
 $ just setup
 
-We build the hook in three moves. The first adds a recipe, the second a script that runs it, and the third a recipe
-that installs it.
+A check that each person must remember to run is a check that someone forgets. We write the check as a recipe.
+Then a hook runs the recipe before each `git commit`, and a last recipe tells git to use the hook.
 
 ### hooks-01.1 A recipe that checks the code
 
-Add a `check` recipe to the justfile. It compiles every Python file, which catches a syntax error before a commit
-does.
+A file with a syntax error breaks tally, and nothing finds it before it goes into git. A recipe `check` compiles
+every Python file of tally. Python then reports a syntax error at once, without running the code.
+
+::: do
+At the end of the `justfile`, add the recipe, with a blank line before it:
 
 ```just
 # Check that every Python file compiles
 check:
     uv run python -m py_compile src/tally/*.py
 ```
+:::
 
-The move changes one file:
+::: watch
+At the end of the `justfile`, the new recipe `check` runs `py_compile`, the compiler of Python, on each file of
+`src/tally`.
+:::
 
-- `justfile`: 4 lines added; adds `recipe check`.
+$ just check && echo "the code compiles"
+
+It prints `the code compiles`, because every file compiles.
 
 files:
 - diff `justfile`: the recipe compiles every Python file.
   show: `uv run python -m py_compile src/tally/*.py`
 
-$ just check && echo "the code compiles"
-
 ### hooks-01.2 A hook script
 
-Now we add the hook, `hooks/pre-commit`. git runs it before each commit, and refuses the commit when it fails.
-The file has three lines:
+`just check` works only when someone runs it. A hook runs it every time. git runs the file `pre-commit` of its
+folder of hooks before each `git commit`, and stops the `git commit` when the file fails. The hook,
+`hooks/pre-commit`, has three lines. They name the shell that runs it, say what it does, and run the check.
+
+::: do
+Make the file `hooks/pre-commit`, with these lines:
 
 ```sh
 #!/bin/sh
 # Run before each commit: refuse it if the code does not compile.
 just check
 ```
+:::
 
-git runs a hook only if the hook is executable. This command makes it so:
+::: watch
+The new file `hooks/pre-commit` runs `just check`, and nothing else. When `just check` fails, the hook fails too.
+:::
+
+git runs a hook only if the hook is executable, so we make it executable.
 
 do$ chmod +x hooks/pre-commit
 
-The move changes one file:
-
-- `hooks/pre-commit`: a new file of 3 lines.
-
-files:
-- file `hooks/pre-commit`: three lines that git runs before a commit.
-- diff `hooks/pre-commit`: the hook only runs the check.
-  show: `just check`
-
-Run it by hand on a broken file, and see it refuse. Then remove the file:
+Run the hook by hand on a broken file, and see it fail. Then remove the file:
 
 $ printf 'def (\n' > src/tally/broken.py; sh hooks/pre-commit; echo "the hook said $?"
 $ rm src/tally/broken.py
 
-The hook says 1, so git would refuse a commit.
+The hook says 1, so git would stop the `git commit`.
+
+files:
+- file `hooks/pre-commit`: three lines that git runs before a `git commit`.
+- diff `hooks/pre-commit`: the hook only runs the check.
+  show: `just check`
 
 ### hooks-01.3 Install it
 
-Hooks are not cloned with a repository, so each copy installs its own. Add an `install-hook` recipe that tells git
-to use the `hooks` folder. The recipe changes git's config, so it is a recipe of its own. It is not part of
-`just setup`, which only makes the environment and the artifacts. This move is the tagged commit of the step.
+git does not copy hooks with a repository, and does not look in the folder `hooks` unless it is told to. So each
+copy of the project installs the hook. A recipe `install-hook` sets `core.hooksPath`, the setting of git that names
+the folder of hooks. The recipe changes the settings of git, so it is a recipe of its own, and not a part of
+`just setup`. `just setup` only makes the environment and the artifacts.
+
+::: do
+At the end of the `justfile`, add the recipe, with a blank line before it:
 
 ```just
-# Make git run the hooks in hooks/, before each commit
+# Make git run the hooks in hooks/, before each commit. This changes git's config, so it is not part of setup
 install-hook:
     git config core.hooksPath hooks
 ```
+:::
 
-The move changes one file:
+::: watch
+At the end of the `justfile`, the new recipe `install-hook` runs one line, `git config core.hooksPath hooks`.
+:::
 
-- `justfile`: 4 lines added; adds `recipe install-hook`.
+$ just install-hook && git config core.hooksPath
+
+It prints `hooks`, so git now runs the hook before each `git commit`.
+
+> Note: the replay copy is a clone with a config of its own. So the setting stays in the copy, and the repository
+> you started from does not change.
 
 files:
 - diff `justfile`: one line of git config, in a recipe of its own.
   show: `git config core.hooksPath hooks`
 
-$ just install-hook && git config core.hooksPath
-
-It prints `hooks`, and git now runs the hook before each commit.
-
-> Note: the replay copy is a clone with a config of its own. So the setting stays in the copy, and the repository
-> you started from does not change.
-
 ## hooks-02 Tests in the hook
 
 $ just setup
 
-The first move adds a test, and the second makes the hook run the tests too.
+Code that compiles can still count wrong. The tests find that, so the hook must run them too. First we write a
+test, then the hook runs the tests after the check.
 
 ### hooks-02.1 A first test
 
-Make `tests/test_count.py` with one test of counting:
+The hook can run tests only if there are tests. A first test, in `tests/test_count.py`, checks that `count` counts
+the words of `a b a`.
+
+::: do
+Make the file `tests/test_count.py`, with these lines:
 
 ```python
 import unittest
@@ -121,33 +148,41 @@ class Count(unittest.TestCase):
     def test_words(self):
         self.assertEqual(count("a b a"), {"a": 2, "b": 1})
 ```
+:::
 
-The move changes one file:
+::: watch
+The new file `tests/test_count.py` has one test, `test_words`. It expects `{"a": 2, "b": 1}` for `a b a`.
+:::
 
-- `tests/test_count.py`: a new file of 9 lines; adds `class Count` and `test_words`.
+$ uv run python -m unittest discover -s tests -q
+
+The test passes.
 
 files:
 - diff `tests/test_count.py`: one test of counting.
   show: `self.assertEqual(count("a b a"), {"a": 2, "b": 1})`
 
-$ uv run python -m unittest discover -s tests -q
-
 ### hooks-02.2 The hook runs the tests too
 
-Add one line to `hooks/pre-commit`, so that a failing test refuses a commit as well:
+The hook compiles the code, but a failing test does not stop a `git commit`. One more line in the hook runs the
+tests after the check.
+
+::: do
+At the end of `hooks/pre-commit`, after the line `just check`, add this line:
 
 ```sh
 uv run python -m unittest discover -s tests -q
 ```
+:::
 
-The move changes one file:
+::: watch
+At the end of `hooks/pre-commit`, the new line runs the tests after `just check`.
+:::
 
-- `hooks/pre-commit`: 1 line added.
+$ sh hooks/pre-commit && echo "the hook passed"
+
+The hook compiles the code, runs the tests, and prints `the hook passed`.
 
 files:
 - diff `hooks/pre-commit`: the tests run after the check.
   show: `uv run python -m unittest discover -s tests -q`
-
-$ sh hooks/pre-commit && echo "the hook passed"
-
-The hook compiles the code, runs the tests, and passes.

@@ -224,7 +224,8 @@ def test_timewalk_export_writes_both_modes_and_a_site_that_builds(kit: Path, tmp
     words = "the three lines under the docstring read the option"   # the watch block of step-05.2
     assert "if args[:1] == [\"--top\"]:" in do and words not in do
     assert words in watch and "write `main` again" not in watch
-    assert "Now we teach `main` an option" in do and "Now we teach `main` an option" in watch, "the plan of a move is in both"
+    shared = "An option, `--top N`, makes `main` print only"
+    assert shared in do and shared in watch, "the problem and the change of a move are in both"
     assert "mkdir -p tests" in do and "mkdir -p tests" not in watch, "a do block's commands, in do mode only"
     assert "> Say:" not in do + watch, "the presenter's cues stay in the class"
     assert "The move ran: `uv add --dev ruff`" in watch and "\nuv add --dev ruff\n" in do, "step-03.1's do$ line follows the mode of the copy"
@@ -246,13 +247,13 @@ def test_timewalk_export_writes_the_small_walks_and_their_sites_build(kit: Path,
         assert sorted(p.name for p in out.iterdir()) == files
         text = (out / files[0]).read_text()
         intro = (kit / "walks" / walk / "intro.md").read_text().split("\n")[0]
-        assert intro in text and "The walk is a tutorial through the tagged steps" not in text, "the walk's intro, in place of the notes' opening"
+        assert intro in text and "We build tally, a small word counter" not in text, "the walk's intro, in place of the notes' opening"
         built = subprocess.run(["uvx", "--from", "smalldocs>=0.1.5,<0.2", "smalldocs", "check"], cwd=site, capture_output=True, text=True)
         assert built.returncode == 0 and "0 thing(s) to look at" in built.stdout + built.stderr, built.stdout + built.stderr
     small = (tmp_path / "small" / "md" / "TUTORIAL-watch.md").read_text()
     assert "## step-02.2 to step-02.3 An empty text, and case" in small, "the title of the range, from select"
     assert "[The code at its Start]" in small and "### step-02.1" not in small
-    assert "The walk leaves out these moves" in small and "> Say:" not in small, "the intro, without its cue"
+    assert "The walk leaves out the rest of tally" in small and "> Say:" not in small, "the intro, without its cue"
 
 
 def test_timewalk_export_writes_the_walks_with_their_own_notes(kit: Path, tmp_path: Path) -> None:
@@ -267,7 +268,7 @@ def test_timewalk_export_writes_the_walks_with_their_own_notes(kit: Path, tmp_pa
         assert text.index("This walk takes only the tests of tally") < text.index("## step-02.1 to step-02.3 Three tests of counting")
         assert "> Say:" not in text and "{{include" not in text
         order = ["tally counts words already", "### step-02.1", "The first test is the pattern", "### step-02.2", "### step-02.3",
-                 "Three tests now say what", "## step-05.1 A test of the most common words", "Since the last stop", "### step-05.1", "The walk stops here"]
+                 "Three tests now say what", "## step-05.1 A test of the most common words", "Since the last part", "### step-05.1", "The walk stops here"]
         assert [text.index(t) for t in order] == sorted(text.index(t) for t in order)
         assert "### step-05.2" not in text and "one file at a time" not in text
     built = subprocess.run(["uvx", "--from", "smalldocs>=0.1.5,<0.2", "smalldocs", "check"], cwd=site, capture_output=True, text=True)
