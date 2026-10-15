@@ -42,15 +42,15 @@ git log --oneline --decorate --all | head -20
 
 ### What changed
 
-- <a id="step-00-.gitignore-a5cc29"></a>`.gitignore`: the files that git does not hold, such as `.venv`. New, 10 lines. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/.gitignore).
-- <a id="step-00-.python-version-7696e9"></a>`.python-version`: the version of Python that uv uses. New, 1 line. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/.python-version).
-- <a id="step-00-README.md-8ec9a0"></a>`README.md`: one line about tally. New, 3 lines. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/README.md).
-- <a id="step-00-justfile-424f0b"></a>`justfile`: the recipes, with `setup` first. New, 15 lines. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/justfile).
-- <a id="step-00-pyproject.toml-5d07e7"></a>`pyproject.toml`: the project, and the table `[project.scripts]` that makes the command `tally`. New, 14 lines. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/pyproject.toml).
+- <a id="step-00-.gitignore-a5cc29"></a>`.gitignore`: the files that git does not hold, such as `.venv`. New, 10 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/.gitignore).
+- <a id="step-00-.python-version-7696e9"></a>`.python-version`: the version of Python that uv uses. New, 1 line. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/.python-version).
+- <a id="step-00-README.md-8ec9a0"></a>`README.md`: one line about tally. New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/README.md).
+- <a id="step-00-justfile-424f0b"></a>`justfile`: the recipes, with `setup` first. New, 15 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/justfile).
+- <a id="step-00-pyproject.toml-5d07e7"></a>`pyproject.toml`: the project, and the table `[project.scripts]` that makes the command `tally`. New, 14 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/pyproject.toml).
   - look at `tally = "tally:main"`
-- <a id="step-00-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main`, which has nothing to count yet. New, 5 lines. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/src/tally/__init__.py).
-- <a id="step-00-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: lets `python -m tally` run `main` too. New, 3 lines. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/src/tally/__main__.py).
-- <a id="step-00-uv.lock-8356d8"></a>`uv.lock`: the exact packages, the same for every learner. New, 8 lines. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/uv.lock).
+- <a id="step-00-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main`, which has nothing to count yet. New, 5 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/src/tally/__init__.py).
+- <a id="step-00-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: lets `python -m tally` run `main` too. New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/src/tally/__main__.py).
+- <a id="step-00-uv.lock-8356d8"></a>`uv.lock`: the exact packages, the same for every learner. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/uv.lock).
 
 <details><summary>The diff of <code>.gitignore</code></summary>
 
@@ -159,7 +159,7 @@ git log --oneline --decorate --all | head -20
 
 </details>
 
-[The code](https://github.com/o/tally/tree/6a63758166d3aeee516faa6244414d7b54b5a730).
+[The code](https://github.com/rahuldave/tally/tree/6a63758166d3aeee516faa6244414d7b54b5a730).
 
 <a id="step-01"></a>
 
@@ -184,7 +184,7 @@ yet that they are one word. The second slide is a picture of what `count` does.
 
 ### What changed
 
-- <a id="step-01-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `count`, and a `main` that reads the text and prints the counts. 12 lines added, 1 removed. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
+- <a id="step-01-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `count`, and a `main` that reads the text and prints the counts. 12 lines added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
   - look at `counts[word] = counts.get(word, 0) + 1`
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -212,7 +212,7 @@ yet that they are one word. The second slide is a picture of what `count` does.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/6a63758166d3aeee516faa6244414d7b54b5a730...eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/o/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/6a63758166d3aeee516faa6244414d7b54b5a730...eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
 
 <a id="step-02"></a>
 
@@ -241,10 +241,10 @@ $ this line is not a button
 
 ### What changed
 
-- <a id="step-02-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the fix, one word. 1 line added, 1 removed. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/src/tally/__init__.py).
+- <a id="step-02-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the fix, one word. 1 line added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/src/tally/__init__.py).
   - look at `for word in text.lower().split():`
-- <a id="step-02-tests-test_count.py-e674f6"></a>`tests/test_count.py`: two tests, and `test_case` is the one that failed. New, 11 lines. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_count.py).
-- <a id="step-02-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_empty.py).
+- <a id="step-02-tests-test_count.py-e674f6"></a>`tests/test_count.py`: two tests, and `test_case` is the one that failed. New, 11 lines. [The file](https://github.com/rahuldave/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_count.py).
+- <a id="step-02-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_empty.py).
   - look at `self.assertEqual(count(""), {})`
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -298,7 +298,7 @@ $ this line is not a button
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/eb951f74756383392f528427a0cf44e135d5c64f...bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/o/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/eb951f74756383392f528427a0cf44e135d5c64f...bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/rahuldave/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
 
 <a id="step-03"></a>
 
@@ -334,14 +334,14 @@ printf '\n# an edit made in class\n' >> src/tally/__init__.py
 
 ### What changed
 
-- <a id="step-03-.gitignore-a5cc29"></a>`.gitignore`: git does not hold the corpus. 3 lines added. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/.gitignore).
+- <a id="step-03-.gitignore-a5cc29"></a>`.gitignore`: git does not hold the corpus. 3 lines added. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/.gitignore).
   - look at `data/`
-- <a id="step-03-justfile-424f0b"></a>`justfile`: `just setup` runs the script. 1 line added. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/justfile).
+- <a id="step-03-justfile-424f0b"></a>`justfile`: `just setup` runs the script. 1 line added. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/justfile).
   - look at `uv run python scripts/corpus.py data/corpus.txt`
-- <a id="step-03-pyproject.toml-5d07e7"></a>`pyproject.toml`: the group `dev`, with ruff, and the line length. 8 lines added. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/pyproject.toml).
+- <a id="step-03-pyproject.toml-5d07e7"></a>`pyproject.toml`: the group `dev`, with ruff, and the line length. 8 lines added. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/pyproject.toml).
   - look at `line-length = 100`
-- <a id="step-03-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: writes the same 2000 words each time, and leaves a corpus that is there alone. New, 25 lines. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/scripts/corpus.py).
-- <a id="step-03-uv.lock-8356d8"></a>`uv.lock`: the exact version of ruff. 35 lines added. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/uv.lock).
+- <a id="step-03-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: writes the same 2000 words each time, and leaves a corpus that is there alone. New, 25 lines. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/scripts/corpus.py).
+- <a id="step-03-uv.lock-8356d8"></a>`uv.lock`: the exact version of ruff. 35 lines added. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/uv.lock).
   - look at `name = "ruff"`
 
 <details><summary>The diff of <code>.gitignore</code></summary>
@@ -425,7 +425,7 @@ printf '\n# an edit made in class\n' >> src/tally/__init__.py
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20...1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/o/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20...1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/rahuldave/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35).
 
 <a id="step-04"></a>
 
@@ -449,7 +449,7 @@ uv run python -m unittest discover -s tests -q
 
 ### What changed
 
-- <a id="step-04-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the types in the signature of `count`, and its docstring. 2 lines added, 1 removed. [The file](https://github.com/o/tally/blob/f79588d3b046ec2787725cdb6e3fcf952014e078/src/tally/__init__.py).
+- <a id="step-04-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the types in the signature of `count`, and its docstring. 2 lines added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/f79588d3b046ec2787725cdb6e3fcf952014e078/src/tally/__init__.py).
   - look at `def count(text: str) -> dict[str, int]:`
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -469,7 +469,7 @@ uv run python -m unittest discover -s tests -q
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/1568a522d23312c59c6e42cb027ec25ba3ae8b35...f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/o/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/1568a522d23312c59c6e42cb027ec25ba3ae8b35...f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).
 
 <a id="step-05"></a>
 
@@ -501,11 +501,11 @@ rm build/top.txt; just setup; ls build
 
 ### What changed
 
-- <a id="step-05-justfile-424f0b"></a>`justfile`: the recipe `report`, and the line of `setup` that runs it. 6 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
+- <a id="step-05-justfile-424f0b"></a>`justfile`: the recipe `report`, and the line of `setup` that runs it. 6 lines added. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
   - look at `test -f build/top.txt || just report`
-- <a id="step-05-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `top`, and the option `--top` of `main`. 13 lines added, 3 removed. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/src/tally/__init__.py).
+- <a id="step-05-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `top`, and the option `--top` of `main`. 13 lines added, 3 removed. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/src/tally/__init__.py).
   - look at `if args[:1] == ["--top"]:`
-- <a id="step-05-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: the test of `top`. New, 8 lines. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/tests/test_top.py).
+- <a id="step-05-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: the test of `top`. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/tests/test_top.py).
 
 <details><summary>The diff of <code>justfile</code></summary>
 
@@ -575,7 +575,7 @@ rm build/top.txt; just setup; ls build
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/f79588d3b046ec2787725cdb6e3fcf952014e078...9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/o/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/f79588d3b046ec2787725cdb6e3fcf952014e078...9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
 
 <a id="step-06"></a>
 
@@ -596,7 +596,7 @@ uv run tally --top 3 data/corpus.txt
 
 ### What changed
 
-- <a id="step-06-README.md-8ec9a0"></a>`README.md`: a section, "Run it", with the commands that a new user needs first. 10 lines added. [The file](https://github.com/o/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/README.md).
+- <a id="step-06-README.md-8ec9a0"></a>`README.md`: a section, "Run it", with the commands that a new user needs first. 10 lines added. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/README.md).
   - look at `## Run it`
 
 <details><summary>The diff of <code>README.md</code></summary>
@@ -620,4 +620,4 @@ uv run tally --top 3 data/corpus.txt
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/9e37b6eed29516f62bc176d1eaa66bf4e86683a6...974d653080b0bd7dd06741b60225518cfecc908e). [The code after it](https://github.com/o/tally/tree/974d653080b0bd7dd06741b60225518cfecc908e).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/9e37b6eed29516f62bc176d1eaa66bf4e86683a6...974d653080b0bd7dd06741b60225518cfecc908e). [The code after it](https://github.com/rahuldave/tally/tree/974d653080b0bd7dd06741b60225518cfecc908e).

@@ -83,3 +83,13 @@ notes = "walks/tutorial/notes.md"
 slides = "walks/tutorial/slides/slides.toml"
 intro = "walks/story/intro.md"
 select = ["step-01.1", "step-02", "step-05.2"]   # a narrative stops at steps and at single moves
+
+[[walk]]
+id = "release"
+title = "A release of tally, one move at a time"
+description = "A rename by a patch, a new version, and then its lock: a move whose own uv.lock is out of date."
+kind = "tutorial"
+folder = "walks/release"
+tags = "release-*"                # a tutorial on one part, with tags of its own on the branch release
+# release-01.2 changes pyproject.toml, and leaves uv lock to the next move: the pages check it with --stale-lock
+loose = ["pyproject.toml", "uv.lock"]

@@ -23,7 +23,7 @@ To learn what `count` takes and what it gives, a reader must now read its body. 
 glance, and an editor can check it. One line under the signature can say what the function does. Neither changes
 what `count` does, so the tests pass as before.
 
-[The code before this part](https://github.com/o/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/o/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).
+[The code before this part](https://github.com/rahuldave/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).
 
 <a id="step-04.1"></a>
 
@@ -45,7 +45,7 @@ The three tests pass as before, because types change what the code says, not wha
 
 #### What changed
 
-- <a id="step-04.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the signature says what goes in and what comes out. 1 line added, 1 removed. [The file](https://github.com/o/tally/blob/a7606fcc89be70f26f75353333a506e9891a6ea1/src/tally/__init__.py).
+- <a id="step-04.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the signature says what goes in and what comes out. 1 line added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/a7606fcc89be70f26f75353333a506e9891a6ea1/src/tally/__init__.py).
   - look at `def count(text: str) -> dict[str, int]:`
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -64,7 +64,7 @@ The three tests pass as before, because types change what the code says, not wha
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/a7606fcc89be70f26f75353333a506e9891a6ea1). [The code after it](https://github.com/o/tally/tree/a7606fcc89be70f26f75353333a506e9891a6ea1).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/a7606fcc89be70f26f75353333a506e9891a6ea1). [The code after it](https://github.com/rahuldave/tally/tree/a7606fcc89be70f26f75353333a506e9891a6ea1).
 
 <a id="step-04.2"></a>
 
@@ -87,7 +87,7 @@ It prints the docstring, ``How many times each word of `text` appears, ignoring 
 
 #### What changed
 
-- <a id="step-04.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: one line under the signature says what the function does. 1 line added. [The file](https://github.com/o/tally/blob/f79588d3b046ec2787725cdb6e3fcf952014e078/src/tally/__init__.py).
+- <a id="step-04.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: one line under the signature says what the function does. 1 line added. [The file](https://github.com/rahuldave/tally/blob/f79588d3b046ec2787725cdb6e3fcf952014e078/src/tally/__init__.py).
   - look at ``"How many times each word of `text` appears, ignoring case."``
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -105,7 +105,7 @@ It prints the docstring, ``How many times each word of `text` appears, ignoring 
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/o/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).
 
 <a id="step-05.3"></a>
 
@@ -118,7 +118,7 @@ just setup
 Since the last part, the walk leaves out the function `top`, its test, and the option `--top`. This part begins
 with their code.
 
-[The code before this part](https://github.com/o/tally/tree/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d). [The code after it](https://github.com/o/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
+[The code before this part](https://github.com/rahuldave/tally/tree/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
 
 <a id="step-05.3"></a>
 
@@ -158,7 +158,7 @@ tally is now finished. It counts, it has tests and types, and `just setup` makes
 
 #### What changed
 
-- <a id="step-05.3-justfile-424f0b"></a>`justfile`: the report, and the line in `setup` that makes it when it is missing. 6 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
+- <a id="step-05.3-justfile-424f0b"></a>`justfile`: the report, and the line in `setup` that makes it when it is missing. 6 lines added. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
   - look at `uv run tally --top 10 data/corpus.txt > build/top.txt`
   - look at `test -f build/top.txt || just report`
 
@@ -186,4 +186,4 @@ tally is now finished. It counts, it has tests and types, and `just setup` makes
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/o/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).

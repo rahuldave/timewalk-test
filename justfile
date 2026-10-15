@@ -48,8 +48,12 @@ style *args:
     python3 "$kit/style/check.py" "$@" "${files[@]}"
     python3 "$kit/scripts/review.py" --class . --repo repo "${files[@]}"
 
-# The project on GitHub that the pages link to
-github := "https://github.com/o/tally"
+# tally on GitHub, which the pages link to and students clone. history/build.py makes repo/, and `just publish` pushes it there
+project := "tally"
+upstream := "rahuldave"
+github := "https://github.com/" + upstream + "/" + project
+# The walk repository that students fork, made by walk-kit's walk-init, beside this folder unless WALK_DIR names another
+walk := env("WALK_DIR", parent_directory(justfile_directory()) / project + "-walk")
 
 # Render the pages that students read, for every walk of toc.toml, into pages/ID: read.md, build.md and site/
 pages: build
@@ -62,7 +66,7 @@ pages: build
     trap 'rm -rf "$facts"' EXIT
     for id in $(python3 -c 'import tomllib; print(*(w["id"] for w in tomllib.load(open("toc.toml", "rb"))["walk"]))'); do
         "${run[@]}" timewalk-export repo --toc toc.toml --walk "$id" --json "$facts/$id.json" --github {{ github }}
-        python3 "$kit/scripts/render.py" "$facts/$id.json" --markdown "pages/$id" --site "pages/$id/site"
+        python3 "$kit/scripts/render.py" "$facts/$id.json" --markdown "pages/$id" --site "pages/$id/site" --repo repo
     done
 
 # Make the PDF of one walk's slides: just pdf tutorial
@@ -73,3 +77,15 @@ pdf walk="narrative": build
 site:
     python3 pages_site.py
     python3 -m http.server -d _site -b 127.0.0.1 8000
+
+# Push repo/ to tally on GitHub: every branch and tag, as history/build.py made them (the tags move when the history does)
+publish: build
+    git -C repo push --force --prune git@github.com:{{ upstream }}/{{ project }}.git '+refs/heads/*:refs/heads/*' '+refs/tags/*:refs/tags/*'
+
+# Make the walk repository, tally-walk, with walk-kit's walk-init. Asks before it creates it on GitHub
+walk-init *args:
+    python3 "${WALK_KIT:-$HOME/Projects/walk-kit}/scripts/walk_init.py" --project {{ project }} --upstream {{ upstream }} --walk {{ quote(walk) }} "$@"
+
+# Refresh tally-walk from the notes and slides of every walk, with walk-kit's walk-update. Shows the diff, and commits on a yes
+walk-update *args: build
+    python3 "${WALK_KIT:-$HOME/Projects/walk-kit}/scripts/walk_update.py" --project {{ project }} --upstream {{ upstream }} --toc toc.toml --walk {{ quote(walk) }} --repo repo "$@"

@@ -1,0 +1,47 @@
+# Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again.
+project:
+  type: website
+  output-dir: _site
+  render: ["index.qmd", "read/*.qmd", "build/*.qmd"]   # only these pages
+
+website:
+  title: "A release of tally, one move at a time"
+  page-navigation: true
+  search: true
+  sidebar:
+    style: docked
+    contents:
+      - index.qmd
+      - section: "Read the tutorial"
+        contents:
+          - text: "0 Where the release starts"
+            href: read/release-00.qmd
+          - section: "1 Release 0.2.0"
+            href: read/release-01.qmd
+            contents:
+              - text: "1.1 Tests of edge cases"
+                href: read/release-01.qmd#release-01.1
+              - text: "1.2 Version 0.2.0"
+                href: read/release-01.qmd#release-01.2
+              - text: "1.3 The lock, and the list of changes"
+                href: read/release-01.qmd#release-01.3
+      - section: "Build it yourself"
+        contents:
+          - text: "0 Where the release starts"
+            href: build/release-00.qmd
+          - section: "1 Release 0.2.0"
+            href: build/release-01.qmd
+            contents:
+              - text: "1.1 Tests of edge cases"
+                href: build/release-01.qmd#release-01.1
+              - text: "1.2 Version 0.2.0"
+                href: build/release-01.qmd#release-01.2
+              - text: "1.3 The lock, and the list of changes"
+                href: build/release-01.qmd#release-01.3
+
+theme: cosmo
+css: styles.css
+toc: true
+toc-depth: 2
+code-copy: true
+from: markdown-tex_math_dollars-smart  # a $ is a dollar, not mathematics; -- stays two hyphens

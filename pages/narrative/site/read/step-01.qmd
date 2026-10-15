@@ -23,7 +23,7 @@ yet that they are one word. The second slide is a picture of what `count` does.
 
 ## What changed {#step-01-what-changed-182c57}
 
-- <a id="step-01-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `count`, and a `main` that reads the text and prints the counts. 12 lines added, 1 removed. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
+- <a id="step-01-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `count`, and a `main` that reads the text and prints the counts. 12 lines added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
   - look at `counts[word] = counts.get(word, 0) + 1`
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -51,4 +51,4 @@ yet that they are one word. The second slide is a picture of what `count` does.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/6a63758166d3aeee516faa6244414d7b54b5a730...eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/o/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/6a63758166d3aeee516faa6244414d7b54b5a730...eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).

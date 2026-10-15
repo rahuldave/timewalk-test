@@ -1,0 +1,51 @@
+---
+title: "A release of tally, one move at a time"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+tally counts words, and has two files of tests. We make a release, version 0.2.0. First the tests of an empty text
+get a name that fits more cases. Then tally gets its new version, and last the lockfile records it.
+
+We make the release in moves. A move is one small change, made by one patch or by one command. You make each move,
+and the page checks your files against it.
+
+There are two ways to read this tutorial. Both have the same parts, in the same order.
+
+Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. What changed is what you check your files against.
+
+In Build it yourself, a file that a command makes says which command. A diff that is open is a patch. Apply it with the command in the text, or make the same change in your editor.
+
+## Read the tutorial
+
+Each change explained, with the code to look at.
+
+- [0 Where the release starts](read/release-00.qmd)
+- [1 Release 0.2.0](read/release-01.qmd)
+
+## Build it yourself
+
+Every command to run and every change to make by hand, to make the project yourself.
+
+### Get the project
+
+You build the project in a clone of your own, on a branch `mine` that starts where this walk starts. Run the commands of these pages in its top folder.
+
+```bash
+git clone https://github.com/rahuldave/tally
+cd tally
+git switch -c mine bfcbe07463b5
+```
+
+Then add the command `git check`, which compares your files with the project's after each move, and leaves what `git add` has staged as it was. It compares `pyproject.toml` by the names of its packages, so another version of a package does not count as a difference. It does not compare the lines of `uv.lock`. It checks that you and the project both have a `uv.lock`, or both have none. It also checks that your `uv.lock` is up to date with your `pyproject.toml`. Where the project's own `uv.lock` is not, the page gives `git check` the option `--stale-lock`, which leaves out that check.
+
+```bash
+echo '/pyproject.toml diff=names' >> .git/info/attributes
+git config diff.names.textconv "sed -E 's/^([[:space:]]*\"[A-Za-z0-9_.-]+(\\[[^]]*\\])?)[^\";]*/\\1/'"
+git config alias.check '!f() { i="$(git rev-parse --git-path check-index)" && { cp "$(git rev-parse --git-path index)" "$i" 2>/dev/null || rm -f "$i"; } && export GIT_INDEX_FILE="$i" && git add -A && git diff --cached "$1" -- ":/" ":(top,exclude,glob)uv.lock" && git diff --cached --name-status --diff-filter=AD "$1" -- ":(top,glob)uv.lock" && { [ "$2" = --stale-lock ] || [ ! -f uv.lock ] || uv lock --check -q; }; }; f'
+```
+
+### The parts
+
+- [0 Where the release starts](build/release-00.qmd)
+- [1 Release 0.2.0](build/release-01.qmd)

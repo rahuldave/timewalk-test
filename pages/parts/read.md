@@ -32,17 +32,17 @@ Both tests pass. The graph shows the branch `parts`, which leaves `main` where t
 
 ### What changed
 
-- <a id="parts-01-.gitignore-a5cc29"></a>`.gitignore`: New, 10 lines. [The file](https://github.com/o/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/.gitignore).
-- <a id="parts-01-.python-version-7696e9"></a>`.python-version`: New, 1 line. [The file](https://github.com/o/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/.python-version).
-- <a id="parts-01-README.md-8ec9a0"></a>`README.md`: New, 3 lines. [The file](https://github.com/o/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/README.md).
-- <a id="parts-01-justfile-424f0b"></a>`justfile`: adds `recipe default`, `recipe run`, `recipe setup`, `recipe test`. New, 15 lines. [The file](https://github.com/o/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/justfile).
-- <a id="parts-01-pyproject.toml-5d07e7"></a>`pyproject.toml`: New, 14 lines. [The file](https://github.com/o/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/pyproject.toml).
-- <a id="parts-01-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `count`, which ignores case from the first day, and the command. New, 16 lines. [The file](https://github.com/o/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/src/tally/__init__.py).
+- <a id="parts-01-.gitignore-a5cc29"></a>`.gitignore`: New, 10 lines. [The file](https://github.com/rahuldave/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/.gitignore).
+- <a id="parts-01-.python-version-7696e9"></a>`.python-version`: New, 1 line. [The file](https://github.com/rahuldave/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/.python-version).
+- <a id="parts-01-README.md-8ec9a0"></a>`README.md`: New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/README.md).
+- <a id="parts-01-justfile-424f0b"></a>`justfile`: adds `recipe default`, `recipe run`, `recipe setup`, `recipe test`. New, 15 lines. [The file](https://github.com/rahuldave/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/justfile).
+- <a id="parts-01-pyproject.toml-5d07e7"></a>`pyproject.toml`: New, 14 lines. [The file](https://github.com/rahuldave/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/pyproject.toml).
+- <a id="parts-01-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `count`, which ignores case from the first day, and the command. New, 16 lines. [The file](https://github.com/rahuldave/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/src/tally/__init__.py).
   - look at `for word in text.lower().split():`
-- <a id="parts-01-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: New, 3 lines. [The file](https://github.com/o/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/src/tally/__main__.py).
-- <a id="parts-01-tests-test_count.py-e674f6"></a>`tests/test_count.py`: a test of counting, and a test of case. New, 11 lines. [The file](https://github.com/o/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/tests/test_count.py).
+- <a id="parts-01-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/src/tally/__main__.py).
+- <a id="parts-01-tests-test_count.py-e674f6"></a>`tests/test_count.py`: a test of counting, and a test of case. New, 11 lines. [The file](https://github.com/rahuldave/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/tests/test_count.py).
   - look at `self.assertEqual(count("A a"), {"a": 2})`
-- <a id="parts-01-uv.lock-8356d8"></a>`uv.lock`: New, 8 lines. [The file](https://github.com/o/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/uv.lock).
+- <a id="parts-01-uv.lock-8356d8"></a>`uv.lock`: New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/e416331e1414a145c9a4e84a49ccd119cbaf2168/uv.lock).
 
 <details><summary>The diff of <code>.gitignore</code></summary>
 
@@ -181,7 +181,7 @@ Both tests pass. The graph shows the branch `parts`, which leaves `main` where t
 
 </details>
 
-[The code](https://github.com/o/tally/tree/e416331e1414a145c9a4e84a49ccd119cbaf2168).
+[The code](https://github.com/rahuldave/tally/tree/e416331e1414a145c9a4e84a49ccd119cbaf2168).
 
 <a id="parts-02"></a>
 
@@ -203,7 +203,7 @@ The three tests pass, and tally prints nothing for an empty text.
 
 ### What changed
 
-- <a id="parts-02-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/o/tally/blob/2792637d83ba3d968e83427f008dc24b2517b400/tests/test_empty.py).
+- <a id="parts-02-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/2792637d83ba3d968e83427f008dc24b2517b400/tests/test_empty.py).
   - look at `self.assertEqual(count(""), {})`
 
 <details><summary>The diff of <code>tests/test_empty.py</code></summary>
@@ -222,4 +222,4 @@ The three tests pass, and tally prints nothing for an empty text.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/e416331e1414a145c9a4e84a49ccd119cbaf2168...2792637d83ba3d968e83427f008dc24b2517b400). [The code after it](https://github.com/o/tally/tree/2792637d83ba3d968e83427f008dc24b2517b400).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/e416331e1414a145c9a4e84a49ccd119cbaf2168...2792637d83ba3d968e83427f008dc24b2517b400). [The code after it](https://github.com/rahuldave/tally/tree/2792637d83ba3d968e83427f008dc24b2517b400).

@@ -20,15 +20,15 @@ the page checks your files against it.
 You build the project in a clone of your own, on a branch `mine` that starts where this walk starts. Run the commands of these pages in its top folder.
 
 ```bash
-git clone https://github.com/o/tally
+git clone https://github.com/rahuldave/tally
 cd tally
 git switch -c mine eb951f747563
 ```
 
-Then add the command `git check`, which compares your files with the project's after each move.
+Then add the command `git check`, which compares your files with the project's after each move, and leaves what `git add` has staged as it was.
 
 ```bash
-git config alias.check '!f() { git add -A && git diff --cached --stat "$1"; }; f'
+git config alias.check '!f() { i="$(git rev-parse --git-path check-index)" && { cp "$(git rev-parse --git-path index)" "$i" 2>/dev/null || rm -f "$i"; } && export GIT_INDEX_FILE="$i" && git add -A && git diff --cached --stat "$1"; }; f'
 ```
 
 <a id="hooks-00"></a>
@@ -48,16 +48,28 @@ just --list
 
 It lists the recipes of tally, and none of them checks the code.
 
+Check your files against this part. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check eb951f747563
+```
+
+If you are stuck, this command puts the files of this part in place of yours. A file that you made yourself stays:
+
+```bash
+git rm -rq --cached --ignore-unmatch -- :/ && git restore --source eb951f747563 --staged --worktree -- :/
+```
+
 ### What changed
 
-- <a id="hooks-00-.gitignore-a5cc29"></a>`.gitignore`: New, 10 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.gitignore).
-- <a id="hooks-00-.python-version-7696e9"></a>`.python-version`: New, 1 line. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.python-version).
-- <a id="hooks-00-README.md-8ec9a0"></a>`README.md`: New, 3 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/README.md).
-- <a id="hooks-00-justfile-424f0b"></a>`justfile`: adds `recipe default`, `recipe run`, `recipe setup`, `recipe test`. New, 15 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/justfile).
-- <a id="hooks-00-pyproject.toml-5d07e7"></a>`pyproject.toml`: New, 14 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/pyproject.toml).
-- <a id="hooks-00-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: adds `count`, `main`. New, 16 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
-- <a id="hooks-00-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: New, 3 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__main__.py).
-- <a id="hooks-00-uv.lock-8356d8"></a>`uv.lock`: New, 8 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/uv.lock).
+- <a id="hooks-00-.gitignore-a5cc29"></a>`.gitignore`: New, 10 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.gitignore).
+- <a id="hooks-00-.python-version-7696e9"></a>`.python-version`: New, 1 line. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.python-version).
+- <a id="hooks-00-README.md-8ec9a0"></a>`README.md`: New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/README.md).
+- <a id="hooks-00-justfile-424f0b"></a>`justfile`: adds `recipe default`, `recipe run`, `recipe setup`, `recipe test`. New, 15 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/justfile).
+- <a id="hooks-00-pyproject.toml-5d07e7"></a>`pyproject.toml`: New, 14 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/pyproject.toml).
+- <a id="hooks-00-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: adds `count`, `main`. New, 16 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
+- <a id="hooks-00-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__main__.py).
+- <a id="hooks-00-uv.lock-8356d8"></a>`uv.lock`: New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/uv.lock).
 
 <details><summary>The diff of <code>.gitignore</code></summary>
 
@@ -177,7 +189,7 @@ It lists the recipes of tally, and none of them checks the code.
 
 </details>
 
-[The code](https://github.com/o/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
+[The code](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
 
 <a id="hooks-01"></a>
 
@@ -190,7 +202,7 @@ just setup
 A check that each person must remember to run is a check that someone forgets. We write the check as a recipe.
 Then a hook runs the recipe before each `git commit`, and a last recipe tells git to use the hook.
 
-[The code before this part](https://github.com/o/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/o/tally/tree/531ba4ddcb71619b788518683004a96f9574a461).
+[The code before this part](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/rahuldave/tally/tree/531ba4ddcb71619b788518683004a96f9574a461).
 
 <a id="hooks-01.1"></a>
 
@@ -202,7 +214,7 @@ every Python file of tally. Python then reports a syntax error at once, without 
 Apply the patch to [`justfile`](#hooks-01.1-justfile-424f0b), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/e1ef40fe88bbf92165b8da067169897e163a59af.diff | git apply --include=justfile
+curl -fsSL https://github.com/rahuldave/tally/commit/e1ef40fe88bbf92165b8da067169897e163a59af.diff | git apply --include=justfile
 ```
 
 The patch adds the recipe `check` at the end of the `justfile`.
@@ -227,7 +239,7 @@ git restore --source eb951f747563 --staged -- :/ && git restore --source e1ef40f
 
 #### What changed
 
-- <a id="hooks-01.1-justfile-424f0b"></a>`justfile`: the recipe compiles every Python file. 4 lines added. [The file](https://github.com/o/tally/blob/e1ef40fe88bbf92165b8da067169897e163a59af/justfile).
+- <a id="hooks-01.1-justfile-424f0b"></a>`justfile`: the recipe compiles every Python file. 4 lines added. [The file](https://github.com/rahuldave/tally/blob/e1ef40fe88bbf92165b8da067169897e163a59af/justfile).
   - look at `uv run python -m py_compile src/tally/*.py`
 
 <details open><summary>The patch to <code>justfile</code></summary>
@@ -245,7 +257,7 @@ git restore --source eb951f747563 --staged -- :/ && git restore --source e1ef40f
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/e1ef40fe88bbf92165b8da067169897e163a59af). [The code after it](https://github.com/o/tally/tree/e1ef40fe88bbf92165b8da067169897e163a59af).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/e1ef40fe88bbf92165b8da067169897e163a59af). [The code after it](https://github.com/rahuldave/tally/tree/e1ef40fe88bbf92165b8da067169897e163a59af).
 
 <a id="hooks-01.2"></a>
 
@@ -259,7 +271,7 @@ file comes whole, as a patch.
 Apply the patch to [`hooks/pre-commit`](#hooks-01.2-hooks-pre-commit-470a57), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1.diff | git apply --include=hooks/pre-commit
+curl -fsSL https://github.com/rahuldave/tally/commit/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1.diff | git apply --include=hooks/pre-commit
 ```
 
 Read its last line, `just check`. It is the whole of what the hook does.
@@ -284,7 +296,7 @@ git restore --source e1ef40fe88bb --staged -- :/ && git restore --source 5bd8d5b
 
 #### What changed
 
-- <a id="hooks-01.2-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: three lines that git runs before a `git commit`. the hook only runs the check. New, 3 lines. [The file](https://github.com/o/tally/blob/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1/hooks/pre-commit).
+- <a id="hooks-01.2-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: three lines that git runs before a `git commit`. the hook only runs the check. New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1/hooks/pre-commit).
   - look at `just check`
 
 <details open><summary>The patch to <code>hooks/pre-commit</code></summary>
@@ -298,7 +310,7 @@ git restore --source e1ef40fe88bb --staged -- :/ && git restore --source 5bd8d5b
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1). [The code after it](https://github.com/o/tally/tree/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1). [The code after it](https://github.com/rahuldave/tally/tree/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1).
 
 <a id="hooks-01.3"></a>
 
@@ -333,9 +345,9 @@ git restore --source 5bd8d5bb524c --staged -- :/ && git restore --source 8d19bc5
 
 #### What changed
 
-- <a id="hooks-01.3-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: Its lines stay as they were. It comes from `chmod +x hooks/pre-commit`. [The file](https://github.com/o/tally/blob/8d19bc56776ab8ebc942b5465d8dd270e33e7485/hooks/pre-commit).
+- <a id="hooks-01.3-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: Its lines stay as they were. It comes from `chmod +x hooks/pre-commit`. [The file](https://github.com/rahuldave/tally/blob/8d19bc56776ab8ebc942b5465d8dd270e33e7485/hooks/pre-commit).
 
-[This change on GitHub](https://github.com/o/tally/commit/8d19bc56776ab8ebc942b5465d8dd270e33e7485). [The code after it](https://github.com/o/tally/tree/8d19bc56776ab8ebc942b5465d8dd270e33e7485).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/8d19bc56776ab8ebc942b5465d8dd270e33e7485). [The code after it](https://github.com/rahuldave/tally/tree/8d19bc56776ab8ebc942b5465d8dd270e33e7485).
 
 <a id="hooks-01.4"></a>
 
@@ -349,7 +361,7 @@ the folder of hooks. The recipe changes the settings of git, so it is a recipe o
 Apply the patch to [`justfile`](#hooks-01.4-justfile-424f0b), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/531ba4ddcb71619b788518683004a96f9574a461.diff | git apply --include=justfile
+curl -fsSL https://github.com/rahuldave/tally/commit/531ba4ddcb71619b788518683004a96f9574a461.diff | git apply --include=justfile
 ```
 
 The patch adds the recipe `install-hook`, with its comment, at the end of the `justfile`.
@@ -374,7 +386,7 @@ git restore --source 8d19bc56776a --staged -- :/ && git restore --source 531ba4d
 
 #### What changed
 
-- <a id="hooks-01.4-justfile-424f0b"></a>`justfile`: one line of git config, in a recipe of its own. 4 lines added. [The file](https://github.com/o/tally/blob/531ba4ddcb71619b788518683004a96f9574a461/justfile).
+- <a id="hooks-01.4-justfile-424f0b"></a>`justfile`: one line of git config, in a recipe of its own. 4 lines added. [The file](https://github.com/rahuldave/tally/blob/531ba4ddcb71619b788518683004a96f9574a461/justfile).
   - look at `git config core.hooksPath hooks`
 
 <details open><summary>The patch to <code>justfile</code></summary>
@@ -392,7 +404,7 @@ git restore --source 8d19bc56776a --staged -- :/ && git restore --source 531ba4d
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/531ba4ddcb71619b788518683004a96f9574a461). [The code after it](https://github.com/o/tally/tree/531ba4ddcb71619b788518683004a96f9574a461).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/531ba4ddcb71619b788518683004a96f9574a461). [The code after it](https://github.com/rahuldave/tally/tree/531ba4ddcb71619b788518683004a96f9574a461).
 
 <a id="hooks-02"></a>
 
@@ -405,7 +417,7 @@ just setup
 Code that compiles can still count wrong. The tests find that, so the hook must run them too. First we write a
 test, then the hook runs the tests after the check.
 
-[The code before this part](https://github.com/o/tally/tree/531ba4ddcb71619b788518683004a96f9574a461). [The code after it](https://github.com/o/tally/tree/df640e57553c144400b44e92cf33341aafd445f2).
+[The code before this part](https://github.com/rahuldave/tally/tree/531ba4ddcb71619b788518683004a96f9574a461). [The code after it](https://github.com/rahuldave/tally/tree/df640e57553c144400b44e92cf33341aafd445f2).
 
 <a id="hooks-02.1"></a>
 
@@ -417,7 +429,7 @@ the words of `a b a`.
 Apply the patch to [`tests/test_count.py`](#hooks-02.1-tests-test_count.py-e674f6), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/03c1416124f56e13bcd39af675927dcbd399de44.diff | git apply --include=tests/test_count.py
+curl -fsSL https://github.com/rahuldave/tally/commit/03c1416124f56e13bcd39af675927dcbd399de44.diff | git apply --include=tests/test_count.py
 ```
 
 The patch makes the file `tests/test_count.py`, with the class `Count` and its test.
@@ -442,7 +454,7 @@ git restore --source 531ba4ddcb71 --staged -- :/ && git restore --source 03c1416
 
 #### What changed
 
-- <a id="hooks-02.1-tests-test_count.py-e674f6"></a>`tests/test_count.py`: one test of counting. New, 9 lines. [The file](https://github.com/o/tally/blob/03c1416124f56e13bcd39af675927dcbd399de44/tests/test_count.py).
+- <a id="hooks-02.1-tests-test_count.py-e674f6"></a>`tests/test_count.py`: one test of counting. New, 9 lines. [The file](https://github.com/rahuldave/tally/blob/03c1416124f56e13bcd39af675927dcbd399de44/tests/test_count.py).
   - look at `self.assertEqual(count("a b a"), {"a": 2, "b": 1})`
 
 <details open><summary>The patch to <code>tests/test_count.py</code></summary>
@@ -462,7 +474,7 @@ git restore --source 531ba4ddcb71 --staged -- :/ && git restore --source 03c1416
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/03c1416124f56e13bcd39af675927dcbd399de44). [The code after it](https://github.com/o/tally/tree/03c1416124f56e13bcd39af675927dcbd399de44).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/03c1416124f56e13bcd39af675927dcbd399de44). [The code after it](https://github.com/rahuldave/tally/tree/03c1416124f56e13bcd39af675927dcbd399de44).
 
 <a id="hooks-02.2"></a>
 
@@ -474,7 +486,7 @@ tests after the check.
 Apply the patch to [`hooks/pre-commit`](#hooks-02.2-hooks-pre-commit-470a57), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/df640e57553c144400b44e92cf33341aafd445f2.diff | git apply --include=hooks/pre-commit
+curl -fsSL https://github.com/rahuldave/tally/commit/df640e57553c144400b44e92cf33341aafd445f2.diff | git apply --include=hooks/pre-commit
 ```
 
 The patch adds one line at the end of `hooks/pre-commit`, after the line `just check`.
@@ -499,7 +511,7 @@ git restore --source 03c1416124f5 --staged -- :/ && git restore --source df640e5
 
 #### What changed
 
-- <a id="hooks-02.2-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: the tests run after the check. 1 line added. [The file](https://github.com/o/tally/blob/df640e57553c144400b44e92cf33341aafd445f2/hooks/pre-commit).
+- <a id="hooks-02.2-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: the tests run after the check. 1 line added. [The file](https://github.com/rahuldave/tally/blob/df640e57553c144400b44e92cf33341aafd445f2/hooks/pre-commit).
   - look at `uv run python -m unittest discover -s tests -q`
 
 <details open><summary>The patch to <code>hooks/pre-commit</code></summary>
@@ -514,4 +526,4 @@ git restore --source 03c1416124f5 --staged -- :/ && git restore --source df640e5
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/df640e57553c144400b44e92cf33341aafd445f2). [The code after it](https://github.com/o/tally/tree/df640e57553c144400b44e92cf33341aafd445f2).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/df640e57553c144400b44e92cf33341aafd445f2). [The code after it](https://github.com/rahuldave/tally/tree/df640e57553c144400b44e92cf33341aafd445f2).

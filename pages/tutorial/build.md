@@ -24,17 +24,17 @@ result, and a list names each file that changed, with what to look for in it.
 You build the project in a clone of your own, on a branch `mine` that starts where this walk starts. Run the commands of these pages in its top folder.
 
 ```bash
-git clone https://github.com/o/tally
+git clone https://github.com/rahuldave/tally
 cd tally
 git switch -c mine 6a63758166d3
 ```
 
-Then add the command `git check`, which compares your files with the project's after each move. It compares `pyproject.toml` by the names of its packages, so another version of a package does not count as a difference. It does not compare the lines of `uv.lock`. It checks that you and the project both have a `uv.lock`, or both have none. It also checks that your `uv.lock` is up to date with your `pyproject.toml`.
+Then add the command `git check`, which compares your files with the project's after each move, and leaves what `git add` has staged as it was. It compares `pyproject.toml` by the names of its packages, so another version of a package does not count as a difference. It does not compare the lines of `uv.lock`. It checks that you and the project both have a `uv.lock`, or both have none. It also checks that your `uv.lock` is up to date with your `pyproject.toml`. Where the project's own `uv.lock` is not, the page gives `git check` the option `--stale-lock`, which leaves out that check.
 
 ```bash
 echo '/pyproject.toml diff=names' >> .git/info/attributes
 git config diff.names.textconv "sed -E 's/^([[:space:]]*\"[A-Za-z0-9_.-]+(\\[[^]]*\\])?)[^\";]*/\\1/'"
-git config alias.check '!f() { git add -A && git diff --cached "$1" -- ":/" ":(top,exclude,glob)uv.lock" && git diff --cached --name-status --diff-filter=AD "$1" -- ":(top,glob)uv.lock" && { [ ! -f uv.lock ] || uv lock --check -q; }; }; f'
+git config alias.check '!f() { i="$(git rev-parse --git-path check-index)" && { cp "$(git rev-parse --git-path index)" "$i" 2>/dev/null || rm -f "$i"; } && export GIT_INDEX_FILE="$i" && git add -A && git diff --cached "$1" -- ":/" ":(top,exclude,glob)uv.lock" && git diff --cached --name-status --diff-filter=AD "$1" -- ":(top,glob)uv.lock" && { [ "$2" = --stale-lock ] || [ ! -f uv.lock ] || uv lock --check -q; }; }; f'
 ```
 
 <a id="step-00"></a>
@@ -54,17 +54,29 @@ uv run tally
 
 It prints `tally: nothing to count yet`.
 
+Check your files against this part. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 6a63758166d3
+```
+
+If you are stuck, this command puts the files of this part in place of yours. A file that you made yourself stays:
+
+```bash
+git rm -rq --cached --ignore-unmatch -- :/ && git restore --source 6a63758166d3 --staged --worktree -- :/
+```
+
 ### What changed
 
-- <a id="step-00-.gitignore-a5cc29"></a>`.gitignore`: the files that git does not hold, such as `.venv`. New, 10 lines. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/.gitignore).
-- <a id="step-00-.python-version-7696e9"></a>`.python-version`: the version of Python that uv uses. New, 1 line. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/.python-version).
-- <a id="step-00-README.md-8ec9a0"></a>`README.md`: one line about tally. New, 3 lines. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/README.md).
-- <a id="step-00-justfile-424f0b"></a>`justfile`: the recipes, with `setup` first. New, 15 lines. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/justfile).
-- <a id="step-00-pyproject.toml-5d07e7"></a>`pyproject.toml`: the project, and the table `[project.scripts]` that makes the command `tally`. New, 14 lines. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/pyproject.toml).
+- <a id="step-00-.gitignore-a5cc29"></a>`.gitignore`: the files that git does not hold, such as `.venv`. New, 10 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/.gitignore).
+- <a id="step-00-.python-version-7696e9"></a>`.python-version`: the version of Python that uv uses. New, 1 line. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/.python-version).
+- <a id="step-00-README.md-8ec9a0"></a>`README.md`: one line about tally. New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/README.md).
+- <a id="step-00-justfile-424f0b"></a>`justfile`: the recipes, with `setup` first. New, 15 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/justfile).
+- <a id="step-00-pyproject.toml-5d07e7"></a>`pyproject.toml`: the project, and the table `[project.scripts]` that makes the command `tally`. New, 14 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/pyproject.toml).
   - look at `tally = "tally:main"`
-- <a id="step-00-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main`, which has nothing to count yet. New, 5 lines. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/src/tally/__init__.py).
-- <a id="step-00-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: lets `python -m tally` run `main` too. New, 3 lines. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/src/tally/__main__.py).
-- <a id="step-00-uv.lock-8356d8"></a>`uv.lock`: the exact packages, the same for every learner. New, 8 lines. [The file](https://github.com/o/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/uv.lock).
+- <a id="step-00-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main`, which has nothing to count yet. New, 5 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/src/tally/__init__.py).
+- <a id="step-00-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: lets `python -m tally` run `main` too. New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/src/tally/__main__.py).
+- <a id="step-00-uv.lock-8356d8"></a>`uv.lock`: the exact packages, the same for every learner. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/uv.lock).
 
 <details><summary>The diff of <code>.gitignore</code></summary>
 
@@ -173,7 +185,7 @@ It prints `tally: nothing to count yet`.
 
 </details>
 
-[The code](https://github.com/o/tally/tree/6a63758166d3aeee516faa6244414d7b54b5a730).
+[The code](https://github.com/rahuldave/tally/tree/6a63758166d3aeee516faa6244414d7b54b5a730).
 
 <a id="step-01"></a>
 
@@ -186,7 +198,7 @@ just setup
 tally must count the words of a text. First we write a function that counts, and try it alone. Then the command
 reads a text, and prints what the function counts.
 
-[The code before this part](https://github.com/o/tally/tree/6a63758166d3aeee516faa6244414d7b54b5a730). [The code after it](https://github.com/o/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
+[The code before this part](https://github.com/rahuldave/tally/tree/6a63758166d3aeee516faa6244414d7b54b5a730). [The code after it](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
 
 <a id="step-01.1"></a>
 
@@ -198,7 +210,7 @@ many times it appears. It goes in `src/tally/__init__.py`, above `main`. The com
 Apply the patch to [`src/tally/__init__.py`](#step-01.1-src-tally-__init__.py-b5485b), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/12fcbe75226dde15e7500b71439bad84712fd2b0.diff | git apply --include=src/tally/__init__.py
+curl -fsSL https://github.com/rahuldave/tally/commit/12fcbe75226dde15e7500b71439bad84712fd2b0.diff | git apply --include=src/tally/__init__.py
 ```
 
 The patch puts `count` above the line `def main() -> None:`, with two blank lines between them.
@@ -224,7 +236,7 @@ git restore --source 6a63758166d3 --staged -- :/ && git restore --source 12fcbe7
 
 #### What changed
 
-- <a id="step-01.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: a dictionary from each word to how many times it appears. 7 lines added. [The file](https://github.com/o/tally/blob/12fcbe75226dde15e7500b71439bad84712fd2b0/src/tally/__init__.py).
+- <a id="step-01.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: a dictionary from each word to how many times it appears. 7 lines added. [The file](https://github.com/rahuldave/tally/blob/12fcbe75226dde15e7500b71439bad84712fd2b0/src/tally/__init__.py).
   - look at `counts[word] = counts.get(word, 0) + 1`
 
 <details open><summary>The patch to <code>src/tally/__init__.py</code></summary>
@@ -247,7 +259,7 @@ git restore --source 6a63758166d3 --staged -- :/ && git restore --source 12fcbe7
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/12fcbe75226dde15e7500b71439bad84712fd2b0). [The code after it](https://github.com/o/tally/tree/12fcbe75226dde15e7500b71439bad84712fd2b0).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/12fcbe75226dde15e7500b71439bad84712fd2b0). [The code after it](https://github.com/rahuldave/tally/tree/12fcbe75226dde15e7500b71439bad84712fd2b0).
 
 <a id="step-01.2"></a>
 
@@ -260,7 +272,7 @@ counts. It reads the file that the command names, or the standard input when the
 Apply the patch to [`src/tally/__init__.py`](#step-01.2-src-tally-__init__.py-b5485b), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/eb951f74756383392f528427a0cf44e135d5c64f.diff | git apply --include=src/tally/__init__.py
+curl -fsSL https://github.com/rahuldave/tally/commit/eb951f74756383392f528427a0cf44e135d5c64f.diff | git apply --include=src/tally/__init__.py
 ```
 
 The patch adds `import sys` under the docstring of the module, and writes `main` again, in place of the old one.
@@ -285,7 +297,7 @@ git restore --source 12fcbe75226d --staged -- :/ && git restore --source eb951f7
 
 #### What changed
 
-- <a id="step-01.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main` reads the text and prints the counts. 5 lines added, 1 removed. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
+- <a id="step-01.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main` reads the text and prints the counts. 5 lines added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
   - look at `for word, n in sorted(count(text).items()):`
 
 <details open><summary>The patch to <code>src/tally/__init__.py</code></summary>
@@ -311,7 +323,7 @@ git restore --source 12fcbe75226d --staged -- :/ && git restore --source eb951f7
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/o/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
 
 <a id="step-02"></a>
 
@@ -326,7 +338,7 @@ Each test gives `count` a text, and compares what it gives back with what we exp
 We add the tests one file at a time, and run them after each. One test asks for something that `count` cannot do yet. It asks `count` to count
 "The" and "the" as one word.
 
-[The code before this part](https://github.com/o/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/o/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
+[The code before this part](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/rahuldave/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
 
 <a id="step-02.1"></a>
 
@@ -349,7 +361,7 @@ The first file of tests, `tests/test_count.py`, has two tests. `test_words` coun
 Apply the patch to [`tests/test_count.py`](#step-02.1-tests-test_count.py-e674f6), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/6a4b1a0e50035c4060f84b50770e234b2156be10.diff | git apply --include=tests/test_count.py
+curl -fsSL https://github.com/rahuldave/tally/commit/6a4b1a0e50035c4060f84b50770e234b2156be10.diff | git apply --include=tests/test_count.py
 ```
 
 The patch makes the file `tests/test_count.py`, with the class `Count` and its two tests.
@@ -375,7 +387,7 @@ git restore --source eb951f747563 --staged -- :/ && git restore --source 6a4b1a0
 
 #### What changed
 
-- <a id="step-02.1-tests-test_count.py-e674f6"></a>`tests/test_count.py`: two tests. The second asks for something the code cannot do yet. New, 11 lines. [The file](https://github.com/o/tally/blob/6a4b1a0e50035c4060f84b50770e234b2156be10/tests/test_count.py).
+- <a id="step-02.1-tests-test_count.py-e674f6"></a>`tests/test_count.py`: two tests. The second asks for something the code cannot do yet. New, 11 lines. [The file](https://github.com/rahuldave/tally/blob/6a4b1a0e50035c4060f84b50770e234b2156be10/tests/test_count.py).
   - look at `self.assertEqual(count("A a"), {"a": 2})`
 
 <details open><summary>The patch to <code>tests/test_count.py</code></summary>
@@ -397,7 +409,7 @@ git restore --source eb951f747563 --staged -- :/ && git restore --source 6a4b1a0
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/6a4b1a0e50035c4060f84b50770e234b2156be10). [The code after it](https://github.com/o/tally/tree/6a4b1a0e50035c4060f84b50770e234b2156be10).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/6a4b1a0e50035c4060f84b50770e234b2156be10). [The code after it](https://github.com/rahuldave/tally/tree/6a4b1a0e50035c4060f84b50770e234b2156be10).
 
 <a id="step-02.2"></a>
 
@@ -409,7 +421,7 @@ file of its own, `tests/test_empty.py`, says so, and keeps it true after later c
 Apply the patch to [`tests/test_empty.py`](#step-02.2-tests-test_empty.py-ffb51e), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/4f9bfa3d9c08307287e81a631039894490a3e590.diff | git apply --include=tests/test_empty.py
+curl -fsSL https://github.com/rahuldave/tally/commit/4f9bfa3d9c08307287e81a631039894490a3e590.diff | git apply --include=tests/test_empty.py
 ```
 
 The patch makes the file `tests/test_empty.py`, with the class `Empty` and its test.
@@ -434,7 +446,7 @@ git restore --source 6a4b1a0e5003 --staged -- :/ && git restore --source 4f9bfa3
 
 #### What changed
 
-- <a id="step-02.2-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/o/tally/blob/4f9bfa3d9c08307287e81a631039894490a3e590/tests/test_empty.py).
+- <a id="step-02.2-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/4f9bfa3d9c08307287e81a631039894490a3e590/tests/test_empty.py).
   - look at `self.assertEqual(count(""), {})`
 
 <details open><summary>The patch to <code>tests/test_empty.py</code></summary>
@@ -453,7 +465,7 @@ git restore --source 6a4b1a0e5003 --staged -- :/ && git restore --source 4f9bfa3
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/4f9bfa3d9c08307287e81a631039894490a3e590). [The code after it](https://github.com/o/tally/tree/4f9bfa3d9c08307287e81a631039894490a3e590).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/4f9bfa3d9c08307287e81a631039894490a3e590). [The code after it](https://github.com/rahuldave/tally/tree/4f9bfa3d9c08307287e81a631039894490a3e590).
 
 <a id="step-02.3"></a>
 
@@ -465,7 +477,7 @@ it splits it, every word is counted in lower case. One word in the loop of `coun
 Apply the patch to [`src/tally/__init__.py`](#step-02.3-src-tally-__init__.py-b5485b), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20.diff | git apply --include=src/tally/__init__.py
+curl -fsSL https://github.com/rahuldave/tally/commit/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20.diff | git apply --include=src/tally/__init__.py
 ```
 
 In `count`, the patch puts `text.lower().split()` in place of `text.split()`.
@@ -491,7 +503,7 @@ git restore --source 4f9bfa3d9c08 --staged -- :/ && git restore --source bfcbe07
 
 #### What changed
 
-- <a id="step-02.3-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: one word, `lower()`, answers the failing test. 1 line added, 1 removed. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/src/tally/__init__.py).
+- <a id="step-02.3-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: one word, `lower()`, answers the failing test. 1 line added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/src/tally/__init__.py).
   - look at `for word in text.lower().split():`
 
 <details open><summary>The patch to <code>src/tally/__init__.py</code></summary>
@@ -510,7 +522,7 @@ git restore --source 4f9bfa3d9c08 --staged -- :/ && git restore --source bfcbe07
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/o/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/rahuldave/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
 
 <a id="step-03"></a>
 
@@ -524,7 +536,7 @@ tally works, and it has tests. Two things help the work ahead. Code in one style
 so we install ruff, a formatter and linter. And a count of three words shows little, so `just setup` makes a
 corpus, a text of 2000 words to count.
 
-[The code before this part](https://github.com/o/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/o/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35).
+[The code before this part](https://github.com/rahuldave/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/rahuldave/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35).
 
 <a id="step-03.1"></a>
 
@@ -564,9 +576,9 @@ git restore --source bfcbe07463b5 --staged -- :/ && git restore --source edb9544
 
 #### What changed
 
-- <a id="step-03.1-pyproject.toml-5d07e7"></a>`pyproject.toml`: ruff, in a group of its own. The version is the newest on the day that ruff was added. 5 lines added. It comes from `uv add --dev ruff`. [The file](https://github.com/o/tally/blob/edb9544c04d29869122cfcef2a0c2173b94c3b06/pyproject.toml).
+- <a id="step-03.1-pyproject.toml-5d07e7"></a>`pyproject.toml`: ruff, in a group of its own. The version is the newest on the day that ruff was added. 5 lines added. It comes from `uv add --dev ruff`. [The file](https://github.com/rahuldave/tally/blob/edb9544c04d29869122cfcef2a0c2173b94c3b06/pyproject.toml).
   - look at `"ruff>=0.17.0",`
-- <a id="step-03.1-uv.lock-8356d8"></a>`uv.lock`: the exact version of ruff, which every learner gets with `just setup`. 35 lines added. It comes from `uv add --dev ruff`. [The file](https://github.com/o/tally/blob/edb9544c04d29869122cfcef2a0c2173b94c3b06/uv.lock).
+- <a id="step-03.1-uv.lock-8356d8"></a>`uv.lock`: the exact version of ruff, which every learner gets with `just setup`. 35 lines added. It comes from `uv add --dev ruff`. [The file](https://github.com/rahuldave/tally/blob/edb9544c04d29869122cfcef2a0c2173b94c3b06/uv.lock).
   - look at `name = "ruff"`
 
 <details><summary>The diff that <code>uv add --dev ruff</code> makes in <code>pyproject.toml</code></summary>
@@ -585,7 +597,7 @@ git restore --source bfcbe07463b5 --staged -- :/ && git restore --source edb9544
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/edb9544c04d29869122cfcef2a0c2173b94c3b06). [The code after it](https://github.com/o/tally/tree/edb9544c04d29869122cfcef2a0c2173b94c3b06).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/edb9544c04d29869122cfcef2a0c2173b94c3b06). [The code after it](https://github.com/rahuldave/tally/tree/edb9544c04d29869122cfcef2a0c2173b94c3b06).
 
 <a id="step-03.2"></a>
 
@@ -597,7 +609,7 @@ It is a table `[tool.ruff]`, with a line length of 100.
 Apply the patch to [`pyproject.toml`](#step-03.2-pyproject.toml-5d07e7), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327.diff | git apply --include=pyproject.toml
+curl -fsSL https://github.com/rahuldave/tally/commit/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327.diff | git apply --include=pyproject.toml
 ```
 
 The patch adds the table `[tool.ruff]` at the end of `pyproject.toml`, after the group `dev`.
@@ -624,7 +636,7 @@ git restore --source edb9544c04d2 --staged -- :/ && git restore --source 0b7b0a8
 
 #### What changed
 
-- <a id="step-03.2-pyproject.toml-5d07e7"></a>`pyproject.toml`: one setting, for the linter and the formatter both. 3 lines added. [The file](https://github.com/o/tally/blob/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327/pyproject.toml).
+- <a id="step-03.2-pyproject.toml-5d07e7"></a>`pyproject.toml`: one setting, for the linter and the formatter both. 3 lines added. [The file](https://github.com/rahuldave/tally/blob/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327/pyproject.toml).
   - look at `line-length = 100`
 
 <details open><summary>The patch to <code>pyproject.toml</code></summary>
@@ -641,7 +653,7 @@ git restore --source edb9544c04d2 --staged -- :/ && git restore --source 0b7b0a8
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327). [The code after it](https://github.com/o/tally/tree/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327). [The code after it](https://github.com/rahuldave/tally/tree/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327).
 
 <a id="step-03.3"></a>
 
@@ -654,7 +666,7 @@ script comes whole, as a patch.
 Apply the patch to [`scripts/corpus.py`](#step-03.3-scripts-corpus.py-ab344b), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/1568a522d23312c59c6e42cb027ec25ba3ae8b35.diff | git apply --include=scripts/corpus.py
+curl -fsSL https://github.com/rahuldave/tally/commit/1568a522d23312c59c6e42cb027ec25ba3ae8b35.diff | git apply --include=scripts/corpus.py
 ```
 
 The corpus is an artifact, a file that the project makes and git does not hold. So `.gitignore` names the folder
@@ -663,7 +675,7 @@ The corpus is an artifact, a file that the project makes and git does not hold. 
 Apply the patch to [`.gitignore`](#step-03.3-.gitignore-a5cc29), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/1568a522d23312c59c6e42cb027ec25ba3ae8b35.diff | git apply --include=.gitignore
+curl -fsSL https://github.com/rahuldave/tally/commit/1568a522d23312c59c6e42cb027ec25ba3ae8b35.diff | git apply --include=.gitignore
 ```
 
 The patch adds the folder `data/` at the end of `.gitignore`, under a comment.
@@ -674,7 +686,7 @@ leaves a corpus that is there alone, so a second `just setup` writes nothing.
 Apply the patch to [`justfile`](#step-03.3-justfile-424f0b), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/1568a522d23312c59c6e42cb027ec25ba3ae8b35.diff | git apply --include=justfile
+curl -fsSL https://github.com/rahuldave/tally/commit/1568a522d23312c59c6e42cb027ec25ba3ae8b35.diff | git apply --include=justfile
 ```
 
 In the recipe `setup`, the patch adds the line that runs the script, after the line `uv sync`.
@@ -701,11 +713,11 @@ git restore --source 0b7b0a80e580 --staged -- :/ && git restore --source 1568a52
 
 #### What changed
 
-- <a id="step-03.3-.gitignore-a5cc29"></a>`.gitignore`: git does not hold the corpus. 3 lines added. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/.gitignore).
+- <a id="step-03.3-.gitignore-a5cc29"></a>`.gitignore`: git does not hold the corpus. 3 lines added. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/.gitignore).
   - look at `data/`
-- <a id="step-03.3-justfile-424f0b"></a>`justfile`: `just setup` now makes the corpus too. 1 line added. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/justfile).
+- <a id="step-03.3-justfile-424f0b"></a>`justfile`: `just setup` now makes the corpus too. 1 line added. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/justfile).
   - look at `uv run python scripts/corpus.py data/corpus.txt`
-- <a id="step-03.3-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: the script writes the same 2000 words each time, and leaves a corpus that is there alone. New, 25 lines. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/scripts/corpus.py).
+- <a id="step-03.3-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: the script writes the same 2000 words each time, and leaves a corpus that is there alone. New, 25 lines. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/scripts/corpus.py).
   - look at `if target.exists():`
 
 <details open><summary>The patch to <code>.gitignore</code></summary>
@@ -770,7 +782,7 @@ git restore --source 0b7b0a80e580 --staged -- :/ && git restore --source 1568a52
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/o/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/rahuldave/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35).
 
 <a id="step-04"></a>
 
@@ -784,7 +796,7 @@ To learn what `count` takes and what it gives, a reader must now read its body. 
 glance, and an editor can check it. One line under the signature can say what the function does. Neither changes
 what `count` does, so the tests pass as before.
 
-[The code before this part](https://github.com/o/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/o/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).
+[The code before this part](https://github.com/rahuldave/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).
 
 <a id="step-04.1"></a>
 
@@ -796,7 +808,7 @@ takes a `str`, and gives a `dict[str, int]`, a dictionary from words to counts. 
 Apply the patch to [`src/tally/__init__.py`](#step-04.1-src-tally-__init__.py-b5485b), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/a7606fcc89be70f26f75353333a506e9891a6ea1.diff | git apply --include=src/tally/__init__.py
+curl -fsSL https://github.com/rahuldave/tally/commit/a7606fcc89be70f26f75353333a506e9891a6ea1.diff | git apply --include=src/tally/__init__.py
 ```
 
 The patch writes the signature of `count` again, with its types.
@@ -821,7 +833,7 @@ git restore --source 1568a522d233 --staged -- :/ && git restore --source a7606fc
 
 #### What changed
 
-- <a id="step-04.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the signature says what goes in and what comes out. 1 line added, 1 removed. [The file](https://github.com/o/tally/blob/a7606fcc89be70f26f75353333a506e9891a6ea1/src/tally/__init__.py).
+- <a id="step-04.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the signature says what goes in and what comes out. 1 line added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/a7606fcc89be70f26f75353333a506e9891a6ea1/src/tally/__init__.py).
   - look at `def count(text: str) -> dict[str, int]:`
 
 <details open><summary>The patch to <code>src/tally/__init__.py</code></summary>
@@ -840,7 +852,7 @@ git restore --source 1568a522d233 --staged -- :/ && git restore --source a7606fc
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/a7606fcc89be70f26f75353333a506e9891a6ea1). [The code after it](https://github.com/o/tally/tree/a7606fcc89be70f26f75353333a506e9891a6ea1).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/a7606fcc89be70f26f75353333a506e9891a6ea1). [The code after it](https://github.com/rahuldave/tally/tree/a7606fcc89be70f26f75353333a506e9891a6ea1).
 
 <a id="step-04.2"></a>
 
@@ -852,7 +864,7 @@ the first line of a function. Python keeps it in `count.__doc__`, and `help(coun
 Apply the patch to [`src/tally/__init__.py`](#step-04.2-src-tally-__init__.py-b5485b), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/f79588d3b046ec2787725cdb6e3fcf952014e078.diff | git apply --include=src/tally/__init__.py
+curl -fsSL https://github.com/rahuldave/tally/commit/f79588d3b046ec2787725cdb6e3fcf952014e078.diff | git apply --include=src/tally/__init__.py
 ```
 
 The patch adds the docstring under the signature of `count`, before the line `counts = {}`.
@@ -877,7 +889,7 @@ git restore --source a7606fcc89be --staged -- :/ && git restore --source f79588d
 
 #### What changed
 
-- <a id="step-04.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: one line under the signature says what the function does. 1 line added. [The file](https://github.com/o/tally/blob/f79588d3b046ec2787725cdb6e3fcf952014e078/src/tally/__init__.py).
+- <a id="step-04.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: one line under the signature says what the function does. 1 line added. [The file](https://github.com/rahuldave/tally/blob/f79588d3b046ec2787725cdb6e3fcf952014e078/src/tally/__init__.py).
   - look at ``"How many times each word of `text` appears, ignoring case."``
 
 <details open><summary>The patch to <code>src/tally/__init__.py</code></summary>
@@ -895,7 +907,7 @@ git restore --source a7606fcc89be --staged -- :/ && git restore --source f79588d
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/o/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).
 
 <a id="step-05"></a>
 
@@ -909,7 +921,7 @@ tally prints a line for every word, in the order of the words. A reader of a lon
 first, and only a few of them. A function finds them, and an option of the command prints them. A recipe writes a
 report of the ten most common words of the corpus.
 
-[The code before this part](https://github.com/o/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/o/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
+[The code before this part](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
 
 <a id="step-05.1"></a>
 
@@ -922,7 +934,7 @@ word, so that two words with the same count keep one order. Then it keeps the fi
 Apply the patch to [`src/tally/__init__.py`](#step-05.1-src-tally-__init__.py-b5485b), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/72a0129dcee765132ad267788636ff4af9066369.diff | git apply --include=src/tally/__init__.py
+curl -fsSL https://github.com/rahuldave/tally/commit/72a0129dcee765132ad267788636ff4af9066369.diff | git apply --include=src/tally/__init__.py
 ```
 
 The patch puts `top` after `count` and before `main`, with two blank lines around it.
@@ -932,7 +944,7 @@ A test says what `top` must give. It gives `top` three words with their counts, 
 Apply the patch to [`tests/test_top.py`](#step-05.1-tests-test_top.py-1f85fe), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/72a0129dcee765132ad267788636ff4af9066369.diff | git apply --include=tests/test_top.py
+curl -fsSL https://github.com/rahuldave/tally/commit/72a0129dcee765132ad267788636ff4af9066369.diff | git apply --include=tests/test_top.py
 ```
 
 The patch makes the file `tests/test_top.py`, with its one test.
@@ -957,9 +969,9 @@ git restore --source f79588d3b046 --staged -- :/ && git restore --source 72a0129
 
 #### What changed
 
-- <a id="step-05.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: sort by count, most common first, then by the word. 5 lines added. [The file](https://github.com/o/tally/blob/72a0129dcee765132ad267788636ff4af9066369/src/tally/__init__.py).
+- <a id="step-05.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: sort by count, most common first, then by the word. 5 lines added. [The file](https://github.com/rahuldave/tally/blob/72a0129dcee765132ad267788636ff4af9066369/src/tally/__init__.py).
   - look at `return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]`
-- <a id="step-05.1-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: its test, with three words. New, 8 lines. [The file](https://github.com/o/tally/blob/72a0129dcee765132ad267788636ff4af9066369/tests/test_top.py).
+- <a id="step-05.1-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: its test, with three words. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/72a0129dcee765132ad267788636ff4af9066369/tests/test_top.py).
 
 <details open><summary>The patch to <code>src/tally/__init__.py</code></summary>
 
@@ -996,7 +1008,7 @@ git restore --source f79588d3b046 --staged -- :/ && git restore --source 72a0129
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/72a0129dcee765132ad267788636ff4af9066369). [The code after it](https://github.com/o/tally/tree/72a0129dcee765132ad267788636ff4af9066369).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/72a0129dcee765132ad267788636ff4af9066369). [The code after it](https://github.com/rahuldave/tally/tree/72a0129dcee765132ad267788636ff4af9066369).
 
 <a id="step-05.2"></a>
 
@@ -1009,7 +1021,7 @@ option before the name of the file, so the command is `tally --top 3 data/corpus
 Apply the patch to [`src/tally/__init__.py`](#step-05.2-src-tally-__init__.py-b5485b), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d.diff | git apply --include=src/tally/__init__.py
+curl -fsSL https://github.com/rahuldave/tally/commit/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d.diff | git apply --include=src/tally/__init__.py
 ```
 
 The patch writes `main` again, in place of the old one.
@@ -1034,7 +1046,7 @@ git restore --source 72a0129dcee7 --staged -- :/ && git restore --source c4b92c9
 
 #### What changed
 
-- <a id="step-05.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main` reads the option before the name of the file. 8 lines added, 3 removed. [The file](https://github.com/o/tally/blob/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d/src/tally/__init__.py).
+- <a id="step-05.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main` reads the option before the name of the file. 8 lines added, 3 removed. [The file](https://github.com/rahuldave/tally/blob/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d/src/tally/__init__.py).
   - look at `if args[:1] == ["--top"]:`
 
 <details open><summary>The patch to <code>src/tally/__init__.py</code></summary>
@@ -1059,7 +1071,7 @@ git restore --source 72a0129dcee7 --staged -- :/ && git restore --source c4b92c9
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d). [The code after it](https://github.com/o/tally/tree/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d). [The code after it](https://github.com/rahuldave/tally/tree/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d).
 
 <a id="step-05.3"></a>
 
@@ -1076,7 +1088,7 @@ prints each line before it runs it. The second line has two parts.
 Apply the patch to [`justfile`](#step-05.3-justfile-424f0b), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/commit/9e37b6eed29516f62bc176d1eaa66bf4e86683a6.diff | git apply --include=justfile
+curl -fsSL https://github.com/rahuldave/tally/commit/9e37b6eed29516f62bc176d1eaa66bf4e86683a6.diff | git apply --include=justfile
 ```
 
 The patch adds the recipe `report` at the end of the `justfile`.
@@ -1112,7 +1124,7 @@ git restore --source c4b92c9bd158 --staged -- :/ && git restore --source 9e37b6e
 
 #### What changed
 
-- <a id="step-05.3-justfile-424f0b"></a>`justfile`: the report, and the line in `setup` that makes it when it is missing. 6 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
+- <a id="step-05.3-justfile-424f0b"></a>`justfile`: the report, and the line in `setup` that makes it when it is missing. 6 lines added. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
   - look at `uv run tally --top 10 data/corpus.txt > build/top.txt`
   - look at `test -f build/top.txt || just report`
 
@@ -1140,7 +1152,7 @@ git restore --source c4b92c9bd158 --staged -- :/ && git restore --source 9e37b6e
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/o/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
 
 <a id="step-06"></a>
 
@@ -1156,7 +1168,7 @@ that says how to run tally, its tests and its report. The code does not change.
 Apply the patch to [`README.md`](#step-06-README.md-8ec9a0), from the top of the project:
 
 ```bash
-curl -fsSL https://github.com/o/tally/compare/9e37b6eed29516f62bc176d1eaa66bf4e86683a6...974d653080b0bd7dd06741b60225518cfecc908e.diff | git apply --include=README.md
+curl -fsSL https://github.com/rahuldave/tally/compare/9e37b6eed29516f62bc176d1eaa66bf4e86683a6...974d653080b0bd7dd06741b60225518cfecc908e.diff | git apply --include=README.md
 ```
 
 The patch adds the section "Run it" to `README.md`, after the line `Count the words in a text.`
@@ -1182,7 +1194,7 @@ git restore --source 9e37b6eed295 --staged -- :/ && git restore --source 974d653
 
 ### What changed
 
-- <a id="step-06-README.md-8ec9a0"></a>`README.md`: the commands that a new user needs first, in the order to run them. 10 lines added. [The file](https://github.com/o/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/README.md).
+- <a id="step-06-README.md-8ec9a0"></a>`README.md`: the commands that a new user needs first, in the order to run them. 10 lines added. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/README.md).
   - look at `## Run it`
 
 <details open><summary>The patch to <code>README.md</code></summary>
@@ -1206,4 +1218,4 @@ git restore --source 9e37b6eed295 --staged -- :/ && git restore --source 974d653
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/9e37b6eed29516f62bc176d1eaa66bf4e86683a6...974d653080b0bd7dd06741b60225518cfecc908e). [The code after it](https://github.com/o/tally/tree/974d653080b0bd7dd06741b60225518cfecc908e).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/9e37b6eed29516f62bc176d1eaa66bf4e86683a6...974d653080b0bd7dd06741b60225518cfecc908e). [The code after it](https://github.com/rahuldave/tally/tree/974d653080b0bd7dd06741b60225518cfecc908e).

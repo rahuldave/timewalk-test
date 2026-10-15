@@ -13,7 +13,7 @@ just setup
 Since the last part, the walk leaves out the function `top`, its test, and the option `--top`. This part begins
 with their code.
 
-[The code before this part](https://github.com/o/tally/tree/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d). [The code after it](https://github.com/o/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
+[The code before this part](https://github.com/rahuldave/tally/tree/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
 
 ## 5.3 A report, which just setup makes {#step-05.3}
 
@@ -51,7 +51,7 @@ tally is now finished. It counts, it has tests and types, and `just setup` makes
 
 ### What changed {#step-05.3-what-changed-182c57}
 
-- <a id="step-05.3-justfile-424f0b"></a>`justfile`: the report, and the line in `setup` that makes it when it is missing. 6 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
+- <a id="step-05.3-justfile-424f0b"></a>`justfile`: the report, and the line in `setup` that makes it when it is missing. 6 lines added. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
   - look at `uv run tally --top 10 data/corpus.txt > build/top.txt`
   - look at `test -f build/top.txt || just report`
 
@@ -79,4 +79,4 @@ tally is now finished. It counts, it has tests and types, and `just setup` makes
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/o/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).

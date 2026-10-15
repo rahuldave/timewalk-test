@@ -30,8 +30,9 @@ def render(
     done = subprocess.run([sys.executable, "-c", "from timewalk.export import main; main()", str(kit / "repo"), "--toc", str(kit / "toc.toml"),
                            "--walk", walk, "--json", str(facts), "--github", "https://github.com/o/tally"], capture_output=True, text=True)
     assert done.returncode == 0, done.stdout + done.stderr
-    done = subprocess.run([sys.executable, str(KIT / "scripts" / "render.py"), str(facts), "--markdown", str(out), "--site", str(out / "site")],
-                          capture_output=True, text=True)
+    # --repo: render.py runs uv lock --check at each commit, and gives git check --stale-lock where the project's uv.lock is out of date
+    done = subprocess.run([sys.executable, str(KIT / "scripts" / "render.py"), str(facts), "--markdown", str(out), "--site", str(out / "site"),
+                           "--repo", str(kit / "repo")], capture_output=True, text=True)
     assert done.returncode == 0, done.stdout + done.stderr
 
 

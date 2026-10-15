@@ -25,7 +25,7 @@ nothing to count.
 
 ## What changed {#step-01.1-what-changed-182c57}
 
-- <a id="step-01.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: a dictionary from each word to how many times it appears. 7 lines added. [The file](https://github.com/o/tally/blob/12fcbe75226dde15e7500b71439bad84712fd2b0/src/tally/__init__.py).
+- <a id="step-01.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: a dictionary from each word to how many times it appears. 7 lines added. [The file](https://github.com/rahuldave/tally/blob/12fcbe75226dde15e7500b71439bad84712fd2b0/src/tally/__init__.py).
   - look at `counts[word] = counts.get(word, 0) + 1`
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -48,4 +48,4 @@ nothing to count.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/6a63758166d3aeee516faa6244414d7b54b5a730...12fcbe75226dde15e7500b71439bad84712fd2b0). [The code after it](https://github.com/o/tally/tree/12fcbe75226dde15e7500b71439bad84712fd2b0).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/6a63758166d3aeee516faa6244414d7b54b5a730...12fcbe75226dde15e7500b71439bad84712fd2b0). [The code after it](https://github.com/rahuldave/tally/tree/12fcbe75226dde15e7500b71439bad84712fd2b0).

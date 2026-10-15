@@ -20,7 +20,7 @@ The three tests pass, and tally prints nothing for an empty text.
 
 ## What changed {#parts-02-what-changed-182c57}
 
-- <a id="parts-02-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/o/tally/blob/2792637d83ba3d968e83427f008dc24b2517b400/tests/test_empty.py).
+- <a id="parts-02-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/2792637d83ba3d968e83427f008dc24b2517b400/tests/test_empty.py).
   - look at `self.assertEqual(count(""), {})`
 
 <details><summary>The diff of <code>tests/test_empty.py</code></summary>
@@ -39,4 +39,4 @@ The three tests pass, and tally prints nothing for an empty text.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/e416331e1414a145c9a4e84a49ccd119cbaf2168...2792637d83ba3d968e83427f008dc24b2517b400). [The code after it](https://github.com/o/tally/tree/2792637d83ba3d968e83427f008dc24b2517b400).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/e416331e1414a145c9a4e84a49ccd119cbaf2168...2792637d83ba3d968e83427f008dc24b2517b400). [The code after it](https://github.com/rahuldave/tally/tree/2792637d83ba3d968e83427f008dc24b2517b400).

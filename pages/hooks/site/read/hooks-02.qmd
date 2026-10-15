@@ -13,7 +13,7 @@ just setup
 Code that compiles can still count wrong. The tests find that, so the hook must run them too. First we write a
 test, then the hook runs the tests after the check.
 
-[The code before this part](https://github.com/o/tally/tree/531ba4ddcb71619b788518683004a96f9574a461). [The code after it](https://github.com/o/tally/tree/df640e57553c144400b44e92cf33341aafd445f2).
+[The code before this part](https://github.com/rahuldave/tally/tree/531ba4ddcb71619b788518683004a96f9574a461). [The code after it](https://github.com/rahuldave/tally/tree/df640e57553c144400b44e92cf33341aafd445f2).
 
 ## 2.1 A first test {#hooks-02.1}
 
@@ -32,7 +32,7 @@ The test passes.
 
 ### What changed {#hooks-02.1-what-changed-182c57}
 
-- <a id="hooks-02.1-tests-test_count.py-e674f6"></a>`tests/test_count.py`: one test of counting. New, 9 lines. [The file](https://github.com/o/tally/blob/03c1416124f56e13bcd39af675927dcbd399de44/tests/test_count.py).
+- <a id="hooks-02.1-tests-test_count.py-e674f6"></a>`tests/test_count.py`: one test of counting. New, 9 lines. [The file](https://github.com/rahuldave/tally/blob/03c1416124f56e13bcd39af675927dcbd399de44/tests/test_count.py).
   - look at `self.assertEqual(count("a b a"), {"a": 2, "b": 1})`
 
 <details><summary>The diff of <code>tests/test_count.py</code></summary>
@@ -52,7 +52,7 @@ The test passes.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/03c1416124f56e13bcd39af675927dcbd399de44). [The code after it](https://github.com/o/tally/tree/03c1416124f56e13bcd39af675927dcbd399de44).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/03c1416124f56e13bcd39af675927dcbd399de44). [The code after it](https://github.com/rahuldave/tally/tree/03c1416124f56e13bcd39af675927dcbd399de44).
 
 ## 2.2 The hook runs the tests too {#hooks-02.2}
 
@@ -71,7 +71,7 @@ The hook compiles the code, runs the tests, and prints `the hook passed`.
 
 ### What changed {#hooks-02.2-what-changed-182c57}
 
-- <a id="hooks-02.2-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: the tests run after the check. 1 line added. [The file](https://github.com/o/tally/blob/df640e57553c144400b44e92cf33341aafd445f2/hooks/pre-commit).
+- <a id="hooks-02.2-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: the tests run after the check. 1 line added. [The file](https://github.com/rahuldave/tally/blob/df640e57553c144400b44e92cf33341aafd445f2/hooks/pre-commit).
   - look at `uv run python -m unittest discover -s tests -q`
 
 <details><summary>The diff of <code>hooks/pre-commit</code></summary>
@@ -86,4 +86,4 @@ The hook compiles the code, runs the tests, and prints `the hook passed`.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/df640e57553c144400b44e92cf33341aafd445f2). [The code after it](https://github.com/o/tally/tree/df640e57553c144400b44e92cf33341aafd445f2).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/df640e57553c144400b44e92cf33341aafd445f2). [The code after it](https://github.com/rahuldave/tally/tree/df640e57553c144400b44e92cf33341aafd445f2).

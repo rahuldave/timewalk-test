@@ -1,0 +1,135 @@
+---
+title: "1 Release 0.2.0"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Read the tutorial.** [Build it yourself](../build/release-01.qmd) is the other way to read this part.
+
+```bash
+just setup
+```
+
+A release gives users a new version. Before it, we tidy the tests, and after it, the lockfile must name the new
+version too.
+
+[The code before this part](https://github.com/rahuldave/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/rahuldave/tally/tree/96d6bbd94a65f08776215543e0d3c49575422541).
+
+## 1.1 Tests of edge cases {#release-01.1}
+
+The file `tests/test_empty.py` tests one edge case, an empty text. A text of spaces alone is another edge case. One
+file can test both, so it gets a name that fits both, `tests/test_edge.py`, and a second test.
+
+A patch to [`tests/test_edge.py`](#release-01.1-tests-test_edge.py-24a601), which renames `tests/test_empty.py`.
+
+The file `tests/test_empty.py` is now `tests/test_edge.py`. Its class is `Edge`, and its new test `test_spaces`
+expects no words in a text of spaces, tabs and a newline.
+
+```bash
+uv run python -m unittest discover -s tests -q
+```
+
+All four tests pass.
+
+### What changed {#release-01.1-what-changed-182c57}
+
+- <a id="release-01.1-tests-test_edge.py-24a601"></a>`tests/test_edge.py`: a new name, and a second test. Renamed from `tests/test_empty.py`, 4 lines added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/a54eadb267e9052af3b1f4f5b2fe3e8f2a4184f7/tests/test_edge.py).
+  - look at `def test_spaces(self):`
+
+<details><summary>The diff of <code>tests/test_edge.py</code></summary>
+
+```diff
+@@ -3,6 +3,9 @@ import unittest
+ from tally import count
+ 
+ 
+-class Empty(unittest.TestCase):
++class Edge(unittest.TestCase):
+     def test_empty(self):
+         self.assertEqual(count(""), {})
++
++    def test_spaces(self):
++        self.assertEqual(count("  \n\t "), {})
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/a54eadb267e9052af3b1f4f5b2fe3e8f2a4184f7). [The code after it](https://github.com/rahuldave/tally/tree/a54eadb267e9052af3b1f4f5b2fe3e8f2a4184f7).
+
+## 1.2 Version 0.2.0 {#release-01.2}
+
+Users tell one release from another by its version. The version is a line of `pyproject.toml`.
+
+A patch to [`pyproject.toml`](#release-01.2-pyproject.toml-5d07e7).
+
+In `pyproject.toml`, the line `version` now says `0.2.0`.
+
+```bash
+grep -n '^version' pyproject.toml
+```
+
+It prints `3:version = "0.2.0"`. The lockfile, `uv.lock`, still names version 0.1.0 of tally, so it is out of date.
+The next move brings it up to date.
+
+### What changed {#release-01.2-what-changed-182c57}
+
+- <a id="release-01.2-pyproject.toml-5d07e7"></a>`pyproject.toml`: the new version. 1 line added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/aea02344f2e362ad133d77ae05653994a652aab3/pyproject.toml).
+  - look at `version = "0.2.0"`
+
+<details><summary>The diff of <code>pyproject.toml</code></summary>
+
+```diff
+@@ -1,6 +1,6 @@
+ [project]
+ name = "tally"
+-version = "0.1.0"
++version = "0.2.0"
+ description = "Count the words in a text"
+ readme = "README.md"
+ requires-python = ">=3.12"
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/aea02344f2e362ad133d77ae05653994a652aab3). [The code after it](https://github.com/rahuldave/tally/tree/aea02344f2e362ad133d77ae05653994a652aab3).
+
+## 1.3 The lock, and the list of changes {#release-01.3}
+
+`uv.lock` records the exact version of each package of the project, tally too. `uv lock` writes it again from
+`pyproject.toml`:
+
+This change came from running `uv lock`.
+
+A user of a release wants to know what changed. A new file, `CHANGES.md`, says it for 0.2.0.
+
+A patch to [`CHANGES.md`](#release-01.3-CHANGES.md-7facec).
+
+The new file `CHANGES.md` has a heading for 0.2.0, and says what changed in the tests.
+
+```bash
+uv lock --check && grep -A1 '^name = "tally"' uv.lock
+```
+
+`uv lock --check` prints nothing, because the lockfile is up to date. Then `grep` prints the entry of tally, with
+`version = "0.2.0"`.
+
+### What changed {#release-01.3-what-changed-182c57}
+
+- <a id="release-01.3-CHANGES.md-7facec"></a>`CHANGES.md`: the changes of 0.2.0. New, 5 lines. [The file](https://github.com/rahuldave/tally/blob/96d6bbd94a65f08776215543e0d3c49575422541/CHANGES.md).
+- <a id="release-01.3-uv.lock-8356d8"></a>`uv.lock`: the version of tally. 1 line added, 1 removed. It comes from `uv lock`. [The file](https://github.com/rahuldave/tally/blob/96d6bbd94a65f08776215543e0d3c49575422541/uv.lock).
+  - look at `version = "0.2.0"`
+
+<details><summary>The diff of <code>CHANGES.md</code></summary>
+
+```diff
+@@ -0,0 +1,5 @@
++# Changes
++
++## 0.2.0
++
++The tests of an empty text are now the tests of edge cases, with a test of a text of spaces.
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/96d6bbd94a65f08776215543e0d3c49575422541). [The code after it](https://github.com/rahuldave/tally/tree/96d6bbd94a65f08776215543e0d3c49575422541).

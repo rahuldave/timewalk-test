@@ -10,7 +10,7 @@ title: "5.1 A function for the most common words"
 just setup
 ```
 
-[The code before this part](https://github.com/o/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/o/tally/tree/72a0129dcee765132ad267788636ff4af9066369).
+[The code before this part](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/rahuldave/tally/tree/72a0129dcee765132ad267788636ff4af9066369).
 
 ## 5.1 A function for the most common words {#step-05.1}
 
@@ -36,9 +36,9 @@ The four tests pass.
 
 ### What changed {#step-05.1-what-changed-182c57}
 
-- <a id="step-05.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: sort by count, most common first, then by the word. 5 lines added. [The file](https://github.com/o/tally/blob/72a0129dcee765132ad267788636ff4af9066369/src/tally/__init__.py).
+- <a id="step-05.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: sort by count, most common first, then by the word. 5 lines added. [The file](https://github.com/rahuldave/tally/blob/72a0129dcee765132ad267788636ff4af9066369/src/tally/__init__.py).
   - look at `return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]`
-- <a id="step-05.1-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: its test, with three words. New, 8 lines. [The file](https://github.com/o/tally/blob/72a0129dcee765132ad267788636ff4af9066369/tests/test_top.py).
+- <a id="step-05.1-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: its test, with three words. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/72a0129dcee765132ad267788636ff4af9066369/tests/test_top.py).
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
 
@@ -75,4 +75,4 @@ The four tests pass.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/72a0129dcee765132ad267788636ff4af9066369). [The code after it](https://github.com/o/tally/tree/72a0129dcee765132ad267788636ff4af9066369).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/72a0129dcee765132ad267788636ff4af9066369). [The code after it](https://github.com/rahuldave/tally/tree/72a0129dcee765132ad267788636ff4af9066369).

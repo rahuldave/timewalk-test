@@ -20,7 +20,7 @@ just setup
 tally counts words already. The function `count` and the command are there, and this walk begins with them.
 Nothing checks yet that they count right.
 
-[The code before this part](https://github.com/o/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/o/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
+[The code before this part](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/rahuldave/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
 
 <a id="step-02.1"></a>
 
@@ -48,7 +48,7 @@ The first test is the pattern for the next two. A test gives `count` a text, and
 
 #### What changed
 
-- <a id="step-02.1-tests-test_count.py-e674f6"></a>`tests/test_count.py`: two tests. The second asks for something the code cannot do yet. New, 11 lines. [The file](https://github.com/o/tally/blob/6a4b1a0e50035c4060f84b50770e234b2156be10/tests/test_count.py).
+- <a id="step-02.1-tests-test_count.py-e674f6"></a>`tests/test_count.py`: two tests. The second asks for something the code cannot do yet. New, 11 lines. [The file](https://github.com/rahuldave/tally/blob/6a4b1a0e50035c4060f84b50770e234b2156be10/tests/test_count.py).
   - look at `self.assertEqual(count("A a"), {"a": 2})`
 
 <details><summary>The diff of <code>tests/test_count.py</code></summary>
@@ -70,7 +70,7 @@ The first test is the pattern for the next two. A test gives `count` a text, and
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/6a4b1a0e50035c4060f84b50770e234b2156be10). [The code after it](https://github.com/o/tally/tree/6a4b1a0e50035c4060f84b50770e234b2156be10).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/6a4b1a0e50035c4060f84b50770e234b2156be10). [The code after it](https://github.com/rahuldave/tally/tree/6a4b1a0e50035c4060f84b50770e234b2156be10).
 
 <a id="step-02.2"></a>
 
@@ -92,7 +92,7 @@ The new test passes at once, because `split()` finds no words in an empty text. 
 
 #### What changed
 
-- <a id="step-02.2-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/o/tally/blob/4f9bfa3d9c08307287e81a631039894490a3e590/tests/test_empty.py).
+- <a id="step-02.2-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/4f9bfa3d9c08307287e81a631039894490a3e590/tests/test_empty.py).
   - look at `self.assertEqual(count(""), {})`
 
 <details><summary>The diff of <code>tests/test_empty.py</code></summary>
@@ -111,7 +111,7 @@ The new test passes at once, because `split()` finds no words in an empty text. 
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/4f9bfa3d9c08307287e81a631039894490a3e590). [The code after it](https://github.com/o/tally/tree/4f9bfa3d9c08307287e81a631039894490a3e590).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/4f9bfa3d9c08307287e81a631039894490a3e590). [The code after it](https://github.com/rahuldave/tally/tree/4f9bfa3d9c08307287e81a631039894490a3e590).
 
 <a id="step-02.3"></a>
 
@@ -136,7 +136,7 @@ Three tests now say what `count` does. It counts words, it gives nothing for an 
 
 #### What changed
 
-- <a id="step-02.3-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: one word, `lower()`, answers the failing test. 1 line added, 1 removed. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/src/tally/__init__.py).
+- <a id="step-02.3-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: one word, `lower()`, answers the failing test. 1 line added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/src/tally/__init__.py).
   - look at `for word in text.lower().split():`
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -155,7 +155,7 @@ Three tests now say what `count` does. It counts words, it gives nothing for an 
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/o/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/rahuldave/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
 
 <a id="step-05.1"></a>
 
@@ -168,7 +168,7 @@ just setup
 Since the last part, the walk leaves out ruff, the corpus, the types and the docstring. None of them changes a
 test. This part begins with their code.
 
-[The code before this part](https://github.com/o/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/o/tally/tree/72a0129dcee765132ad267788636ff4af9066369).
+[The code before this part](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/rahuldave/tally/tree/72a0129dcee765132ad267788636ff4af9066369).
 
 <a id="step-05.1"></a>
 
@@ -199,9 +199,9 @@ The test of `top` has the same form as the three tests of `count`. The walk stop
 
 #### What changed
 
-- <a id="step-05.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: sort by count, most common first, then by the word. 5 lines added. [The file](https://github.com/o/tally/blob/72a0129dcee765132ad267788636ff4af9066369/src/tally/__init__.py).
+- <a id="step-05.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: sort by count, most common first, then by the word. 5 lines added. [The file](https://github.com/rahuldave/tally/blob/72a0129dcee765132ad267788636ff4af9066369/src/tally/__init__.py).
   - look at `return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]`
-- <a id="step-05.1-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: its test, with three words. New, 8 lines. [The file](https://github.com/o/tally/blob/72a0129dcee765132ad267788636ff4af9066369/tests/test_top.py).
+- <a id="step-05.1-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: its test, with three words. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/72a0129dcee765132ad267788636ff4af9066369/tests/test_top.py).
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
 
@@ -238,4 +238,4 @@ The test of `top` has the same form as the three tests of `count`. The walk stop
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/72a0129dcee765132ad267788636ff4af9066369). [The code after it](https://github.com/o/tally/tree/72a0129dcee765132ad267788636ff4af9066369).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/72a0129dcee765132ad267788636ff4af9066369). [The code after it](https://github.com/rahuldave/tally/tree/72a0129dcee765132ad267788636ff4af9066369).

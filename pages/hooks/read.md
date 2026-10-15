@@ -32,14 +32,14 @@ It lists the recipes of tally, and none of them checks the code.
 
 ### What changed
 
-- <a id="hooks-00-.gitignore-a5cc29"></a>`.gitignore`: New, 10 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.gitignore).
-- <a id="hooks-00-.python-version-7696e9"></a>`.python-version`: New, 1 line. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.python-version).
-- <a id="hooks-00-README.md-8ec9a0"></a>`README.md`: New, 3 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/README.md).
-- <a id="hooks-00-justfile-424f0b"></a>`justfile`: adds `recipe default`, `recipe run`, `recipe setup`, `recipe test`. New, 15 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/justfile).
-- <a id="hooks-00-pyproject.toml-5d07e7"></a>`pyproject.toml`: New, 14 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/pyproject.toml).
-- <a id="hooks-00-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: adds `count`, `main`. New, 16 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
-- <a id="hooks-00-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: New, 3 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__main__.py).
-- <a id="hooks-00-uv.lock-8356d8"></a>`uv.lock`: New, 8 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/uv.lock).
+- <a id="hooks-00-.gitignore-a5cc29"></a>`.gitignore`: New, 10 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.gitignore).
+- <a id="hooks-00-.python-version-7696e9"></a>`.python-version`: New, 1 line. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.python-version).
+- <a id="hooks-00-README.md-8ec9a0"></a>`README.md`: New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/README.md).
+- <a id="hooks-00-justfile-424f0b"></a>`justfile`: adds `recipe default`, `recipe run`, `recipe setup`, `recipe test`. New, 15 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/justfile).
+- <a id="hooks-00-pyproject.toml-5d07e7"></a>`pyproject.toml`: New, 14 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/pyproject.toml).
+- <a id="hooks-00-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: adds `count`, `main`. New, 16 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
+- <a id="hooks-00-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__main__.py).
+- <a id="hooks-00-uv.lock-8356d8"></a>`uv.lock`: New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/uv.lock).
 
 <details><summary>The diff of <code>.gitignore</code></summary>
 
@@ -159,7 +159,7 @@ It lists the recipes of tally, and none of them checks the code.
 
 </details>
 
-[The code](https://github.com/o/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
+[The code](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
 
 <a id="hooks-01"></a>
 
@@ -172,7 +172,7 @@ just setup
 A check that each person must remember to run is a check that someone forgets. We write the check as a recipe.
 Then a hook runs the recipe before each `git commit`, and a last recipe tells git to use the hook.
 
-[The code before this part](https://github.com/o/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/o/tally/tree/531ba4ddcb71619b788518683004a96f9574a461).
+[The code before this part](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/rahuldave/tally/tree/531ba4ddcb71619b788518683004a96f9574a461).
 
 <a id="hooks-01.1"></a>
 
@@ -194,7 +194,7 @@ It prints `the code compiles`, because every file compiles.
 
 #### What changed
 
-- <a id="hooks-01.1-justfile-424f0b"></a>`justfile`: the recipe compiles every Python file. 4 lines added. [The file](https://github.com/o/tally/blob/e1ef40fe88bbf92165b8da067169897e163a59af/justfile).
+- <a id="hooks-01.1-justfile-424f0b"></a>`justfile`: the recipe compiles every Python file. 4 lines added. [The file](https://github.com/rahuldave/tally/blob/e1ef40fe88bbf92165b8da067169897e163a59af/justfile).
   - look at `uv run python -m py_compile src/tally/*.py`
 
 <details><summary>The diff of <code>justfile</code></summary>
@@ -212,7 +212,7 @@ It prints `the code compiles`, because every file compiles.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/e1ef40fe88bbf92165b8da067169897e163a59af). [The code after it](https://github.com/o/tally/tree/e1ef40fe88bbf92165b8da067169897e163a59af).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/e1ef40fe88bbf92165b8da067169897e163a59af). [The code after it](https://github.com/rahuldave/tally/tree/e1ef40fe88bbf92165b8da067169897e163a59af).
 
 <a id="hooks-01.2"></a>
 
@@ -235,7 +235,7 @@ The code compiles, so the hook says 0.
 
 #### What changed
 
-- <a id="hooks-01.2-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: three lines that git runs before a `git commit`. the hook only runs the check. New, 3 lines. [The file](https://github.com/o/tally/blob/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1/hooks/pre-commit).
+- <a id="hooks-01.2-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: three lines that git runs before a `git commit`. the hook only runs the check. New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1/hooks/pre-commit).
   - look at `just check`
 
 <details><summary>The diff of <code>hooks/pre-commit</code></summary>
@@ -249,7 +249,7 @@ The code compiles, so the hook says 0.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1). [The code after it](https://github.com/o/tally/tree/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1). [The code after it](https://github.com/rahuldave/tally/tree/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1).
 
 <a id="hooks-01.3"></a>
 
@@ -270,9 +270,9 @@ The hook says 1, so git would stop the `git commit`.
 
 #### What changed
 
-- <a id="hooks-01.3-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: Its lines stay as they were. It comes from `chmod +x hooks/pre-commit`. [The file](https://github.com/o/tally/blob/8d19bc56776ab8ebc942b5465d8dd270e33e7485/hooks/pre-commit).
+- <a id="hooks-01.3-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: Its lines stay as they were. It comes from `chmod +x hooks/pre-commit`. [The file](https://github.com/rahuldave/tally/blob/8d19bc56776ab8ebc942b5465d8dd270e33e7485/hooks/pre-commit).
 
-[This change on GitHub](https://github.com/o/tally/commit/8d19bc56776ab8ebc942b5465d8dd270e33e7485). [The code after it](https://github.com/o/tally/tree/8d19bc56776ab8ebc942b5465d8dd270e33e7485).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/8d19bc56776ab8ebc942b5465d8dd270e33e7485). [The code after it](https://github.com/rahuldave/tally/tree/8d19bc56776ab8ebc942b5465d8dd270e33e7485).
 
 <a id="hooks-01.4"></a>
 
@@ -295,7 +295,7 @@ It prints `hooks`, so git now runs the hook before each `git commit`.
 
 #### What changed
 
-- <a id="hooks-01.4-justfile-424f0b"></a>`justfile`: one line of git config, in a recipe of its own. 4 lines added. [The file](https://github.com/o/tally/blob/531ba4ddcb71619b788518683004a96f9574a461/justfile).
+- <a id="hooks-01.4-justfile-424f0b"></a>`justfile`: one line of git config, in a recipe of its own. 4 lines added. [The file](https://github.com/rahuldave/tally/blob/531ba4ddcb71619b788518683004a96f9574a461/justfile).
   - look at `git config core.hooksPath hooks`
 
 <details><summary>The diff of <code>justfile</code></summary>
@@ -313,7 +313,7 @@ It prints `hooks`, so git now runs the hook before each `git commit`.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/531ba4ddcb71619b788518683004a96f9574a461). [The code after it](https://github.com/o/tally/tree/531ba4ddcb71619b788518683004a96f9574a461).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/531ba4ddcb71619b788518683004a96f9574a461). [The code after it](https://github.com/rahuldave/tally/tree/531ba4ddcb71619b788518683004a96f9574a461).
 
 <a id="hooks-02"></a>
 
@@ -326,7 +326,7 @@ just setup
 Code that compiles can still count wrong. The tests find that, so the hook must run them too. First we write a
 test, then the hook runs the tests after the check.
 
-[The code before this part](https://github.com/o/tally/tree/531ba4ddcb71619b788518683004a96f9574a461). [The code after it](https://github.com/o/tally/tree/df640e57553c144400b44e92cf33341aafd445f2).
+[The code before this part](https://github.com/rahuldave/tally/tree/531ba4ddcb71619b788518683004a96f9574a461). [The code after it](https://github.com/rahuldave/tally/tree/df640e57553c144400b44e92cf33341aafd445f2).
 
 <a id="hooks-02.1"></a>
 
@@ -347,7 +347,7 @@ The test passes.
 
 #### What changed
 
-- <a id="hooks-02.1-tests-test_count.py-e674f6"></a>`tests/test_count.py`: one test of counting. New, 9 lines. [The file](https://github.com/o/tally/blob/03c1416124f56e13bcd39af675927dcbd399de44/tests/test_count.py).
+- <a id="hooks-02.1-tests-test_count.py-e674f6"></a>`tests/test_count.py`: one test of counting. New, 9 lines. [The file](https://github.com/rahuldave/tally/blob/03c1416124f56e13bcd39af675927dcbd399de44/tests/test_count.py).
   - look at `self.assertEqual(count("a b a"), {"a": 2, "b": 1})`
 
 <details><summary>The diff of <code>tests/test_count.py</code></summary>
@@ -367,7 +367,7 @@ The test passes.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/03c1416124f56e13bcd39af675927dcbd399de44). [The code after it](https://github.com/o/tally/tree/03c1416124f56e13bcd39af675927dcbd399de44).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/03c1416124f56e13bcd39af675927dcbd399de44). [The code after it](https://github.com/rahuldave/tally/tree/03c1416124f56e13bcd39af675927dcbd399de44).
 
 <a id="hooks-02.2"></a>
 
@@ -388,7 +388,7 @@ The hook compiles the code, runs the tests, and prints `the hook passed`.
 
 #### What changed
 
-- <a id="hooks-02.2-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: the tests run after the check. 1 line added. [The file](https://github.com/o/tally/blob/df640e57553c144400b44e92cf33341aafd445f2/hooks/pre-commit).
+- <a id="hooks-02.2-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: the tests run after the check. 1 line added. [The file](https://github.com/rahuldave/tally/blob/df640e57553c144400b44e92cf33341aafd445f2/hooks/pre-commit).
   - look at `uv run python -m unittest discover -s tests -q`
 
 <details><summary>The diff of <code>hooks/pre-commit</code></summary>
@@ -403,4 +403,4 @@ The hook compiles the code, runs the tests, and prints `the hook passed`.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/df640e57553c144400b44e92cf33341aafd445f2). [The code after it](https://github.com/o/tally/tree/df640e57553c144400b44e92cf33341aafd445f2).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/df640e57553c144400b44e92cf33341aafd445f2). [The code after it](https://github.com/rahuldave/tally/tree/df640e57553c144400b44e92cf33341aafd445f2).

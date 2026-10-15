@@ -36,7 +36,7 @@ nothing to count.
 
 ### What changed
 
-- <a id="step-01.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: a dictionary from each word to how many times it appears. 7 lines added. [The file](https://github.com/o/tally/blob/12fcbe75226dde15e7500b71439bad84712fd2b0/src/tally/__init__.py).
+- <a id="step-01.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: a dictionary from each word to how many times it appears. 7 lines added. [The file](https://github.com/rahuldave/tally/blob/12fcbe75226dde15e7500b71439bad84712fd2b0/src/tally/__init__.py).
   - look at `counts[word] = counts.get(word, 0) + 1`
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -59,7 +59,7 @@ nothing to count.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/6a63758166d3aeee516faa6244414d7b54b5a730...12fcbe75226dde15e7500b71439bad84712fd2b0). [The code after it](https://github.com/o/tally/tree/12fcbe75226dde15e7500b71439bad84712fd2b0).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/6a63758166d3aeee516faa6244414d7b54b5a730...12fcbe75226dde15e7500b71439bad84712fd2b0). [The code after it](https://github.com/rahuldave/tally/tree/12fcbe75226dde15e7500b71439bad84712fd2b0).
 
 <a id="step-02"></a>
 
@@ -76,9 +76,9 @@ We add the tests one file at a time, and run them after each. One test asks for 
 
 ### What changed
 
-- <a id="step-02-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: changes `count`. 1 line added, 1 removed. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/src/tally/__init__.py).
-- <a id="step-02-tests-test_count.py-e674f6"></a>`tests/test_count.py`: adds `class Count`, `test_case`, `test_words`. New, 11 lines. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_count.py).
-- <a id="step-02-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: adds `class Empty`, `test_empty`. New, 8 lines. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_empty.py).
+- <a id="step-02-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: changes `count`. 1 line added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/src/tally/__init__.py).
+- <a id="step-02-tests-test_count.py-e674f6"></a>`tests/test_count.py`: adds `class Count`, `test_case`, `test_words`. New, 11 lines. [The file](https://github.com/rahuldave/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_count.py).
+- <a id="step-02-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: adds `class Empty`, `test_empty`. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_empty.py).
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
 
@@ -131,7 +131,7 @@ We add the tests one file at a time, and run them after each. One test asks for 
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/eb951f74756383392f528427a0cf44e135d5c64f...bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/o/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/eb951f74756383392f528427a0cf44e135d5c64f...bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/rahuldave/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
 
 <a id="step-05.2"></a>
 
@@ -159,7 +159,7 @@ The command prints three lines, the most common word first. They are `127 line`,
 
 ### What changed
 
-- <a id="step-05.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main` reads the option before the name of the file. 8 lines added, 3 removed. [The file](https://github.com/o/tally/blob/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d/src/tally/__init__.py).
+- <a id="step-05.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main` reads the option before the name of the file. 8 lines added, 3 removed. [The file](https://github.com/rahuldave/tally/blob/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d/src/tally/__init__.py).
   - look at `if args[:1] == ["--top"]:`
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -184,4 +184,4 @@ The command prints three lines, the most common word first. They are `127 line`,
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/72a0129dcee765132ad267788636ff4af9066369...c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d). [The code after it](https://github.com/o/tally/tree/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/72a0129dcee765132ad267788636ff4af9066369...c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d). [The code after it](https://github.com/rahuldave/tally/tree/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d).

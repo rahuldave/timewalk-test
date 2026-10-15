@@ -19,7 +19,7 @@ uv run tally --top 3 data/corpus.txt
 
 ## What changed {#step-06-what-changed-182c57}
 
-- <a id="step-06-README.md-8ec9a0"></a>`README.md`: a section, "Run it", with the commands that a new user needs first. 10 lines added. [The file](https://github.com/o/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/README.md).
+- <a id="step-06-README.md-8ec9a0"></a>`README.md`: a section, "Run it", with the commands that a new user needs first. 10 lines added. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/README.md).
   - look at `## Run it`
 
 <details><summary>The diff of <code>README.md</code></summary>
@@ -43,4 +43,4 @@ uv run tally --top 3 data/corpus.txt
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/9e37b6eed29516f62bc176d1eaa66bf4e86683a6...974d653080b0bd7dd06741b60225518cfecc908e). [The code after it](https://github.com/o/tally/tree/974d653080b0bd7dd06741b60225518cfecc908e).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/9e37b6eed29516f62bc176d1eaa66bf4e86683a6...974d653080b0bd7dd06741b60225518cfecc908e). [The code after it](https://github.com/rahuldave/tally/tree/974d653080b0bd7dd06741b60225518cfecc908e).

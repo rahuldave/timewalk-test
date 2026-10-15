@@ -14,7 +14,7 @@ To learn what `count` takes and what it gives, a reader must now read its body. 
 glance, and an editor can check it. One line under the signature can say what the function does. Neither changes
 what `count` does, so the tests pass as before.
 
-[The code before this part](https://github.com/o/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/o/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).
+[The code before this part](https://github.com/rahuldave/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).
 
 ## 4.1 Types {#step-04.1}
 
@@ -34,7 +34,7 @@ The three tests pass as before, because types change what the code says, not wha
 
 ### What changed {#step-04.1-what-changed-182c57}
 
-- <a id="step-04.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the signature says what goes in and what comes out. 1 line added, 1 removed. [The file](https://github.com/o/tally/blob/a7606fcc89be70f26f75353333a506e9891a6ea1/src/tally/__init__.py).
+- <a id="step-04.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the signature says what goes in and what comes out. 1 line added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/a7606fcc89be70f26f75353333a506e9891a6ea1/src/tally/__init__.py).
   - look at `def count(text: str) -> dict[str, int]:`
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -53,7 +53,7 @@ The three tests pass as before, because types change what the code says, not wha
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/a7606fcc89be70f26f75353333a506e9891a6ea1). [The code after it](https://github.com/o/tally/tree/a7606fcc89be70f26f75353333a506e9891a6ea1).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/a7606fcc89be70f26f75353333a506e9891a6ea1). [The code after it](https://github.com/rahuldave/tally/tree/a7606fcc89be70f26f75353333a506e9891a6ea1).
 
 ## 4.2 A docstring {#step-04.2}
 
@@ -72,7 +72,7 @@ It prints the docstring, ``How many times each word of `text` appears, ignoring 
 
 ### What changed {#step-04.2-what-changed-182c57}
 
-- <a id="step-04.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: one line under the signature says what the function does. 1 line added. [The file](https://github.com/o/tally/blob/f79588d3b046ec2787725cdb6e3fcf952014e078/src/tally/__init__.py).
+- <a id="step-04.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: one line under the signature says what the function does. 1 line added. [The file](https://github.com/rahuldave/tally/blob/f79588d3b046ec2787725cdb6e3fcf952014e078/src/tally/__init__.py).
   - look at ``"How many times each word of `text` appears, ignoring case."``
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -90,4 +90,4 @@ It prints the docstring, ``How many times each word of `text` appears, ignoring 
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/o/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).

@@ -20,11 +20,11 @@ All three tests pass, and the command now prints `2 the` for "The the".
 
 ## What changed {#step-02-what-changed-182c57}
 
-- <a id="step-02-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the word that answers the test of case. 1 line added, 1 removed. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/src/tally/__init__.py).
+- <a id="step-02-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the word that answers the test of case. 1 line added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/src/tally/__init__.py).
   - look at `for word in text.lower().split():`
-- <a id="step-02-tests-test_count.py-e674f6"></a>`tests/test_count.py`: a test of counting, and a test of case. New, 11 lines. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_count.py).
+- <a id="step-02-tests-test_count.py-e674f6"></a>`tests/test_count.py`: a test of counting, and a test of case. New, 11 lines. [The file](https://github.com/rahuldave/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_count.py).
   - look at `self.assertEqual(count("A a"), {"a": 2})`
-- <a id="step-02-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_empty.py).
+- <a id="step-02-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_empty.py).
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
 
@@ -77,4 +77,4 @@ All three tests pass, and the command now prints `2 the` for "The the".
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/eb951f74756383392f528427a0cf44e135d5c64f...bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/o/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/eb951f74756383392f528427a0cf44e135d5c64f...bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/rahuldave/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).

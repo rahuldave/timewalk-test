@@ -12,6 +12,9 @@ The project is `tally`, a small word counter. Its history has what every kind of
 - a branch `parts` from step-00 with its own tags, `parts-01` and `parts-02`, for a walk on one part;
 - a branch `hooks` from step-01 with its own tags, `hooks-00` to `hooks-02`, and small commits between them, for a
   tutorial on one part: a git hook that checks the code before each commit.
+- a branch `release` from step-02 with its own tags, `release-00` and `release-01`, for a tutorial with `loose`. Its
+  first move renames a file by a patch. Its second changes the version in pyproject.toml, so the commit's own uv.lock
+  is out of date, and its third runs `uv lock` and adds a list of changes.
 
 Every author, committer and date is fixed, so the commits get the same hashes on every build.
 """
@@ -25,6 +28,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 
 RUNNABLE = object()   # in place of a file's text: make the file that is there executable, as chmod +x does
+GONE = object()   # in place of a file's text: delete the file, as a rename does to the old path
 
 
 README = "# tally\n\nCount the words in a text.\n"
@@ -254,6 +258,24 @@ HOOKS = [
      ("hooks-02", "Tests in the hook\n\nA commit with a failing test is refused.")),
 ]
 
+# The branch `release`, from step-02: a tutorial whose files are compared loosely, as in a class with uv.
+# release-01.1 renames tests/test_empty.py by a patch, and adds a test: git finds the rename, as the two files are alike.
+TEST_EDGE = TEST_EMPTY.replace("class Empty(", "class Edge(") + '''
+    def test_spaces(self):
+        self.assertEqual(count("  \\n\\t "), {})
+'''
+# release-01.2 changes the version, and not uv.lock, which still names 0.1.0: `uv lock --check` fails at that commit.
+# release-01 is what `uv lock` then writes, with a list of the changes of the release.
+CHANGES = "# Changes\n\n## 0.2.0\n\nThe tests of an empty text are now the tests of edge cases, with a test of a text of spaces.\n"
+VERSION_2 = PYPROJECT.replace('version = "0.1.0"', 'version = "0.2.0"')
+UV_LOCK_2 = UV_LOCK.replace('version = "0.1.0"', 'version = "0.2.0"')
+RELEASE = [
+    ("release-01.1: the tests of an empty text become the tests of edge cases", {"tests/test_empty.py": GONE, "tests/test_edge.py": TEST_EDGE}, None),
+    ("release-01.2: version 0.2.0", {"pyproject.toml": VERSION_2}, None),
+    ("release-01: the lock of version 0.2.0, written by uv lock, and the list of changes", {"uv.lock": UV_LOCK_2, "CHANGES.md": CHANGES},
+     ("release-01", "Release 0.2.0\n\nThe tests of edge cases get their name, and tally gets a new version and its lock.")),
+]
+
 
 def git(dest: Path, *args: str, when: int = 0) -> str:
     "Run git in dest with a fixed author, committer and date."
@@ -271,6 +293,9 @@ def commit_all(dest: Path, commits: list, clock: int) -> int:
             path.parent.mkdir(parents=True, exist_ok=True)
             if text is RUNNABLE:
                 path.chmod(0o755)  # git runs a hook only if it can execute it
+                continue
+            if text is GONE:
+                path.unlink()
                 continue
             path.write_text(text)   # a file that exists keeps its mode
         git(dest, "add", "-A", when=clock)
@@ -302,11 +327,14 @@ def build(dest: Path) -> None:
     clock = commit_all(dest, PARTS, clock)
     git(dest, "switch", "-q", "-c", "hooks", "step-01")
     git(dest, "tag", "-a", "hooks-00", "-m", "Where the hooks start\n\ntally counts words, and nothing checks it.", when=clock)
-    commit_all(dest, HOOKS, clock + 1)
+    clock = commit_all(dest, HOOKS, clock + 1)
+    git(dest, "switch", "-q", "-c", "release", "step-02")
+    git(dest, "tag", "-a", "release-00", "-m", "Where the release starts\n\ntally counts words, and has two files of tests.", when=clock)
+    commit_all(dest, RELEASE, clock + 1)
     git(dest, "switch", "-q", "main")
 
 
 if __name__ == "__main__":
     target = Path(sys.argv[1]) if len(sys.argv) > 1 else HERE.parent / "repo"
     build(target.resolve())
-    print(f"build: {target} has {len(MAIN)} commits on main, {len(PARTS)} on parts and {len(HOOKS)} on hooks")
+    print(f"build: {target} has {len(MAIN)} commits on main, {len(PARTS)} on parts, {len(HOOKS)} on hooks and {len(RELEASE)} on release")

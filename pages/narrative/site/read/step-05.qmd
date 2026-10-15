@@ -30,11 +30,11 @@ rm build/top.txt; just setup; ls build
 
 ## What changed {#step-05-what-changed-182c57}
 
-- <a id="step-05-justfile-424f0b"></a>`justfile`: the recipe `report`, and the line of `setup` that runs it. 6 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
+- <a id="step-05-justfile-424f0b"></a>`justfile`: the recipe `report`, and the line of `setup` that runs it. 6 lines added. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
   - look at `test -f build/top.txt || just report`
-- <a id="step-05-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `top`, and the option `--top` of `main`. 13 lines added, 3 removed. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/src/tally/__init__.py).
+- <a id="step-05-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `top`, and the option `--top` of `main`. 13 lines added, 3 removed. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/src/tally/__init__.py).
   - look at `if args[:1] == ["--top"]:`
-- <a id="step-05-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: the test of `top`. New, 8 lines. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/tests/test_top.py).
+- <a id="step-05-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: the test of `top`. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/tests/test_top.py).
 
 <details><summary>The diff of <code>justfile</code></summary>
 
@@ -104,4 +104,4 @@ rm build/top.txt; just setup; ls build
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/f79588d3b046ec2787725cdb6e3fcf952014e078...9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/o/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/f79588d3b046ec2787725cdb6e3fcf952014e078...9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).

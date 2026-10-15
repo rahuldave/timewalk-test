@@ -13,7 +13,7 @@ just setup
 tally must count the words of a text. First we write a function that counts, and try it alone. Then the command
 reads a text, and prints what the function counts.
 
-[The code before this part](https://github.com/o/tally/tree/6a63758166d3aeee516faa6244414d7b54b5a730). [The code after it](https://github.com/o/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
+[The code before this part](https://github.com/rahuldave/tally/tree/6a63758166d3aeee516faa6244414d7b54b5a730). [The code after it](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
 
 ## 1.1 A function that counts {#step-01.1}
 
@@ -34,7 +34,7 @@ nothing to count.
 
 ### What changed {#step-01.1-what-changed-182c57}
 
-- <a id="step-01.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: a dictionary from each word to how many times it appears. 7 lines added. [The file](https://github.com/o/tally/blob/12fcbe75226dde15e7500b71439bad84712fd2b0/src/tally/__init__.py).
+- <a id="step-01.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: a dictionary from each word to how many times it appears. 7 lines added. [The file](https://github.com/rahuldave/tally/blob/12fcbe75226dde15e7500b71439bad84712fd2b0/src/tally/__init__.py).
   - look at `counts[word] = counts.get(word, 0) + 1`
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -57,7 +57,7 @@ nothing to count.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/12fcbe75226dde15e7500b71439bad84712fd2b0). [The code after it](https://github.com/o/tally/tree/12fcbe75226dde15e7500b71439bad84712fd2b0).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/12fcbe75226dde15e7500b71439bad84712fd2b0). [The code after it](https://github.com/rahuldave/tally/tree/12fcbe75226dde15e7500b71439bad84712fd2b0).
 
 ## 1.2 The command counts {#step-01.2}
 
@@ -79,7 +79,7 @@ It prints `2 a` and then `1 b`. The command now counts.
 
 ### What changed {#step-01.2-what-changed-182c57}
 
-- <a id="step-01.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main` reads the text and prints the counts. 5 lines added, 1 removed. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
+- <a id="step-01.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main` reads the text and prints the counts. 5 lines added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
   - look at `for word, n in sorted(count(text).items()):`
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -105,4 +105,4 @@ It prints `2 a` and then `1 b`. The command now counts.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/o/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).

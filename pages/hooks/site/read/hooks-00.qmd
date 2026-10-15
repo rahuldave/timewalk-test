@@ -21,14 +21,14 @@ It lists the recipes of tally, and none of them checks the code.
 
 ## What changed {#hooks-00-what-changed-182c57}
 
-- <a id="hooks-00-.gitignore-a5cc29"></a>`.gitignore`: New, 10 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.gitignore).
-- <a id="hooks-00-.python-version-7696e9"></a>`.python-version`: New, 1 line. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.python-version).
-- <a id="hooks-00-README.md-8ec9a0"></a>`README.md`: New, 3 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/README.md).
-- <a id="hooks-00-justfile-424f0b"></a>`justfile`: adds `recipe default`, `recipe run`, `recipe setup`, `recipe test`. New, 15 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/justfile).
-- <a id="hooks-00-pyproject.toml-5d07e7"></a>`pyproject.toml`: New, 14 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/pyproject.toml).
-- <a id="hooks-00-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: adds `count`, `main`. New, 16 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
-- <a id="hooks-00-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: New, 3 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__main__.py).
-- <a id="hooks-00-uv.lock-8356d8"></a>`uv.lock`: New, 8 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/uv.lock).
+- <a id="hooks-00-.gitignore-a5cc29"></a>`.gitignore`: New, 10 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.gitignore).
+- <a id="hooks-00-.python-version-7696e9"></a>`.python-version`: New, 1 line. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.python-version).
+- <a id="hooks-00-README.md-8ec9a0"></a>`README.md`: New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/README.md).
+- <a id="hooks-00-justfile-424f0b"></a>`justfile`: adds `recipe default`, `recipe run`, `recipe setup`, `recipe test`. New, 15 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/justfile).
+- <a id="hooks-00-pyproject.toml-5d07e7"></a>`pyproject.toml`: New, 14 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/pyproject.toml).
+- <a id="hooks-00-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: adds `count`, `main`. New, 16 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
+- <a id="hooks-00-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__main__.py).
+- <a id="hooks-00-uv.lock-8356d8"></a>`uv.lock`: New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/uv.lock).
 
 <details><summary>The diff of <code>.gitignore</code></summary>
 
@@ -148,4 +148,4 @@ It lists the recipes of tally, and none of them checks the code.
 
 </details>
 
-[The code](https://github.com/o/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
+[The code](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).

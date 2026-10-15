@@ -22,7 +22,7 @@ uv run python -m unittest discover -s tests -q
 
 ## What changed {#step-04-what-changed-182c57}
 
-- <a id="step-04-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the types in the signature of `count`, and its docstring. 2 lines added, 1 removed. [The file](https://github.com/o/tally/blob/f79588d3b046ec2787725cdb6e3fcf952014e078/src/tally/__init__.py).
+- <a id="step-04-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the types in the signature of `count`, and its docstring. 2 lines added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/f79588d3b046ec2787725cdb6e3fcf952014e078/src/tally/__init__.py).
   - look at `def count(text: str) -> dict[str, int]:`
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -42,4 +42,4 @@ uv run python -m unittest discover -s tests -q
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/1568a522d23312c59c6e42cb027ec25ba3ae8b35...f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/o/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/1568a522d23312c59c6e42cb027ec25ba3ae8b35...f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).

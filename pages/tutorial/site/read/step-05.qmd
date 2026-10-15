@@ -14,7 +14,7 @@ tally prints a line for every word, in the order of the words. A reader of a lon
 first, and only a few of them. A function finds them, and an option of the command prints them. A recipe writes a
 report of the ten most common words of the corpus.
 
-[The code before this part](https://github.com/o/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/o/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
+[The code before this part](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
 
 ## 5.1 A function for the most common words {#step-05.1}
 
@@ -40,9 +40,9 @@ The four tests pass.
 
 ### What changed {#step-05.1-what-changed-182c57}
 
-- <a id="step-05.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: sort by count, most common first, then by the word. 5 lines added. [The file](https://github.com/o/tally/blob/72a0129dcee765132ad267788636ff4af9066369/src/tally/__init__.py).
+- <a id="step-05.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: sort by count, most common first, then by the word. 5 lines added. [The file](https://github.com/rahuldave/tally/blob/72a0129dcee765132ad267788636ff4af9066369/src/tally/__init__.py).
   - look at `return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]`
-- <a id="step-05.1-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: its test, with three words. New, 8 lines. [The file](https://github.com/o/tally/blob/72a0129dcee765132ad267788636ff4af9066369/tests/test_top.py).
+- <a id="step-05.1-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: its test, with three words. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/72a0129dcee765132ad267788636ff4af9066369/tests/test_top.py).
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
 
@@ -79,7 +79,7 @@ The four tests pass.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/72a0129dcee765132ad267788636ff4af9066369). [The code after it](https://github.com/o/tally/tree/72a0129dcee765132ad267788636ff4af9066369).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/72a0129dcee765132ad267788636ff4af9066369). [The code after it](https://github.com/rahuldave/tally/tree/72a0129dcee765132ad267788636ff4af9066369).
 
 ## 5.2 tally --top N {#step-05.2}
 
@@ -101,7 +101,7 @@ The command prints three lines, the most common word first. They are `127 line`,
 
 ### What changed {#step-05.2-what-changed-182c57}
 
-- <a id="step-05.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main` reads the option before the name of the file. 8 lines added, 3 removed. [The file](https://github.com/o/tally/blob/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d/src/tally/__init__.py).
+- <a id="step-05.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main` reads the option before the name of the file. 8 lines added, 3 removed. [The file](https://github.com/rahuldave/tally/blob/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d/src/tally/__init__.py).
   - look at `if args[:1] == ["--top"]:`
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
@@ -126,7 +126,7 @@ The command prints three lines, the most common word first. They are `127 line`,
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d). [The code after it](https://github.com/o/tally/tree/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d). [The code after it](https://github.com/rahuldave/tally/tree/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d).
 
 ## 5.3 A report, which just setup makes {#step-05.3}
 
@@ -160,7 +160,7 @@ The file has ten lines, the most common word first.
 
 ### What changed {#step-05.3-what-changed-182c57}
 
-- <a id="step-05.3-justfile-424f0b"></a>`justfile`: the report, and the line in `setup` that makes it when it is missing. 6 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
+- <a id="step-05.3-justfile-424f0b"></a>`justfile`: the report, and the line in `setup` that makes it when it is missing. 6 lines added. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
   - look at `uv run tally --top 10 data/corpus.txt > build/top.txt`
   - look at `test -f build/top.txt || just report`
 
@@ -188,4 +188,4 @@ The file has ten lines, the most common word first.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/o/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).

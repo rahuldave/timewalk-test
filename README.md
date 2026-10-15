@@ -14,7 +14,15 @@ just pages              # render the pages that students read, for every walk, i
 just site               # build the website of pages/ into _site/, and serve it at http://127.0.0.1:8000
 just style              # check the README, notes, slides and pages by walk-kit's writing guide
 just test               # build a fresh copy, then run every test
+just publish            # push repo/ to github.com/rahuldave/tally, every branch and tag
+just walk-init          # make ../tally-walk, the repository that students fork, with walk-kit
+just walk-update        # write the notes, slides and pages of every walk into ../tally-walk
 ```
+
+timewalk-test is a whole class, as a class made with walk-kit is. Its project, tally, is on GitHub at
+rahuldave/tally, and its walk repository is tally-walk, beside this folder and at rahuldave/tally-walk. Each change to
+walk-kit is tried here first. `just walk-update` writes tally-walk again, and walk-kit's follow.py follows each of its
+pages. Then a push of tally-walk runs its Pages workflow, which publishes its site.
 
 timewalk-test also tests the pages that students read. The `walk` skill, in walk-kit, makes these pages from the facts
 of each walk. `just pages` writes them into `pages/`, one folder for each walk, and you can commit them. A tutorial also
@@ -55,6 +63,7 @@ walk with the menu at the left of the step bar.
 | **The tests of tally, with notes of its own** (`testing`) | tutorial, some moves, notes of its own | A small tutorial with its own notes, `walks/testing/notes.md`. Its `{{include ...}}` lines take the move sections from the tutorial's notes. Each stop runs `$ just setup`, and has its own words between and after the moves: what the walk leaves out, and what the moves did |
 | **Types, then the report, with notes of its own** (`finish`) | tutorial, a step and a move, notes of its own | A stop with a whole step, `{{include step-04}}`, which brings the step's `$ just setup` with it, then a stop of one move after a gap, `{{include step-05.3}}`. Its own text has a block for each mode |
 | **A git hook, one move at a time** (`hooks`) | tutorial, its own tags, sync off | A tutorial on one part, on the branch `hooks`. At move hooks-01.3, the hook refuses a broken file. Up and Down page through the slides without making moves |
+| **A release of tally, one move at a time** (`release`) | tutorial, its own tags, `loose` | A tutorial on the branch `release`. Move release-01.1 renames a file by a patch. Move release-01.2 changes the version in `pyproject.toml`, so its own `uv.lock` is out of date until release-01.3 runs `uv lock`. Its Build it yourself page checks release-01.2 with `git check SHA --stale-lock` |
 
 ### An example of each feature
 
@@ -65,6 +74,8 @@ walk with the menu at the left of the step bar.
 | Shared commands, the same in both modes | step-05.3 |
 | A `do$` line, a command that makes the move | step-03.1, `do$ uv add --dev ruff`, and hooks-01.3, `do$ chmod +x hooks/pre-commit`, a move with no subject |
 | `loose`, files that match by the names of their packages | The tutorial in `toc.toml`, for the `pyproject.toml` and `uv.lock` of step-03.1 |
+| A rename by a patch, with `patch$` lines for the old path and the new | release-01.1, in `walks/release/notes.md` |
+| A move whose commit has a `uv.lock` that is out of date | release-01.2. The next move, release-01.3, runs `do$ uv lock` |
 | A `show:` line in two backticks, for a line with a backtick in it | step-04.2, which quotes the docstring of `count` |
 | `select`, with a range of moves and a title | The walk `small` in `toc.toml` |
 | `intro`, the text under "About this walk" | `walks/small/intro.md`, with a cue that the Room hides, and `walks/story/intro.md` |

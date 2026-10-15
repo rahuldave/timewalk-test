@@ -30,15 +30,15 @@ The second command counts "The" and "the" as two words. Nothing says whether tha
 
 ### What changed
 
-- <a id="step-01-.gitignore-a5cc29"></a>`.gitignore`: New, 10 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.gitignore).
-- <a id="step-01-.python-version-7696e9"></a>`.python-version`: New, 1 line. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.python-version).
-- <a id="step-01-README.md-8ec9a0"></a>`README.md`: New, 3 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/README.md).
-- <a id="step-01-justfile-424f0b"></a>`justfile`: adds `recipe default`, `recipe run`, `recipe setup`, `recipe test`. New, 15 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/justfile).
-- <a id="step-01-pyproject.toml-5d07e7"></a>`pyproject.toml`: New, 14 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/pyproject.toml).
-- <a id="step-01-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `count`, and the command that uses it. New, 16 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
+- <a id="step-01-.gitignore-a5cc29"></a>`.gitignore`: New, 10 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.gitignore).
+- <a id="step-01-.python-version-7696e9"></a>`.python-version`: New, 1 line. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/.python-version).
+- <a id="step-01-README.md-8ec9a0"></a>`README.md`: New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/README.md).
+- <a id="step-01-justfile-424f0b"></a>`justfile`: adds `recipe default`, `recipe run`, `recipe setup`, `recipe test`. New, 15 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/justfile).
+- <a id="step-01-pyproject.toml-5d07e7"></a>`pyproject.toml`: New, 14 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/pyproject.toml).
+- <a id="step-01-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `count`, and the command that uses it. New, 16 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
   - look at `for word in text.split():`
-- <a id="step-01-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: New, 3 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__main__.py).
-- <a id="step-01-uv.lock-8356d8"></a>`uv.lock`: New, 8 lines. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/uv.lock).
+- <a id="step-01-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__main__.py).
+- <a id="step-01-uv.lock-8356d8"></a>`uv.lock`: New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/uv.lock).
 
 <details><summary>The diff of <code>.gitignore</code></summary>
 
@@ -158,7 +158,7 @@ The second command counts "The" and "the" as two words. Nothing says whether tha
 
 </details>
 
-[The code](https://github.com/o/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
+[The code](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
 
 <a id="step-02"></a>
 
@@ -180,11 +180,11 @@ All three tests pass, and the command now prints `2 the` for "The the".
 
 ### What changed
 
-- <a id="step-02-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the word that answers the test of case. 1 line added, 1 removed. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/src/tally/__init__.py).
+- <a id="step-02-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the word that answers the test of case. 1 line added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/src/tally/__init__.py).
   - look at `for word in text.lower().split():`
-- <a id="step-02-tests-test_count.py-e674f6"></a>`tests/test_count.py`: a test of counting, and a test of case. New, 11 lines. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_count.py).
+- <a id="step-02-tests-test_count.py-e674f6"></a>`tests/test_count.py`: a test of counting, and a test of case. New, 11 lines. [The file](https://github.com/rahuldave/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_count.py).
   - look at `self.assertEqual(count("A a"), {"a": 2})`
-- <a id="step-02-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_empty.py).
+- <a id="step-02-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_empty.py).
 
 <details><summary>The diff of <code>src/tally/__init__.py</code></summary>
 
@@ -237,7 +237,7 @@ All three tests pass, and the command now prints `2 the` for "The the".
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/eb951f74756383392f528427a0cf44e135d5c64f...bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/o/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/eb951f74756383392f528427a0cf44e135d5c64f...bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/rahuldave/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
 
 <a id="step-05"></a>
 
@@ -259,13 +259,13 @@ The four tests pass, and the command prints the three most common words of the c
 
 ### What changed
 
-- <a id="step-05-.gitignore-a5cc29"></a>`.gitignore`: git does not hold the corpus. 3 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/.gitignore).
-- <a id="step-05-justfile-424f0b"></a>`justfile`: `just setup` makes the corpus and the report. 7 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
-- <a id="step-05-pyproject.toml-5d07e7"></a>`pyproject.toml`: ruff, and its line length. 8 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/pyproject.toml).
-- <a id="step-05-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: the script that writes the corpus. New, 25 lines. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/scripts/corpus.py).
-- <a id="step-05-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: types, a docstring, `top` and the option `--top`. 15 lines added, 4 removed. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/src/tally/__init__.py).
-- <a id="step-05-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: the new test, of `top`. New, 8 lines. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/tests/test_top.py).
-- <a id="step-05-uv.lock-8356d8"></a>`uv.lock`: the exact version of ruff. 35 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/uv.lock).
+- <a id="step-05-.gitignore-a5cc29"></a>`.gitignore`: git does not hold the corpus. 3 lines added. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/.gitignore).
+- <a id="step-05-justfile-424f0b"></a>`justfile`: `just setup` makes the corpus and the report. 7 lines added. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
+- <a id="step-05-pyproject.toml-5d07e7"></a>`pyproject.toml`: ruff, and its line length. 8 lines added. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/pyproject.toml).
+- <a id="step-05-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: the script that writes the corpus. New, 25 lines. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/scripts/corpus.py).
+- <a id="step-05-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: types, a docstring, `top` and the option `--top`. 15 lines added, 4 removed. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/src/tally/__init__.py).
+- <a id="step-05-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: the new test, of `top`. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/tests/test_top.py).
+- <a id="step-05-uv.lock-8356d8"></a>`uv.lock`: the exact version of ruff. 35 lines added. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/uv.lock).
 
 <details><summary>The diff of <code>.gitignore</code></summary>
 
@@ -411,4 +411,4 @@ The four tests pass, and the command prints the three most common words of the c
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20...9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/o/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20...9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).

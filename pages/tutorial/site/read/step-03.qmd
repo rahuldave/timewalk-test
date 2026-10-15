@@ -14,7 +14,7 @@ tally works, and it has tests. Two things help the work ahead. Code in one style
 so we install ruff, a formatter and linter. And a count of three words shows little, so `just setup` makes a
 corpus, a text of 2000 words to count.
 
-[The code before this part](https://github.com/o/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/o/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35).
+[The code before this part](https://github.com/rahuldave/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/rahuldave/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35).
 
 ## 3.1 ruff, a tool for development {#step-03.1}
 
@@ -38,9 +38,9 @@ ruff reads every Python file of the project, and prints `5 files already formatt
 
 ### What changed {#step-03.1-what-changed-182c57}
 
-- <a id="step-03.1-pyproject.toml-5d07e7"></a>`pyproject.toml`: ruff, in a group of its own. The version is the newest on the day that ruff was added. 5 lines added. It comes from `uv add --dev ruff`. [The file](https://github.com/o/tally/blob/edb9544c04d29869122cfcef2a0c2173b94c3b06/pyproject.toml).
+- <a id="step-03.1-pyproject.toml-5d07e7"></a>`pyproject.toml`: ruff, in a group of its own. The version is the newest on the day that ruff was added. 5 lines added. It comes from `uv add --dev ruff`. [The file](https://github.com/rahuldave/tally/blob/edb9544c04d29869122cfcef2a0c2173b94c3b06/pyproject.toml).
   - look at `"ruff>=0.17.0",`
-- <a id="step-03.1-uv.lock-8356d8"></a>`uv.lock`: the exact version of ruff, which every learner gets with `just setup`. 35 lines added. It comes from `uv add --dev ruff`. [The file](https://github.com/o/tally/blob/edb9544c04d29869122cfcef2a0c2173b94c3b06/uv.lock).
+- <a id="step-03.1-uv.lock-8356d8"></a>`uv.lock`: the exact version of ruff, which every learner gets with `just setup`. 35 lines added. It comes from `uv add --dev ruff`. [The file](https://github.com/rahuldave/tally/blob/edb9544c04d29869122cfcef2a0c2173b94c3b06/uv.lock).
   - look at `name = "ruff"`
 
 <details><summary>The diff of <code>pyproject.toml</code></summary>
@@ -59,7 +59,7 @@ ruff reads every Python file of the project, and prints `5 files already formatt
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/edb9544c04d29869122cfcef2a0c2173b94c3b06). [The code after it](https://github.com/o/tally/tree/edb9544c04d29869122cfcef2a0c2173b94c3b06).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/edb9544c04d29869122cfcef2a0c2173b94c3b06). [The code after it](https://github.com/rahuldave/tally/tree/edb9544c04d29869122cfcef2a0c2173b94c3b06).
 
 ## 3.2 A line length for ruff {#step-03.2}
 
@@ -81,7 +81,7 @@ is already formatted.
 
 ### What changed {#step-03.2-what-changed-182c57}
 
-- <a id="step-03.2-pyproject.toml-5d07e7"></a>`pyproject.toml`: one setting, for the linter and the formatter both. 3 lines added. [The file](https://github.com/o/tally/blob/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327/pyproject.toml).
+- <a id="step-03.2-pyproject.toml-5d07e7"></a>`pyproject.toml`: one setting, for the linter and the formatter both. 3 lines added. [The file](https://github.com/rahuldave/tally/blob/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327/pyproject.toml).
   - look at `line-length = 100`
 
 <details><summary>The diff of <code>pyproject.toml</code></summary>
@@ -98,7 +98,7 @@ is already formatted.
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327). [The code after it](https://github.com/o/tally/tree/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327). [The code after it](https://github.com/rahuldave/tally/tree/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327).
 
 ## 3.3 A corpus, which just setup makes {#step-03.3}
 
@@ -132,11 +132,11 @@ uv run tally data/corpus.txt | sort -rn | head -3
 
 ### What changed {#step-03.3-what-changed-182c57}
 
-- <a id="step-03.3-.gitignore-a5cc29"></a>`.gitignore`: git does not hold the corpus. 3 lines added. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/.gitignore).
+- <a id="step-03.3-.gitignore-a5cc29"></a>`.gitignore`: git does not hold the corpus. 3 lines added. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/.gitignore).
   - look at `data/`
-- <a id="step-03.3-justfile-424f0b"></a>`justfile`: `just setup` now makes the corpus too. 1 line added. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/justfile).
+- <a id="step-03.3-justfile-424f0b"></a>`justfile`: `just setup` now makes the corpus too. 1 line added. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/justfile).
   - look at `uv run python scripts/corpus.py data/corpus.txt`
-- <a id="step-03.3-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: the script writes the same 2000 words each time, and leaves a corpus that is there alone. New, 25 lines. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/scripts/corpus.py).
+- <a id="step-03.3-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: the script writes the same 2000 words each time, and leaves a corpus that is there alone. New, 25 lines. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/scripts/corpus.py).
   - look at `if target.exists():`
 
 <details><summary>The diff of <code>.gitignore</code></summary>
@@ -201,4 +201,4 @@ uv run tally data/corpus.txt | sort -rn | head -3
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/commit/1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/o/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35).
+[This change on GitHub](https://github.com/rahuldave/tally/commit/1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/rahuldave/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35).

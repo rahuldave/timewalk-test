@@ -34,14 +34,14 @@ printf '\n# an edit made in class\n' >> src/tally/__init__.py
 
 ## What changed {#step-03-what-changed-182c57}
 
-- <a id="step-03-.gitignore-a5cc29"></a>`.gitignore`: git does not hold the corpus. 3 lines added. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/.gitignore).
+- <a id="step-03-.gitignore-a5cc29"></a>`.gitignore`: git does not hold the corpus. 3 lines added. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/.gitignore).
   - look at `data/`
-- <a id="step-03-justfile-424f0b"></a>`justfile`: `just setup` runs the script. 1 line added. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/justfile).
+- <a id="step-03-justfile-424f0b"></a>`justfile`: `just setup` runs the script. 1 line added. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/justfile).
   - look at `uv run python scripts/corpus.py data/corpus.txt`
-- <a id="step-03-pyproject.toml-5d07e7"></a>`pyproject.toml`: the group `dev`, with ruff, and the line length. 8 lines added. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/pyproject.toml).
+- <a id="step-03-pyproject.toml-5d07e7"></a>`pyproject.toml`: the group `dev`, with ruff, and the line length. 8 lines added. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/pyproject.toml).
   - look at `line-length = 100`
-- <a id="step-03-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: writes the same 2000 words each time, and leaves a corpus that is there alone. New, 25 lines. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/scripts/corpus.py).
-- <a id="step-03-uv.lock-8356d8"></a>`uv.lock`: the exact version of ruff. 35 lines added. [The file](https://github.com/o/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/uv.lock).
+- <a id="step-03-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: writes the same 2000 words each time, and leaves a corpus that is there alone. New, 25 lines. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/scripts/corpus.py).
+- <a id="step-03-uv.lock-8356d8"></a>`uv.lock`: the exact version of ruff. 35 lines added. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/uv.lock).
   - look at `name = "ruff"`
 
 <details><summary>The diff of <code>.gitignore</code></summary>
@@ -125,4 +125,4 @@ printf '\n# an edit made in class\n' >> src/tally/__init__.py
 
 </details>
 
-[This change on GitHub](https://github.com/o/tally/compare/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20...1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/o/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35).
+[This change on GitHub](https://github.com/rahuldave/tally/compare/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20...1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/rahuldave/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35).
