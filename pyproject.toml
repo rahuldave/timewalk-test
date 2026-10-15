@@ -19,3 +19,4 @@ timewalk = { git = "https://github.com/rahuldave/timewalk", branch = "main" }
 testpaths = ["tests"]
 # A test that waits on the page fails after two minutes, with a traceback, and never hangs the run.
 timeout = 120
+markers = ["pages: the pages of every walk, rendered by walk-kit and followed in a clone (just test -k pages)"]

@@ -1,0 +1,66 @@
+---
+title: "tally, one move at a time"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+We build tally, a small word counter, one change at a time. It begins as a command with nothing to count. At the
+end, it counts the words of a file, has tests and types, and writes a report of the most common words. Every
+command runs through uv, in the project's own environment.
+
+We make tally in moves. A move is one small change, made by one patch or by one command. A patch changes a file, and
+a command such as `uv add` writes the files it needs. You make each move, and the page checks your files against it.
+When they match, the move is made, and the next one starts.
+
+Each move first says what problem it solves. Then it gives the change, piece by piece. Last, a command checks the
+result, and a list names each file that changed, with what to look for in it.
+
+There are two ways to read this tutorial. Both have the same parts, in the same order.
+
+Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. What changed is what you check your files against.
+
+In Build it yourself, a file that a command makes says which command. A diff that is open is a patch. Apply it with the command in the text, or make the same change in your editor.
+
+## Read the tutorial
+
+Each change explained, with the code to look at.
+
+- [0 Where it starts](read/step-00.qmd)
+- [1 Counting](read/step-01.qmd)
+- [2 Tests, one at a time](read/step-02.qmd)
+- [3 Formatting, and a corpus](read/step-03.qmd)
+- [4 Types, then a docstring](read/step-04.qmd)
+- [5 The most common words, and a report](read/step-05.qmd)
+- [6 How to run it](read/step-06.qmd)
+
+## Build it yourself
+
+Every command to run and every change to make by hand, to make the project yourself.
+
+### Get the project
+
+You build the project in a clone of your own, on a branch `mine` that starts where this walk starts. Run the commands of these pages in its top folder.
+
+```bash
+git clone https://github.com/o/tally
+cd tally
+git switch -c mine 6a63758166d3
+```
+
+Then add the command `git check`, which compares your files with the project's after each move. It compares `pyproject.toml` by the names of its packages, so another version of a package does not count as a difference. It does not compare the lines of `uv.lock`. It checks that you and the project both have a `uv.lock`, or both have none. It also checks that your `uv.lock` is up to date with your `pyproject.toml`.
+
+```bash
+echo '/pyproject.toml diff=names' >> .git/info/attributes
+git config diff.names.textconv "sed -E 's/^([[:space:]]*\"[A-Za-z0-9_.-]+(\\[[^]]*\\])?)[^\";]*/\\1/'"
+git config alias.check '!f() { git add -A && git diff --cached "$1" -- ":/" ":(top,exclude,glob)uv.lock" && git diff --cached --name-status --diff-filter=AD "$1" -- ":(top,glob)uv.lock" && { [ ! -f uv.lock ] || uv lock --check -q; }; }; f'
+```
+
+### The parts
+
+- [0 Where it starts](build/step-00.qmd)
+- [1 Counting](build/step-01.qmd)
+- [2 Tests, one at a time](build/step-02.qmd)
+- [3 Formatting, and a corpus](build/step-03.qmd)
+- [4 Types, then a docstring](build/step-04.qmd)
+- [5 The most common words, and a report](build/step-05.qmd)
+- [6 How to run it](build/step-06.qmd)

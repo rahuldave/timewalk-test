@@ -1,0 +1,54 @@
+---
+title: "1 Counting"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+```bash
+just setup
+```
+
+A word counter must count. A function, `count`, splits a text into words and counts each one. `main` reads a
+file, or the standard input when you give no file, and prints each word with its count.
+
+```bash
+echo "a b a" | uv run tally
+echo "The the THE" | uv run tally
+```
+
+The first command prints `2 a` and `1 b`. The second prints three words of one each, because tally does not know
+yet that they are one word. The second slide is a picture of what `count` does.
+
+> Ask: is that a bug, and who decides?
+
+## What changed {#step-01-what-changed-182c57}
+
+- <a id="step-01-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `count`, and a `main` that reads the text and prints the counts. 12 lines added, 1 removed. [The file](https://github.com/o/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
+  - look at `counts[word] = counts.get(word, 0) + 1`
+
+<details><summary>The diff of <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -1,5 +1,16 @@
+ """tally: count the words in a text."""
+ 
++import sys
++
++
++def count(text):
++    counts = {}
++    for word in text.split():
++        counts[word] = counts.get(word, 0) + 1
++    return counts
++
+ 
+ def main() -> None:
+-    print("tally: nothing to count yet")
++    text = open(sys.argv[1]).read() if len(sys.argv) > 1 else sys.stdin.read()
++    for word, n in sorted(count(text).items()):
++        print(n, word)
+```
+
+</details>
+
+[This change on GitHub](https://github.com/o/tally/compare/6a63758166d3aeee516faa6244414d7b54b5a730...eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/o/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).

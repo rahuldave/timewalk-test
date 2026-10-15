@@ -1,0 +1,18 @@
+---
+title: "Only the tests"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+We follow tally, a word counter, through the three places where its tests matter. We see it before any test, then
+when the tests come, and last when new code comes with a test of its own. Every command runs through uv.
+
+Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. What changed is what you check your files against.
+
+## Read the tutorial
+
+Each change explained, with the code to look at.
+
+- [1 Before any test](read/step-01.qmd)
+- [2 Two tests](read/step-02.qmd)
+- [5 Still green](read/step-05.qmd)

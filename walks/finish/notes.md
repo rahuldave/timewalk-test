@@ -9,8 +9,7 @@ This part is whole. It adds the types, then the docstring.
 
 {{include step-04}}
 
-`count` now says what it takes and what it gives, in its signature and in its docstring. Its body did not change,
-so the tests pass as before.
+`count` now says what it takes and what it gives, in its signature and in its docstring. Its body did not change.
 
 ## A report of the corpus
 

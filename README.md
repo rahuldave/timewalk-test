@@ -10,12 +10,24 @@ just present tutorial   # start on another walk: narrative, tests, parts, story,
 just check              # check the notes and slides of every walk against the steps
 just pdf hooks          # the PDF of one walk's slides, in build/
 just build              # build repo/ again, and start again from the first step
-just style              # check the prose of the README, CLAUDE.md, notes and slides by the nossaifd writing guide
+just pages              # render the pages that students read, for every walk, into pages/
+just site               # build the website of pages/ into _site/, and serve it at http://127.0.0.1:8000
+just style              # check the README, notes, slides and pages by walk-kit's writing guide
 just test               # build a fresh copy, then run every test
 ```
 
-The pages that students read are made from the facts of each walk, by `render.py` of the `walk` skill. To check them
-too, run this in the class folder:
+timewalk-test also tests the pages that students read. The `walk` skill, in walk-kit, makes these pages from the facts
+of each walk. `just pages` writes them into `pages/`, one folder for each walk, and you can commit them. A tutorial also
+gets a Build it yourself page, with every command to run.
+
+`just test -k pages` makes the pages again in a temporary folder. Then it runs each Build it yourself page in a fresh
+copy of the project, and every check on the page must pass. It skips that part when walk-kit has no `scripts/follow.py`.
+`just style` checks the text of the pages, the README, the notes and the slides.
+
+The website of the pages is at https://rahuldave.com/timewalk-test/, with one site for each walk. GitHub publishes
+it on each push to `main` that changes `pages/`. `just site` builds the same website on your computer.
+
+To check the pages of every walk without writing them, run this in the class folder:
 
 ```
 TIMEWALK=~/Projects/timewalk python3 ~/Projects/walk-kit/scripts/render.py --class . --repo repo --github https://github.com/o/tally
@@ -24,9 +36,8 @@ TIMEWALK=~/Projects/timewalk python3 ~/Projects/walk-kit/scripts/render.py --cla
 It must report 0 problems and 0 warnings for every walk. It reports a file that the do mode does not give in full.
 It also reports the words of timewalk, such as "step", "move" and "commit", in the text that a reader reads.
 
-`pyproject.toml` takes timewalk from its `walks` branch on GitHub. To use a working copy of timewalk instead,
-put `TIMEWALK_LOCAL=~/Projects/timewalk` before any recipe. Students use timewalk's `main`, which this
-repository does not touch.
+`pyproject.toml` takes timewalk from its `main` branch on GitHub. To use a working copy of timewalk instead,
+put `TIMEWALK_LOCAL=~/Projects/timewalk` before any recipe.
 
 ## A tour
 
@@ -80,8 +91,9 @@ notes column.
 | `toc.toml` | The table of contents: the nine walks, the default first. Each has a `description`, which the band shows at the walk's first step |
 | `notes.md`, `slides/` | The default walk: its notes, and its manifest with the slide files |
 | `walks/NAME/` | Each other walk: `notes.md`, and `slides/slides.toml` with its own slide files. The small walks `small` and `story` have only an `intro.md`, and read the notes and slides of the tutorial. The small walks `testing` and `finish` have only a `notes.md` of their own, and read the move sections and the slides of the tutorial |
+| `pages/ID/` | The pages of each walk, from `just pages`: `read.md`, `build.md` for a tutorial, and the website in `site/` |
 | `justfile` | The recipes above |
-| `tests/` | pytest and Playwright: two windows through every walk, step, move and slide, commands typed into a shell, the checks on broken copies of the class, and the PDF. `tests/test_facts.py` checks the facts that `timewalk-export --json` writes, for a tutorial, a narrative, the small walks with `select` and with notes of their own, and a narrative that stops at moves, against timewalk's `facts.schema.json` |
+| `tests/` | pytest and Playwright: two windows through every walk, step, move and slide, commands typed into a shell, the checks on broken copies of the class, and the PDF. `tests/test_facts.py` checks the facts that `timewalk-export --json` writes, for a tutorial, a narrative, the small walks with `select` and with notes of their own, and a narrative that stops at moves, against timewalk's `facts.schema.json`. `tests/test_pages.py` renders the pages of every walk, and follows each Build it yourself page |
 
 **`just setup` starts every step, and it never touches git.** It makes the environment (`uv sync`) and the
 artifacts that the step needs. The artifacts are `data/corpus.txt` from step-03, and `build/top.txt` from step-05.

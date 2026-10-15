@@ -1,0 +1,175 @@
+---
+title: "5 Still green"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+```bash
+just setup
+```
+
+Much later, `top` comes with a test of its own, and the old tests still pass. The types and the docstring that came
+in between did not change a test. The tests check what the code does, and not how it says it.
+
+```bash
+uv run python -m unittest discover -s tests -v
+uv run tally --top 3 data/corpus.txt
+```
+
+The four tests pass, and the command prints the three most common words of the corpus.
+
+## What changed {#step-05-what-changed-182c57}
+
+- <a id="step-05-.gitignore-a5cc29"></a>`.gitignore`: git does not hold the corpus. 3 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/.gitignore).
+- <a id="step-05-justfile-424f0b"></a>`justfile`: `just setup` makes the corpus and the report. 7 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
+- <a id="step-05-pyproject.toml-5d07e7"></a>`pyproject.toml`: ruff, and its line length. 8 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/pyproject.toml).
+- <a id="step-05-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: the script that writes the corpus. New, 25 lines. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/scripts/corpus.py).
+- <a id="step-05-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: types, a docstring, `top` and the option `--top`. 15 lines added, 4 removed. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/src/tally/__init__.py).
+- <a id="step-05-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: the new test, of `top`. New, 8 lines. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/tests/test_top.py).
+- <a id="step-05-uv.lock-8356d8"></a>`uv.lock`: the exact version of ruff. 35 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/uv.lock).
+
+<details><summary>The diff of <code>.gitignore</code></summary>
+
+```diff
+@@ -8,3 +8,6 @@ wheels/
+ 
+ # Virtual environments
+ .venv
++
++# Artifacts that just setup makes: they are not in git
++data/
+```
+
+</details>
+
+<details><summary>The diff of <code>justfile</code></summary>
+
+```diff
+@@ -5,6 +5,8 @@ default:
+ # Make the environment of this step: the first command of every step
+ setup:
+     uv sync
++    uv run python scripts/corpus.py data/corpus.txt
++    test -f build/top.txt || just report
+ 
+ # Count the words of a file
+ run file:
+@@ -13,3 +15,8 @@ run file:
+ # Run the tests
+ test:
+     uv run python -m unittest discover -s tests -q
++
++# Write the ten most common words of the corpus to build/top.txt
++report:
++    mkdir -p build
++    uv run tally --top 10 data/corpus.txt > build/top.txt
+```
+
+</details>
+
+<details><summary>The diff of <code>pyproject.toml</code></summary>
+
+```diff
+@@ -12,3 +12,11 @@ tally = "tally:main"
+ [build-system]
+ requires = ["uv_build>=0.12.13,<0.13.0"]
+ build-backend = "uv_build"
++
++[dependency-groups]
++dev = [
++    "ruff>=0.17.0",
++]
++
++[tool.ruff]
++line-length = 100
+```
+
+</details>
+
+<details><summary>The diff of <code>scripts/corpus.py</code></summary>
+
+```diff
+@@ -0,0 +1,25 @@
++"""Write data/corpus.txt, a text of 2000 words to count, the same every time. Leave it alone if it is there."""
++
++import sys
++from pathlib import Path
++
++WORDS = "the a word count text tally test step move commit tag note slide class shell file line code".split()
++
++
++def main() -> None:
++    target = Path(sys.argv[1] if len(sys.argv) > 1 else "data/corpus.txt")
++    if target.exists():
++        print(f"{target} is there")
++        return
++    seed, words = 7, []
++    for _ in range(2000):
++        seed = (seed * 1103515245 + 12345) % 2**31
++        words.append(WORDS[seed % len(WORDS)])
++    target.parent.mkdir(parents=True, exist_ok=True)
++    lines = (" ".join(words[i : i + 12]) for i in range(0, len(words), 12))
++    target.write_text("\n".join(lines) + "\n")
++    print(f"wrote {target}: {len(words)} words")
++
++
++if __name__ == "__main__":
++    main()
+```
+
+</details>
+
+<details><summary>The diff of <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -3,14 +3,25 @@
+ import sys
+ 
+ 
+-def count(text):
++def count(text: str) -> dict[str, int]:
++    "How many times each word of `text` appears, ignoring case."
+     counts = {}
+     for word in text.lower().split():
+         counts[word] = counts.get(word, 0) + 1
+     return counts
+ 
+ 
++def top(counts: dict[str, int], n: int) -> list[tuple[str, int]]:
++    "The n most common words, most common first."
++    return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]
++
++
+ def main() -> None:
+-    text = open(sys.argv[1]).read() if len(sys.argv) > 1 else sys.stdin.read()
+-    for word, n in sorted(count(text).items()):
+-        print(n, word)
++    "Count the words of a file, or of the standard input. With --top N, only the N most common."
++    args, n = sys.argv[1:], None
++    if args[:1] == ["--top"]:
++        n, args = int(args[1]), args[2:]
++    text = open(args[0]).read() if args else sys.stdin.read()
++    counts = count(text)
++    for word, times in top(counts, n) if n else sorted(counts.items()):
++        print(times, word)
+```
+
+</details>
+
+<details><summary>The diff of <code>tests/test_top.py</code></summary>
+
+```diff
+@@ -0,0 +1,8 @@
++import unittest
++
++from tally import top
++
++
++class Top(unittest.TestCase):
++    def test_most_common_first(self):
++        self.assertEqual(top({"a": 1, "b": 3, "c": 2}, 2), [("b", 3), ("c", 2)])
+```
+
+</details>
+
+[This change on GitHub](https://github.com/o/tally/compare/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20...9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/o/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).

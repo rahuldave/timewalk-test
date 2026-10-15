@@ -1,0 +1,107 @@
+---
+title: "5 The most common words"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+```bash
+just setup
+```
+
+A reader of a long text wants the most common words first, and only a few. `top` returns the most common words,
+`tally --top N` prints them, and `just report` writes them to `build/top.txt`. That report is an artifact too.
+`just setup` makes it when it is missing, so a learner who comes straight here still has it.
+
+```bash
+cat build/top.txt
+uv run tally --top 3 data/corpus.txt
+just test
+```
+
+A long command runs in a terminal of its own, so the first terminal stays free. A second long command runs in a
+third terminal:
+
+```bash
+# in a second terminal
+for i in 1 2 3 4 5; do echo "epoch $i"; sleep 1; done
+for i in 1 2 3; do echo "sweep $i"; sleep 2; done
+rm build/top.txt; just setup; ls build
+```
+
+## What changed {#step-05-what-changed-182c57}
+
+- <a id="step-05-justfile-424f0b"></a>`justfile`: the recipe `report`, and the line of `setup` that runs it. 6 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
+  - look at `test -f build/top.txt || just report`
+- <a id="step-05-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `top`, and the option `--top` of `main`. 13 lines added, 3 removed. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/src/tally/__init__.py).
+  - look at `if args[:1] == ["--top"]:`
+- <a id="step-05-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: the test of `top`. New, 8 lines. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/tests/test_top.py).
+
+<details><summary>The diff of <code>justfile</code></summary>
+
+```diff
+@@ -6,6 +6,7 @@ default:
+ setup:
+     uv sync
+     uv run python scripts/corpus.py data/corpus.txt
++    test -f build/top.txt || just report
+ 
+ # Count the words of a file
+ run file:
+@@ -14,3 +15,8 @@ run file:
+ # Run the tests
+ test:
+     uv run python -m unittest discover -s tests -q
++
++# Write the ten most common words of the corpus to build/top.txt
++report:
++    mkdir -p build
++    uv run tally --top 10 data/corpus.txt > build/top.txt
+```
+
+</details>
+
+<details><summary>The diff of <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -11,7 +11,17 @@ def count(text: str) -> dict[str, int]:
+     return counts
+ 
+ 
++def top(counts: dict[str, int], n: int) -> list[tuple[str, int]]:
++    "The n most common words, most common first."
++    return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]
++
++
+ def main() -> None:
+-    text = open(sys.argv[1]).read() if len(sys.argv) > 1 else sys.stdin.read()
+-    for word, n in sorted(count(text).items()):
+-        print(n, word)
++    "Count the words of a file, or of the standard input. With --top N, only the N most common."
++    args, n = sys.argv[1:], None
++    if args[:1] == ["--top"]:
++        n, args = int(args[1]), args[2:]
++    text = open(args[0]).read() if args else sys.stdin.read()
++    counts = count(text)
++    for word, times in top(counts, n) if n else sorted(counts.items()):
++        print(times, word)
+```
+
+</details>
+
+<details><summary>The diff of <code>tests/test_top.py</code></summary>
+
+```diff
+@@ -0,0 +1,8 @@
++import unittest
++
++from tally import top
++
++
++class Top(unittest.TestCase):
++    def test_most_common_first(self):
++        self.assertEqual(top({"a": 1, "b": 3, "c": 2}, 2), [("b", 3), ("c", 2)])
+```
+
+</details>
+
+[This change on GitHub](https://github.com/o/tally/compare/f79588d3b046ec2787725cdb6e3fcf952014e078...9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/o/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).

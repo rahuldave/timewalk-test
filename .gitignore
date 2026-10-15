@@ -7,3 +7,9 @@ __pycache__/
 .pytest_cache/
 # timewalk follows the head of its branch: `just test` upgrades it each run
 uv.lock
+# The reports of walk-kit's review of the writing
+/reports/writing/
+/reports/follow/
+# The website that `just site` builds from pages/, and smalldocs's output in each walk's site/
+/_site/
+/pages/*/site/_site/

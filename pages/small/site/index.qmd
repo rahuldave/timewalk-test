@@ -1,0 +1,52 @@
+---
+title: "Two parts of tally, one move at a time"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+This walk takes two parts of tally alone. The first part is the test of an empty text and the fix of case. The
+second part is the function for the most common words. Each part begins with the code as it was just before it.
+
+The walk leaves out the rest of tally:
+
+- Before the first part, it leaves out the first file of tests, `tests/test_count.py`. The first part begins with it in place.
+- Between the two parts, it leaves out ruff, the corpus, the types and the docstring. The second part begins with their code.
+- After the second part, it leaves out the option `--top` and the report.
+
+There are two ways to read this tutorial. Both have the same parts, in the same order.
+
+Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. What changed is what you check your files against.
+
+In Build it yourself, a file that a command makes says which command. A diff that is open is a patch. Apply it with the command in the text, or make the same change in your editor.
+
+## Read the tutorial
+
+Each change explained, with the code to look at.
+
+- [2.2 to 2.3 An empty text, and case](read/step-02.2-to-step-02.3.qmd)
+- [5.1 A function for the most common words](read/step-05.1.qmd)
+
+## Build it yourself
+
+Every command to run and every change to make by hand, to make the project yourself.
+
+### Get the project
+
+You build the project in a clone of your own, on a branch `mine` that starts where this walk starts. Run the commands of these pages in its top folder.
+
+```bash
+git clone https://github.com/o/tally
+cd tally
+git switch -c mine 6a4b1a0e5003
+```
+
+Then add the command `git check`, which compares your files with the project's after each move.
+
+```bash
+git config alias.check '!f() { git add -A && git diff --cached --stat "$1"; }; f'
+```
+
+### The parts
+
+- [2.2 to 2.3 An empty text, and case](build/step-02.2-to-step-02.3.qmd)
+- [5.1 A function for the most common words](build/step-05.1.qmd)

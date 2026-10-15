@@ -1,0 +1,82 @@
+---
+title: "5.3 A report of the corpus"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Read the tutorial.** [Build it yourself](../build/step-05.3.qmd) is the other way to read this part.
+
+```bash
+just setup
+```
+
+Since the last part, the walk leaves out the function `top`, its test, and the option `--top`. This part begins
+with their code.
+
+[The code before this part](https://github.com/o/tally/tree/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d). [The code after it](https://github.com/o/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
+
+## 5.3 A report, which just setup makes {#step-05.3}
+
+The most common words of the corpus make a report, which others want to read without running tally. A recipe of
+the `justfile`, `report`, writes the ten most common words to `build/top.txt`. The recipe has two lines, and `just`
+prints each line before it runs it. The second line has two parts.
+
+- **`mkdir -p build`** makes the folder `build`, and does nothing when the folder is there.
+- **`uv run tally --top 10 data/corpus.txt`** counts the corpus, and keeps the ten most common words.
+- **`> build/top.txt`** sends what tally prints to the file, in place of the terminal.
+
+A patch to [`justfile`](#step-05.3-justfile-424f0b).
+
+The report is an artifact, as the corpus is. git ignores the folder `build/`, so git holds the recipe, and not the
+report. `just setup` makes the report when the file is missing. `test -f build/top.txt` is true when the file is
+there, and `||` runs `just report` only when it is not.
+
+At the end of the `justfile`, the new recipe `report` makes the folder `build`, and writes the report into it. In
+the recipe `setup`, the new last line runs `just report` when `build/top.txt` is missing.
+
+A report from an earlier run stays, because git ignores it. So remove the report first, and then `just setup` makes
+it again:
+
+```bash
+rm -f build/top.txt
+just setup
+cat build/top.txt
+```
+
+The file has ten lines, the most common word first.
+
+The report is the ten most common words of the corpus, the same list that `--top 10` prints.
+
+tally is now finished. It counts, it has tests and types, and `just setup` makes its report.
+
+### What changed {#step-05.3-what-changed-182c57}
+
+- <a id="step-05.3-justfile-424f0b"></a>`justfile`: the report, and the line in `setup` that makes it when it is missing. 6 lines added. [The file](https://github.com/o/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
+  - look at `uv run tally --top 10 data/corpus.txt > build/top.txt`
+  - look at `test -f build/top.txt || just report`
+
+<details><summary>The diff of <code>justfile</code></summary>
+
+```diff
+@@ -6,6 +6,7 @@ default:
+ setup:
+     uv sync
+     uv run python scripts/corpus.py data/corpus.txt
++    test -f build/top.txt || just report
+ 
+ # Count the words of a file
+ run file:
+@@ -14,3 +15,8 @@ run file:
+ # Run the tests
+ test:
+     uv run python -m unittest discover -s tests -q
++
++# Write the ten most common words of the corpus to build/top.txt
++report:
++    mkdir -p build
++    uv run tally --top 10 data/corpus.txt > build/top.txt
+```
+
+</details>
+
+[This change on GitHub](https://github.com/o/tally/commit/9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/o/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).

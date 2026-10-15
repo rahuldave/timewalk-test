@@ -1,0 +1,73 @@
+---
+title: "2 Tests, one at a time"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+```bash
+just setup
+```
+
+We cannot tell whether `count` still works after a change, unless we try it by hand each time. Tests try it for us.
+Each test gives `count` a text, and compares what it gives back with what we expect.
+We add the tests one file at a time, and run them after each. One test asks for something that `count` cannot do yet. It asks `count` to count
+"The" and "the" as one word.
+
+## What changed {#step-02-what-changed-182c57}
+
+- <a id="step-02-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: changes `count`. 1 line added, 1 removed. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/src/tally/__init__.py).
+- <a id="step-02-tests-test_count.py-e674f6"></a>`tests/test_count.py`: adds `class Count`, `test_case`, `test_words`. New, 11 lines. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_count.py).
+- <a id="step-02-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: adds `class Empty`, `test_empty`. New, 8 lines. [The file](https://github.com/o/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/tests/test_empty.py).
+
+<details><summary>The diff of <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -5,7 +5,7 @@ import sys
+ 
+ def count(text):
+     counts = {}
+-    for word in text.split():
++    for word in text.lower().split():
+         counts[word] = counts.get(word, 0) + 1
+     return counts
+ 
+```
+
+</details>
+
+<details><summary>The diff of <code>tests/test_count.py</code></summary>
+
+```diff
+@@ -0,0 +1,11 @@
++import unittest
++
++from tally import count
++
++
++class Count(unittest.TestCase):
++    def test_words(self):
++        self.assertEqual(count("a b a"), {"a": 2, "b": 1})
++
++    def test_case(self):
++        self.assertEqual(count("A a"), {"a": 2})
+```
+
+</details>
+
+<details><summary>The diff of <code>tests/test_empty.py</code></summary>
+
+```diff
+@@ -0,0 +1,8 @@
++import unittest
++
++from tally import count
++
++
++class Empty(unittest.TestCase):
++    def test_empty(self):
++        self.assertEqual(count(""), {})
+```
+
+</details>
+
+[This change on GitHub](https://github.com/o/tally/compare/eb951f74756383392f528427a0cf44e135d5c64f...bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/o/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).

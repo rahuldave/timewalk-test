@@ -1,0 +1,51 @@
+---
+title: "1.1 A function that counts"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+```bash
+just setup
+```
+
+A word counter needs a way to count. A function, `count`, takes a text and gives a dictionary from each word to how
+many times it appears. It goes in `src/tally/__init__.py`, above `main`. The command does not use it yet.
+
+A patch to [`src/tally/__init__.py`](#step-01.1-src-tally-__init__.py-b5485b).
+
+In `src/tally/__init__.py`, `count` now stands above `main`. It splits the text at each space. For each word, it
+adds 1 to the count so far, and `counts.get(word, 0)` gives 0 for a word it has not seen.
+
+```bash
+uv run python -c "from tally import count; print(count('a b a'))"
+```
+
+It prints `{'a': 2, 'b': 1}`, two of `a` and one of `b`. So the function works, though the command still has
+nothing to count.
+
+## What changed {#step-01.1-what-changed-182c57}
+
+- <a id="step-01.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: a dictionary from each word to how many times it appears. 7 lines added. [The file](https://github.com/o/tally/blob/12fcbe75226dde15e7500b71439bad84712fd2b0/src/tally/__init__.py).
+  - look at `counts[word] = counts.get(word, 0) + 1`
+
+<details><summary>The diff of <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -1,5 +1,12 @@
+ """tally: count the words in a text."""
+ 
+ 
++def count(text):
++    counts = {}
++    for word in text.split():
++        counts[word] = counts.get(word, 0) + 1
++    return counts
++
++
+ def main() -> None:
+     print("tally: nothing to count yet")
+```
+
+</details>
+
+[This change on GitHub](https://github.com/o/tally/compare/6a63758166d3aeee516faa6244414d7b54b5a730...12fcbe75226dde15e7500b71439bad84712fd2b0). [The code after it](https://github.com/o/tally/tree/12fcbe75226dde15e7500b71439bad84712fd2b0).

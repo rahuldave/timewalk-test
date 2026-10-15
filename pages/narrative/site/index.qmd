@@ -1,0 +1,24 @@
+---
+title: "tally, step by step"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+We follow tally, a word counter, from a project that does nothing to a command with tests, types and a report.
+tally is a uv project from the beginning. Every command runs through `uv run`, in the project's own `.venv`, and
+never in the Python of the system. Each part begins with `just setup`, which brings the environment and the files
+that the code needs up to date. `just setup` never changes git.
+
+Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. What changed is what you check your files against.
+
+## Read the tutorial
+
+Each change explained, with the code to look at.
+
+- [0 Where it starts](read/step-00.qmd)
+- [1 Counting](read/step-01.qmd)
+- [2 Tests](read/step-02.qmd)
+- [3 Formatting, and a corpus](read/step-03.qmd)
+- [4 Types and docs](read/step-04.qmd)
+- [5 The most common words](read/step-05.qmd)
+- [6 How to run it](read/step-06.qmd)

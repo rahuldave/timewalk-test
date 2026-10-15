@@ -1,0 +1,46 @@
+---
+title: "The tests of tally, with notes of its own"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+This walk takes only the tests of tally. It begins where tally can already count the words of a text. It leaves out
+the formatting, the types and the report.
+
+There are two ways to read this tutorial. Both have the same parts, in the same order.
+
+Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. What changed is what you check your files against.
+
+In Build it yourself, a file that a command makes says which command. A diff that is open is a patch. Apply it with the command in the text, or make the same change in your editor.
+
+## Read the tutorial
+
+Each change explained, with the code to look at.
+
+- [2.1 to 2.3 Three tests of counting](read/step-02.1-to-step-02.3.qmd)
+- [5.1 A test of the most common words](read/step-05.1.qmd)
+
+## Build it yourself
+
+Every command to run and every change to make by hand, to make the project yourself.
+
+### Get the project
+
+You build the project in a clone of your own, on a branch `mine` that starts where this walk starts. Run the commands of these pages in its top folder.
+
+```bash
+git clone https://github.com/o/tally
+cd tally
+git switch -c mine eb951f747563
+```
+
+Then add the command `git check`, which compares your files with the project's after each move.
+
+```bash
+git config alias.check '!f() { git add -A && git diff --cached --stat "$1"; }; f'
+```
+
+### The parts
+
+- [2.1 to 2.3 Three tests of counting](build/step-02.1-to-step-02.3.qmd)
+- [5.1 A test of the most common words](build/step-05.1.qmd)

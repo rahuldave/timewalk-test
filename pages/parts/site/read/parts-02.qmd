@@ -1,0 +1,42 @@
+---
+title: "2 One more test"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+```bash
+just setup
+```
+
+An empty text has no words, and `count` must give an empty dictionary for it. A test of an empty text says so. It
+passes at once, because `count` already handles it.
+
+```bash
+uv run python -m unittest discover -s tests -v
+echo "" | uv run tally && echo "(nothing, as the test says)"
+```
+
+The three tests pass, and tally prints nothing for an empty text.
+
+## What changed {#parts-02-what-changed-182c57}
+
+- <a id="parts-02-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/o/tally/blob/2792637d83ba3d968e83427f008dc24b2517b400/tests/test_empty.py).
+  - look at `self.assertEqual(count(""), {})`
+
+<details><summary>The diff of <code>tests/test_empty.py</code></summary>
+
+```diff
+@@ -0,0 +1,8 @@
++import unittest
++
++from tally import count
++
++
++class Empty(unittest.TestCase):
++    def test_empty(self):
++        self.assertEqual(count(""), {})
+```
+
+</details>
+
+[This change on GitHub](https://github.com/o/tally/compare/e416331e1414a145c9a4e84a49ccd119cbaf2168...2792637d83ba3d968e83427f008dc24b2517b400). [The code after it](https://github.com/o/tally/tree/2792637d83ba3d968e83427f008dc24b2517b400).

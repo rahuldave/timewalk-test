@@ -1,0 +1,46 @@
+---
+title: "6 How to run it"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+```bash
+just setup
+```
+
+A new user does not know which commands to run first. The README now says how to run tally, its tests and its
+report. Only `README.md` changes, so the code is as it was.
+
+```bash
+uv run tally --top 3 data/corpus.txt
+```
+
+> Ask: what else would a new user ask before they run it?
+
+## What changed {#step-06-what-changed-182c57}
+
+- <a id="step-06-README.md-8ec9a0"></a>`README.md`: a section, "Run it", with the commands that a new user needs first. 10 lines added. [The file](https://github.com/o/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/README.md).
+  - look at `## Run it`
+
+<details><summary>The diff of <code>README.md</code></summary>
+
+```diff
+@@ -1,3 +1,13 @@
+ # tally
+ 
+ Count the words in a text.
++
++## Run it
++
++Make the environment, the corpus and the report first. Then count the words of a file:
++
++    just setup
++    uv run tally data/corpus.txt
++
++`uv run tally --top 10 data/corpus.txt` prints only the ten most common words. `just test` runs the tests, and
++`just report` writes the ten most common words of the corpus to `build/top.txt`.
+```
+
+</details>
+
+[This change on GitHub](https://github.com/o/tally/compare/9e37b6eed29516f62bc176d1eaa66bf4e86683a6...974d653080b0bd7dd06741b60225518cfecc908e). [The code after it](https://github.com/o/tally/tree/974d653080b0bd7dd06741b60225518cfecc908e).

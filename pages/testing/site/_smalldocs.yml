@@ -1,0 +1,53 @@
+# Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again.
+project:
+  type: website
+  output-dir: _site
+  render: ["index.qmd", "read/*.qmd", "build/*.qmd"]   # only these pages
+
+website:
+  title: "The tests of tally, with notes of its own"
+  page-navigation: true
+  search: true
+  sidebar:
+    style: docked
+    contents:
+      - index.qmd
+      - section: "Read the tutorial"
+        contents:
+          - section: "2.1 to 2.3 Three tests of counting"
+            href: read/step-02.1-to-step-02.3.qmd
+            contents:
+              - text: "2.1 A test of counting"
+                href: read/step-02.1-to-step-02.3.qmd#step-02.1
+              - text: "2.2 A test of an empty text"
+                href: read/step-02.1-to-step-02.3.qmd#step-02.2
+              - text: "2.3 Case does not matter"
+                href: read/step-02.1-to-step-02.3.qmd#step-02.3
+          - section: "5.1 A test of the most common words"
+            href: read/step-05.1.qmd
+            contents:
+              - text: "5.1 A function for the most common words"
+                href: read/step-05.1.qmd#step-05.1
+      - section: "Build it yourself"
+        contents:
+          - section: "2.1 to 2.3 Three tests of counting"
+            href: build/step-02.1-to-step-02.3.qmd
+            contents:
+              - text: "2.1 A test of counting"
+                href: build/step-02.1-to-step-02.3.qmd#step-02.1
+              - text: "2.2 A test of an empty text"
+                href: build/step-02.1-to-step-02.3.qmd#step-02.2
+              - text: "2.3 Case does not matter"
+                href: build/step-02.1-to-step-02.3.qmd#step-02.3
+          - section: "5.1 A test of the most common words"
+            href: build/step-05.1.qmd
+            contents:
+              - text: "5.1 A function for the most common words"
+                href: build/step-05.1.qmd#step-05.1
+
+theme: cosmo
+css: styles.css
+toc: true
+toc-depth: 2
+code-copy: true
+from: markdown-tex_math_dollars-smart  # a $ is a dollar, not mathematics; -- stays two hyphens

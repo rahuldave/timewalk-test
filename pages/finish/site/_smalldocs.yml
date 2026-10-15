@@ -1,0 +1,49 @@
+# Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again.
+project:
+  type: website
+  output-dir: _site
+  render: ["index.qmd", "read/*.qmd", "build/*.qmd"]   # only these pages
+
+website:
+  title: "Types, then the report, with notes of its own"
+  page-navigation: true
+  search: true
+  sidebar:
+    style: docked
+    contents:
+      - index.qmd
+      - section: "Read the tutorial"
+        contents:
+          - section: "4 Types and a docstring"
+            href: read/step-04.qmd
+            contents:
+              - text: "4.1 Types"
+                href: read/step-04.qmd#step-04.1
+              - text: "4.2 A docstring"
+                href: read/step-04.qmd#step-04.2
+          - section: "5.3 A report of the corpus"
+            href: read/step-05.3.qmd
+            contents:
+              - text: "5.3 A report, which just setup makes"
+                href: read/step-05.3.qmd#step-05.3
+      - section: "Build it yourself"
+        contents:
+          - section: "4 Types and a docstring"
+            href: build/step-04.qmd
+            contents:
+              - text: "4.1 Types"
+                href: build/step-04.qmd#step-04.1
+              - text: "4.2 A docstring"
+                href: build/step-04.qmd#step-04.2
+          - section: "5.3 A report of the corpus"
+            href: build/step-05.3.qmd
+            contents:
+              - text: "5.3 A report, which just setup makes"
+                href: build/step-05.3.qmd#step-05.3
+
+theme: cosmo
+css: styles.css
+toc: true
+toc-depth: 2
+code-copy: true
+from: markdown-tex_math_dollars-smart  # a $ is a dollar, not mathematics; -- stays two hyphens

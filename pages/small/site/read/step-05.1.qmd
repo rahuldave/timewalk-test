@@ -1,0 +1,78 @@
+---
+title: "5.1 A function for the most common words"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Read the tutorial.** [Build it yourself](../build/step-05.1.qmd) is the other way to read this part.
+
+```bash
+just setup
+```
+
+[The code before this part](https://github.com/o/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/o/tally/tree/72a0129dcee765132ad267788636ff4af9066369).
+
+## 5.1 A function for the most common words {#step-05.1}
+
+`count` gives the counts in no useful order. To find the most common words, tally must sort the counts, most common
+first, and keep the first few. A function, `top`, does it. It sorts by count, highest first, and then by the
+word, so that two words with the same count keep one order. Then it keeps the first `n`.
+
+A patch to [`src/tally/__init__.py`](#step-05.1-src-tally-__init__.py-b5485b).
+
+A test says what `top` must give. It gives `top` three words with their counts, and asks for the two most common.
+
+A patch to [`tests/test_top.py`](#step-05.1-tests-test_top.py-1f85fe).
+
+In `src/tally/__init__.py`, `top` stands between `count` and `main`. It sorts with the key `(-pair[1], pair[0])`.
+The key is the count with a minus sign, so that the highest count comes first, and then the word. The new file
+`tests/test_top.py` has one test, `test_most_common_first`.
+
+```bash
+uv run python -m unittest discover -s tests -q
+```
+
+The four tests pass.
+
+### What changed {#step-05.1-what-changed-182c57}
+
+- <a id="step-05.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: sort by count, most common first, then by the word. 5 lines added. [The file](https://github.com/o/tally/blob/72a0129dcee765132ad267788636ff4af9066369/src/tally/__init__.py).
+  - look at `return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]`
+- <a id="step-05.1-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: its test, with three words. New, 8 lines. [The file](https://github.com/o/tally/blob/72a0129dcee765132ad267788636ff4af9066369/tests/test_top.py).
+
+<details><summary>The diff of <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -11,6 +11,11 @@ def count(text: str) -> dict[str, int]:
+     return counts
+ 
+ 
++def top(counts: dict[str, int], n: int) -> list[tuple[str, int]]:
++    "The n most common words, most common first."
++    return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]
++
++
+ def main() -> None:
+     text = open(sys.argv[1]).read() if len(sys.argv) > 1 else sys.stdin.read()
+     for word, n in sorted(count(text).items()):
+```
+
+</details>
+
+<details><summary>The diff of <code>tests/test_top.py</code></summary>
+
+```diff
+@@ -0,0 +1,8 @@
++import unittest
++
++from tally import top
++
++
++class Top(unittest.TestCase):
++    def test_most_common_first(self):
++        self.assertEqual(top({"a": 1, "b": 3, "c": 2}, 2), [("b", 3), ("c", 2)])
+```
+
+</details>
+
+[This change on GitHub](https://github.com/o/tally/commit/72a0129dcee765132ad267788636ff4af9066369). [The code after it](https://github.com/o/tally/tree/72a0129dcee765132ad267788636ff4af9066369).
