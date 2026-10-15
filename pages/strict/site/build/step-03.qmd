@@ -31,7 +31,7 @@ who installs tally does not get ruff.
 
 One command does it all. `uv add` writes ruff into `pyproject.toml` and `uv.lock`, and installs it in `.venv`.
 
-The author ran `uv add --dev ruff` here. It writes `pyproject.toml` and `uv.lock`. On a later day, it can write newer versions of packages than the author's, and this walk compares `pyproject.toml` and `uv.lock` exactly. So do not run it. Run this command in its place, from the top of the project. It takes each file as the author has it from the project, and installs exactly the versions that `uv.lock` names:
+The author ran `uv add --dev ruff` here. It writes `pyproject.toml` and `uv.lock`. On a later day, it can write newer versions of packages than the author's, and then git check finds that your files differ. So do not run it. Run this command in its place, from the top of the project. It takes each file as the author has it from the project, and installs exactly the versions that `uv.lock` names:
 
 ```bash
 git restore --source edb9544c04d2 -- pyproject.toml uv.lock && uv sync --locked --all-groups --all-packages

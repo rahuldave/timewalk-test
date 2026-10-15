@@ -27,7 +27,7 @@ tally needs tabulate to draw a table. A new version 1.0 of tabulate could change
 any 0.9 version, and no later one. `uv add` with a range of versions puts the range in `pyproject.toml`, and the
 exact version in `uv.lock`:
 
-The author ran `uv add "tabulate>=0.9,<0.10"` here. It writes `pyproject.toml` and `uv.lock`. On a later day, it can write newer versions of packages than the author's, and this walk compares `pyproject.toml` and `uv.lock` exactly. So do not run it. Run this command in its place, from the top of the project. It takes each file as the author has it from the project, and installs exactly the versions that `uv.lock` names:
+The author ran `uv add "tabulate>=0.9,<0.10"` here. It writes `pyproject.toml` and `uv.lock`. On a later day, it can write newer versions of packages than the author's, and then git check finds that your files differ. So do not run it. Run this command in its place, from the top of the project. It takes each file as the author has it from the project, and installs exactly the versions that `uv.lock` names:
 
 ```bash
 git restore --source 418e7fd88a3f -- pyproject.toml uv.lock && uv sync --locked --all-groups --all-packages
@@ -159,7 +159,7 @@ git restore --source 418e7fd88a3f --staged -- :/ && git restore --source 5051c3f
 The docs will be Markdown files. mdformat formats Markdown, and its option `--check` says whether a file is
 formatted. Only the people who write the docs need it, so it goes in a group of its own, `docs`:
 
-The author ran `uv add --group docs mdformat` here. It writes `pyproject.toml` and `uv.lock`. On a later day, it can write newer versions of packages than the author's, and this walk compares `pyproject.toml` and `uv.lock` exactly. So do not run it. Run this command in its place, from the top of the project. It takes each file as the author has it from the project, and installs exactly the versions that `uv.lock` names:
+The author ran `uv add --group docs mdformat` here. It writes `pyproject.toml` and `uv.lock`. On a later day, it can write newer versions of packages than the author's, and then git check finds that your files differ. So do not run it. Run this command in its place, from the top of the project. It takes each file as the author has it from the project, and installs exactly the versions that `uv.lock` names:
 
 ```bash
 git restore --source ec6a8aa7f9a8 -- pyproject.toml uv.lock && uv sync --locked --all-groups --all-packages
