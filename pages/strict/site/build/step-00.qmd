@@ -1,0 +1,153 @@
+---
+title: "0 Where it starts"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Build it yourself.** [Read the tutorial](../read/step-00.qmd) is the other way to read this part.
+
+```bash
+just setup
+```
+
+tally is a uv project with one command, `tally`, which has nothing to count yet. `just setup` makes the
+environment of the project, `.venv`, with `uv sync`. Run the command, to see where we begin.
+
+```bash
+uv run tally
+```
+
+It prints `tally: nothing to count yet`.
+
+Check your files against this part. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 6a63758166d3
+```
+
+If you are stuck, this command puts the files of this part in place of yours. A file that you made yourself stays:
+
+```bash
+git rm -rq --cached --ignore-unmatch -- :/ && git restore --source 6a63758166d3 --staged --worktree -- :/
+```
+
+## What changed {#step-00-what-changed-182c57}
+
+- <a id="step-00-.gitignore-a5cc29"></a>`.gitignore`: the files that git does not hold, such as `.venv`. New, 10 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/.gitignore).
+- <a id="step-00-.python-version-7696e9"></a>`.python-version`: the version of Python that uv uses. New, 1 line. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/.python-version).
+- <a id="step-00-README.md-8ec9a0"></a>`README.md`: one line about tally. New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/README.md).
+- <a id="step-00-justfile-424f0b"></a>`justfile`: the recipes, with `setup` first. New, 15 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/justfile).
+- <a id="step-00-pyproject.toml-5d07e7"></a>`pyproject.toml`: the project, and the table `[project.scripts]` that makes the command `tally`. New, 14 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/pyproject.toml).
+  - look at `tally = "tally:main"`
+- <a id="step-00-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main`, which has nothing to count yet. New, 5 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/src/tally/__init__.py).
+- <a id="step-00-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: lets `python -m tally` run `main` too. New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/src/tally/__main__.py).
+- <a id="step-00-uv.lock-8356d8"></a>`uv.lock`: the exact packages, the same for every learner. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/6a63758166d3aeee516faa6244414d7b54b5a730/uv.lock).
+
+<details><summary>The diff of <code>.gitignore</code></summary>
+
+```diff
+@@ -0,0 +1,10 @@
++# Python-generated files
++__pycache__/
++*.py[oc]
++build/
++dist/
++wheels/
++*.egg-info
++
++# Virtual environments
++.venv
+```
+
+</details>
+
+<details><summary>The diff of <code>.python-version</code></summary>
+
+```diff
+@@ -0,0 +1 @@
++3.12
+```
+
+</details>
+
+<details><summary>The diff of <code>README.md</code></summary>
+
+```diff
+@@ -0,0 +1,3 @@
++# tally
++
++Count the words in a text.
+```
+
+</details>
+
+<details><summary>The diff of <code>justfile</code></summary>
+
+```diff
+@@ -0,0 +1,15 @@
++# The recipes of tally. Each one runs through uv, in the project's own environment.
++default:
++    @just --list
++
++# Make the environment of this step: the first command of every step
++setup:
++    uv sync
++
++# Count the words of a file
++run file:
++    uv run tally {{ file }}
++
++# Run the tests
++test:
++    uv run python -m unittest discover -s tests -q
+```
+
+</details>
+
+<details><summary>The diff of <code>pyproject.toml</code></summary>
+
+```diff
+@@ -0,0 +1,14 @@
++[project]
++name = "tally"
++version = "0.1.0"
++description = "Count the words in a text"
++readme = "README.md"
++requires-python = ">=3.12"
++dependencies = []
++
++[project.scripts]
++tally = "tally:main"
++
++[build-system]
++requires = ["uv_build>=0.12.13,<0.13.0"]
++build-backend = "uv_build"
+```
+
+</details>
+
+<details><summary>The diff of <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -0,0 +1,5 @@
++"""tally: count the words in a text."""
++
++
++def main() -> None:
++    print("tally: nothing to count yet")
+```
+
+</details>
+
+<details><summary>The diff of <code>src/tally/__main__.py</code></summary>
+
+```diff
+@@ -0,0 +1,3 @@
++from tally import main
++
++main()
+```
+
+</details>
+
+[The code](https://github.com/rahuldave/tally/tree/6a63758166d3aeee516faa6244414d7b54b5a730).

@@ -10,7 +10,8 @@ and the page checks your files against it.
 
 > Note: the walk is on the branch `extra`, with the tags extra-00 to extra-04 and a lettered extra-03b. The files
 > that a command writes are what uv 0.12.13 and ruff 0.17.0 wrote. A learner with a newer uv or mdformat gets other
-> versions in `pyproject.toml` and `uv.lock`, and `loose` lets them match.
+> versions in `pyproject.toml` and `uv.lock`. In the walk extra, `loose` lets them match. In the walk strict-extra,
+> the learner takes the author's files in place of each uv command.
 
 ## extra-00 Where it starts
 

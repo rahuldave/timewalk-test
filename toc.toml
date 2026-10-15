@@ -104,3 +104,22 @@ tags = "extra-*"                  # a tutorial with tags of its own on the branc
 # uv add with a range, uv add --group, uv init --lib and uv remove: a learner on a later day gets newer versions, and
 # uv init writes the version of uv in the build system of the library
 loose = ["pyproject.toml", "uv.lock", "packages/talib/pyproject.toml"]
+
+[[walk]]
+id = "strict"
+title = "tally, with the author's exact versions"
+description = "Build tally yourself with the same versions of its tools as the author: ruff comes from the project, not from today's newest release."
+kind = "tutorial"
+folder = "walks/tutorial"         # the notes of the walk tutorial, on the same tags
+# no loose: do mode compares pyproject.toml and uv.lock line by line, so Build it yourself takes the files that
+# step-03.1's uv add --dev ruff wrote from the project, and uv sync --locked installs that ruff
+
+[[walk]]
+id = "strict-extra"
+title = "A bigger tally, with the author's exact versions"
+description = "tally gets a table, a page of docs, a library of its own and a tool in a group of its own, each at the author's version."
+kind = "tutorial"
+folder = "walks/extra"
+tags = "extra-*"
+# no loose: each uv add, uv init and uv remove of the walk extra is taken from the project. extra-01.3 adds mdformat in
+# the group docs, and extra-02.11 runs it, so the install must take every group

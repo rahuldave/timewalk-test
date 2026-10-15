@@ -1,0 +1,143 @@
+---
+title: "2 Tests, one at a time"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Read the tutorial.** [Build it yourself](../build/step-02.qmd) is the other way to read this part.
+
+```bash
+just setup
+```
+
+We cannot tell whether `count` still works after a change, unless we try it by hand each time. Tests try it for us.
+Each test gives `count` a text, and compares what it gives back with what we expect.
+We add the tests one file at a time, and run them after each. One test asks for something that `count` cannot do yet. It asks `count` to count
+"The" and "the" as one word.
+
+[The code before this part](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/rahuldave/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).
+
+## 2.1 A test of counting {#step-02.1}
+
+Nothing checks yet that `count` gives the right counts. A test of `unittest`, the test library of Python, calls
+`count` on a short text and compares the result with the dictionary that it expects. The tests go in a new folder,
+`tests`.
+
+The first file of tests, `tests/test_count.py`, has two tests. `test_words` counts `a b a`. `test_case` counts
+`A a`, and expects the one word `a`, twice. The code cannot do this yet.
+
+A patch to [`tests/test_count.py`](#step-02.1-tests-test_count.py-e674f6).
+
+In [the change of `tests/test_count.py`](#step-02.1-tests-test_count.py-e674f6), look at `test_case`. It is the test that fails below.
+
+```bash
+uv run python -m unittest discover -s tests -q
+```
+
+One test fails. `test_case` expects `{'a': 2}`, and gets `{'A': 1, 'a': 1}`. The failure is a question that the
+code has not answered yet.
+
+### What changed {#step-02.1-what-changed-182c57}
+
+- <a id="step-02.1-tests-test_count.py-e674f6"></a>`tests/test_count.py`: two tests. The second asks for something the code cannot do yet. New, 11 lines. [The file](https://github.com/rahuldave/tally/blob/6a4b1a0e50035c4060f84b50770e234b2156be10/tests/test_count.py).
+  - look at `self.assertEqual(count("A a"), {"a": 2})`
+
+<details><summary>The diff of <code>tests/test_count.py</code></summary>
+
+```diff
+@@ -0,0 +1,11 @@
++import unittest
++
++from tally import count
++
++
++class Count(unittest.TestCase):
++    def test_words(self):
++        self.assertEqual(count("a b a"), {"a": 2, "b": 1})
++
++    def test_case(self):
++        self.assertEqual(count("A a"), {"a": 2})
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/6a4b1a0e50035c4060f84b50770e234b2156be10). [The code after it](https://github.com/rahuldave/tally/tree/6a4b1a0e50035c4060f84b50770e234b2156be10).
+
+## 2.2 A test of an empty text {#step-02.2}
+
+An empty file is a text with no words. `count` must give an empty dictionary for it, and not fail. A test in a
+file of its own, `tests/test_empty.py`, says so, and keeps it true after later changes.
+
+A patch to [`tests/test_empty.py`](#step-02.2-tests-test_empty.py-ffb51e).
+
+The new file `tests/test_empty.py` holds one test, `test_empty`. It gives `count` the empty text `""`, and
+expects the empty dictionary `{}`.
+
+```bash
+uv run python -m unittest discover -s tests -q
+```
+
+The new test passes at once, because `split()` finds no words in an empty text. `test_case` still fails.
+
+### What changed {#step-02.2-what-changed-182c57}
+
+- <a id="step-02.2-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: an empty text counts nothing. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/4f9bfa3d9c08307287e81a631039894490a3e590/tests/test_empty.py).
+  - look at `self.assertEqual(count(""), {})`
+
+<details><summary>The diff of <code>tests/test_empty.py</code></summary>
+
+```diff
+@@ -0,0 +1,8 @@
++import unittest
++
++from tally import count
++
++
++class Empty(unittest.TestCase):
++    def test_empty(self):
++        self.assertEqual(count(""), {})
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/4f9bfa3d9c08307287e81a631039894490a3e590). [The code after it](https://github.com/rahuldave/tally/tree/4f9bfa3d9c08307287e81a631039894490a3e590).
+
+## 2.3 Case does not matter {#step-02.3}
+
+`test_case` fails, because `count` counts `A` and `a` as two words. When `count` puts the text in lower case before
+it splits it, every word is counted in lower case. One word in the loop of `count`, `lower()`, does it.
+
+A patch to [`src/tally/__init__.py`](#step-02.3-src-tally-__init__.py-b5485b).
+
+In `count`, in `src/tally/__init__.py`, the loop now splits `text.lower()`, and not `text`. So `A` and `a` are
+the same word.
+
+```bash
+uv run python -m unittest discover -s tests -q
+echo "The the" | uv run tally
+```
+
+All three tests pass, and the command prints `2 the` for "The the".
+
+### What changed {#step-02.3-what-changed-182c57}
+
+- <a id="step-02.3-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: one word, `lower()`, answers the failing test. 1 line added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20/src/tally/__init__.py).
+  - look at `for word in text.lower().split():`
+
+<details><summary>The diff of <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -5,7 +5,7 @@ import sys
+ 
+ def count(text):
+     counts = {}
+-    for word in text.split():
++    for word in text.lower().split():
+         counts[word] = counts.get(word, 0) + 1
+     return counts
+ 
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/rahuldave/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20).

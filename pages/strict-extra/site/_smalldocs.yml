@@ -1,0 +1,147 @@
+# Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again.
+project:
+  type: website
+  output-dir: _site
+  render: ["index.qmd", "read/*.qmd", "build/*.qmd"]   # only these pages
+
+website:
+  title: "A bigger tally, one move at a time"
+  page-navigation: true
+  search: true
+  sidebar:
+    style: docked
+    contents:
+      - index.qmd
+      - section: "Read the tutorial"
+        contents:
+          - text: "0 Where it starts"
+            href: read/extra-00.qmd
+          - section: "1 A table, and a tool for the docs"
+            href: read/extra-01.qmd
+            contents:
+              - text: "1.1 tabulate, in a range of versions"
+                href: read/extra-01.qmd#extra-01.1
+              - text: "1.2 tally --table"
+                href: read/extra-01.qmd#extra-01.2
+              - text: "1.3 mdformat, in the group docs"
+                href: read/extra-01.qmd#extra-01.3
+          - section: "2 The docs"
+            href: read/extra-02.qmd
+            contents:
+              - text: "2.1 A page on how to run tally"
+                href: read/extra-02.qmd#extra-02.1
+              - text: "2.2 The most common words"
+                href: read/extra-02.qmd#extra-02.2
+              - text: "2.3 The table"
+                href: read/extra-02.qmd#extra-02.3
+              - text: "2.4 A picture of the most common words"
+                href: read/extra-02.qmd#extra-02.4
+              - text: "2.5 The page shows the picture"
+                href: read/extra-02.qmd#extra-02.5
+              - text: "2.6 Count from Python"
+                href: read/extra-02.qmd#extra-02.6
+              - text: "2.7 The README links to the page"
+                href: read/extra-02.qmd#extra-02.7
+              - text: "2.8 The picture in green"
+                href: read/extra-02.qmd#extra-02.8
+              - text: "2.9 Count a file from Python"
+                href: read/extra-02.qmd#extra-02.9
+              - text: "2.10 A recipe that checks the docs"
+                href: read/extra-02.qmd#extra-02.10
+              - text: "2.11 The README as mdformat writes it"
+                href: read/extra-02.qmd#extra-02.11
+              - text: "2.12 The page says how to check the docs"
+                href: read/extra-02.qmd#extra-02.12
+          - section: "3 A library"
+            href: read/extra-03.qmd
+            contents:
+              - text: "3.1 A library, with uv init"
+                href: read/extra-03.qmd#extra-03.1
+              - text: "3.2 tally depends on talib"
+                href: read/extra-03.qmd#extra-03.2
+              - text: "3.3 top goes into talib"
+                href: read/extra-03.qmd#extra-03.3
+          - section: "3b Lint"
+            href: read/extra-03b.qmd
+            contents:
+              - text: "3b.1 What ruff fixes"
+                href: read/extra-03b.qmd#extra-03b.1
+              - text: "3b.2 main closes its file"
+                href: read/extra-03b.qmd#extra-03b.2
+          - section: "4 One dependency less"
+            href: read/extra-04.qmd
+            contents:
+              - text: "4.1 tally draws its own table"
+                href: read/extra-04.qmd#extra-04.1
+              - text: "4.2 tabulate goes"
+                href: read/extra-04.qmd#extra-04.2
+      - section: "Build it yourself"
+        contents:
+          - text: "0 Where it starts"
+            href: build/extra-00.qmd
+          - section: "1 A table, and a tool for the docs"
+            href: build/extra-01.qmd
+            contents:
+              - text: "1.1 tabulate, in a range of versions"
+                href: build/extra-01.qmd#extra-01.1
+              - text: "1.2 tally --table"
+                href: build/extra-01.qmd#extra-01.2
+              - text: "1.3 mdformat, in the group docs"
+                href: build/extra-01.qmd#extra-01.3
+          - section: "2 The docs"
+            href: build/extra-02.qmd
+            contents:
+              - text: "2.1 A page on how to run tally"
+                href: build/extra-02.qmd#extra-02.1
+              - text: "2.2 The most common words"
+                href: build/extra-02.qmd#extra-02.2
+              - text: "2.3 The table"
+                href: build/extra-02.qmd#extra-02.3
+              - text: "2.4 A picture of the most common words"
+                href: build/extra-02.qmd#extra-02.4
+              - text: "2.5 The page shows the picture"
+                href: build/extra-02.qmd#extra-02.5
+              - text: "2.6 Count from Python"
+                href: build/extra-02.qmd#extra-02.6
+              - text: "2.7 The README links to the page"
+                href: build/extra-02.qmd#extra-02.7
+              - text: "2.8 The picture in green"
+                href: build/extra-02.qmd#extra-02.8
+              - text: "2.9 Count a file from Python"
+                href: build/extra-02.qmd#extra-02.9
+              - text: "2.10 A recipe that checks the docs"
+                href: build/extra-02.qmd#extra-02.10
+              - text: "2.11 The README as mdformat writes it"
+                href: build/extra-02.qmd#extra-02.11
+              - text: "2.12 The page says how to check the docs"
+                href: build/extra-02.qmd#extra-02.12
+          - section: "3 A library"
+            href: build/extra-03.qmd
+            contents:
+              - text: "3.1 A library, with uv init"
+                href: build/extra-03.qmd#extra-03.1
+              - text: "3.2 tally depends on talib"
+                href: build/extra-03.qmd#extra-03.2
+              - text: "3.3 top goes into talib"
+                href: build/extra-03.qmd#extra-03.3
+          - section: "3b Lint"
+            href: build/extra-03b.qmd
+            contents:
+              - text: "3b.1 What ruff fixes"
+                href: build/extra-03b.qmd#extra-03b.1
+              - text: "3b.2 main closes its file"
+                href: build/extra-03b.qmd#extra-03b.2
+          - section: "4 One dependency less"
+            href: build/extra-04.qmd
+            contents:
+              - text: "4.1 tally draws its own table"
+                href: build/extra-04.qmd#extra-04.1
+              - text: "4.2 tabulate goes"
+                href: build/extra-04.qmd#extra-04.2
+
+theme: cosmo
+css: styles.css
+toc: true
+toc-depth: 2
+code-copy: true
+from: markdown-tex_math_dollars-smart  # a $ is a dollar, not mathematics; -- stays two hyphens

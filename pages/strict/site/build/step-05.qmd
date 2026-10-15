@@ -1,0 +1,248 @@
+---
+title: "5 The most common words, and a report"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Build it yourself.** [Read the tutorial](../read/step-05.qmd) is the other way to read this part.
+
+If you start at this part, make your clone as **Get the project** says, and then run this command. It puts in your clone the files that this part starts from. A file that the project deleted before this part stays, so delete it if `git check` lists it:
+
+```bash
+git rm -rq --cached --ignore-unmatch -- :/ && git restore --source f79588d3b046 --staged --worktree -- :/
+```
+
+```bash
+just setup
+```
+
+tally prints a line for every word, in alphabetical order. A reader of a long text wants the most common words
+first, and only a few of them. A function finds them, and an option of the command prints them. A recipe writes a
+report of the ten most common words of the corpus.
+
+[The code before this part](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
+
+## 5.1 A function for the most common words {#step-05.1}
+
+`count` gives the counts in no useful order. To find the most common words, tally must sort the counts, most common
+first, and keep the first few. A function, `top`, does it. It sorts by count, highest first, and then by the
+word, so that two words with the same count keep one order. Then it keeps the first `n`.
+
+Apply the patch to [`src/tally/__init__.py`](#step-05.1-src-tally-__init__.py-b5485b), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/72a0129dcee765132ad267788636ff4af9066369.diff | git apply --include=src/tally/__init__.py
+```
+
+The patch puts `top` after `count` and before `main`, with two blank lines around it.
+
+A test says what `top` must give. It gives `top` three words with their counts, and asks for the two most common.
+
+Apply the patch to [`tests/test_top.py`](#step-05.1-tests-test_top.py-1f85fe), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/72a0129dcee765132ad267788636ff4af9066369.diff | git apply --include=tests/test_top.py
+```
+
+The patch makes the file `tests/test_top.py`, with its one test.
+
+```bash
+uv run python -m unittest discover -s tests -q
+```
+
+The four tests pass.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 72a0129dcee7
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source f79588d3b046 --staged -- :/ && git restore --source 72a0129dcee7 --staged --worktree -- :/
+```
+
+### What changed {#step-05.1-what-changed-182c57}
+
+- <a id="step-05.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: sort by count, most common first, then by the word. 5 lines added. [The file](https://github.com/rahuldave/tally/blob/72a0129dcee765132ad267788636ff4af9066369/src/tally/__init__.py).
+  - look at `return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]`
+- <a id="step-05.1-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: its test, with three words. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/72a0129dcee765132ad267788636ff4af9066369/tests/test_top.py).
+
+<details open><summary>The patch to <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -11,6 +11,11 @@ def count(text: str) -> dict[str, int]:
+     return counts
+ 
+ 
++def top(counts: dict[str, int], n: int) -> list[tuple[str, int]]:
++    "The n most common words, most common first."
++    return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]
++
++
+ def main() -> None:
+     text = open(sys.argv[1]).read() if len(sys.argv) > 1 else sys.stdin.read()
+     for word, n in sorted(count(text).items()):
+```
+
+</details>
+
+<details open><summary>The patch to <code>tests/test_top.py</code></summary>
+
+```diff
+@@ -0,0 +1,8 @@
++import unittest
++
++from tally import top
++
++
++class Top(unittest.TestCase):
++    def test_most_common_first(self):
++        self.assertEqual(top({"a": 1, "b": 3, "c": 2}, 2), [("b", 3), ("c", 2)])
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/72a0129dcee765132ad267788636ff4af9066369). [The code after it](https://github.com/rahuldave/tally/tree/72a0129dcee765132ad267788636ff4af9066369).
+
+## 5.2 tally --top N {#step-05.2}
+
+tally prints every word of a text, and the corpus fills the screen. An option, `--top N`, makes `main` print only the
+`N` most common words, with `top`. Without the option, `main` prints every count, as before. `main` reads the
+option before the name of the file, so the command is `tally --top 3 data/corpus.txt`.
+
+Apply the patch to [`src/tally/__init__.py`](#step-05.2-src-tally-__init__.py-b5485b), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d.diff | git apply --include=src/tally/__init__.py
+```
+
+The patch writes `main` again, in place of the old one.
+
+```bash
+uv run tally --top 3 data/corpus.txt
+```
+
+The command prints three lines, the most common word first. They are `127 line`, `126 class` and `125 word`.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check c4b92c9bd158
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source 72a0129dcee7 --staged -- :/ && git restore --source c4b92c9bd158 --staged --worktree -- :/
+```
+
+### What changed {#step-05.2-what-changed-182c57}
+
+- <a id="step-05.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main` reads the option before the name of the file. 8 lines added, 3 removed. [The file](https://github.com/rahuldave/tally/blob/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d/src/tally/__init__.py).
+  - look at `if args[:1] == ["--top"]:`
+
+<details open><summary>The patch to <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -17,6 +17,11 @@ def top(counts: dict[str, int], n: int) -> list[tuple[str, int]]:
+ 
+ 
+ def main() -> None:
+-    text = open(sys.argv[1]).read() if len(sys.argv) > 1 else sys.stdin.read()
+-    for word, n in sorted(count(text).items()):
+-        print(n, word)
++    "Count the words of a file, or of the standard input. With --top N, only the N most common."
++    args, n = sys.argv[1:], None
++    if args[:1] == ["--top"]:
++        n, args = int(args[1]), args[2:]
++    text = open(args[0]).read() if args else sys.stdin.read()
++    counts = count(text)
++    for word, times in top(counts, n) if n else sorted(counts.items()):
++        print(times, word)
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d). [The code after it](https://github.com/rahuldave/tally/tree/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d).
+
+## 5.3 A report, which just setup makes {#step-05.3}
+
+The most common words of the corpus make a report, which others want to read without running tally. A recipe of
+the `justfile`, `report`, writes the ten most common words to `build/top.txt`. The recipe has two lines, and `just`
+prints each line before it runs it. The second line has two parts.
+
+- **`mkdir -p build`** makes the folder `build`, and does nothing when the folder is there.
+- **`uv run tally --top 10 data/corpus.txt`** counts the corpus, and keeps the ten most common words.
+- **`> build/top.txt`** sends what tally prints to the file, in place of the terminal.
+
+Apply the patch to [`justfile`](#step-05.3-justfile-424f0b), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/9e37b6eed29516f62bc176d1eaa66bf4e86683a6.diff | git apply --include=justfile
+```
+
+The patch adds the recipe `report` at the end of the `justfile`.
+
+The report is an artifact, as the corpus is. git ignores the folder `build/`, so git holds the recipe, and not the
+report. `just setup` makes the report when the file is missing. `test -f build/top.txt` is true when the file is
+there, and `||` runs `just report` only when it is not.
+
+The same patch adds a line to the recipe `setup`, after the line that makes the corpus.
+
+A report from an earlier run stays, because git ignores it. So remove the report first, and then `just setup` makes
+it again:
+
+```bash
+rm -f build/top.txt
+just setup
+cat build/top.txt
+```
+
+The file has ten lines, the most common word first.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 9e37b6eed295
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source c4b92c9bd158 --staged -- :/ && git restore --source 9e37b6eed295 --staged --worktree -- :/
+```
+
+### What changed {#step-05.3-what-changed-182c57}
+
+- <a id="step-05.3-justfile-424f0b"></a>`justfile`: the report, and the line in `setup` that makes it when it is missing. 6 lines added. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
+  - look at `uv run tally --top 10 data/corpus.txt > build/top.txt`
+  - look at `test -f build/top.txt || just report`
+
+<details open><summary>The patch to <code>justfile</code></summary>
+
+```diff
+@@ -6,6 +6,7 @@ default:
+ setup:
+     uv sync
+     uv run python scripts/corpus.py data/corpus.txt
++    test -f build/top.txt || just report
+ 
+ # Count the words of a file
+ run file:
+@@ -14,3 +15,8 @@ run file:
+ # Run the tests
+ test:
+     uv run python -m unittest discover -s tests -q
++
++# Write the ten most common words of the corpus to build/top.txt
++report:
++    mkdir -p build
++    uv run tally --top 10 data/corpus.txt > build/top.txt
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).

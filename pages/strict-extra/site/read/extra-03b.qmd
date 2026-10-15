@@ -1,0 +1,97 @@
+---
+title: "3b Lint"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Read the tutorial.** [Build it yourself](../build/extra-03b.qmd) is the other way to read this part.
+
+```bash
+just setup
+```
+
+ruff finds code that works but could be better, such as a file that nobody closes. It fixes some of what it finds
+by itself, and leaves the rest to us.
+
+[The code before this part](https://github.com/rahuldave/tally/tree/909df18d1c02f51f42154cdded5a8ef515482057). [The code after it](https://github.com/rahuldave/tally/tree/25f4f751628b8461806074ef35b6cd489e7c9ce8).
+
+## 3b.1 What ruff fixes {#extra-03b.1}
+
+`ruff check --fix` fixes what it can, and lists the rest. It writes its fixes, and then exits with code 1, because
+one problem is left.
+
+This change came from running `uv run ruff check --fix`.
+
+In `scripts/corpus.py`, ruff wrote the list `WORDS` as a list of strings, in place of a string that the code split.
+
+```bash
+uv run ruff check --statistics
+```
+
+It fails, with exit code 1. It prints one line for the rule `SIM115`, open-file-with-context-handler, and then
+`Found 1 error.` `main` opens a file and never closes it, and ruff cannot fix that.
+
+### What changed {#extra-03b.1-what-changed-182c57}
+
+- <a id="extra-03b.1-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: a list of words, as ruff writes it. 1 line added, 1 removed. It comes from `uv run ruff check --fix`. [The file](https://github.com/rahuldave/tally/blob/429a292239114c0e1263db0992fbd0365164ba2f/scripts/corpus.py).
+  - look at `WORDS = ["the", "a", "word", "count", "text", "tally", "test", "step", "move", "commit", "tag", "note", "slide", "class", "shell", "file", "line", "code"]`
+
+<details><summary>The diff of <code>scripts/corpus.py</code></summary>
+
+```diff
+@@ -3,7 +3,7 @@
+ import sys
+ from pathlib import Path
+ 
+-WORDS = "the a word count text tally test step move commit tag note slide class shell file line code".split()
++WORDS = ["the", "a", "word", "count", "text", "tally", "test", "step", "move", "commit", "tag", "note", "slide", "class", "shell", "file", "line", "code"]
+ 
+ 
+ def main() -> None:
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/429a292239114c0e1263db0992fbd0365164ba2f). [The code after it](https://github.com/rahuldave/tally/tree/429a292239114c0e1263db0992fbd0365164ba2f).
+
+## 3b.2 main closes its file {#extra-03b.2}
+
+ruff cannot fix SIM115. A `with` block closes the file when the block ends.
+
+A patch to [`src/tally/__init__.py`](#extra-03b.2-src-tally-__init__.py-b5485b).
+
+`main` in `src/tally/__init__.py` reads the file in a `with` block, and reads the standard input when there is no
+file.
+
+```bash
+uv run ruff check
+```
+
+It prints `All checks passed!`.
+
+### What changed {#extra-03b.2-what-changed-182c57}
+
+- <a id="extra-03b.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: a `with` block, which closes the file. 5 lines added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/25f4f751628b8461806074ef35b6cd489e7c9ce8/src/tally/__init__.py).
+  - look at `with open(args[0]) as file:`
+
+<details><summary>The diff of <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -21,7 +21,11 @@ def main() -> None:
+     args, n = [arg for arg in args if arg != "--table"], None
+     if args[:1] == ["--top"]:
+         n, args = int(args[1]), args[2:]
+-    text = open(args[0]).read() if args else sys.stdin.read()
++    if args:
++        with open(args[0]) as file:
++            text = file.read()
++    else:
++        text = sys.stdin.read()
+     counts = count(text)
+     rows = top(counts, n) if n else sorted(counts.items())
+     if as_table:
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/25f4f751628b8461806074ef35b6cd489e7c9ce8). [The code after it](https://github.com/rahuldave/tally/tree/25f4f751628b8461806074ef35b6cd489e7c9ce8).

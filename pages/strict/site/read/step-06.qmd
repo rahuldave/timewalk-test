@@ -1,0 +1,54 @@
+---
+title: "6 How to run it"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Read the tutorial.** [Build it yourself](../build/step-06.qmd) is the other way to read this part.
+
+```bash
+just setup
+```
+
+A new user of tally does not know which commands to run, or in which order. The README gets a section, "Run it",
+that says how to run tally, its tests and its report. The code does not change.
+
+A patch to [`README.md`](#step-06-README.md-8ec9a0).
+
+At the end of `README.md`, the new section "Run it" gives the two commands to run first, `just setup` and then
+tally on the corpus. Under them, it names the option `--top`, the tests and the report.
+
+```bash
+uv run tally --top 3 data/corpus.txt
+just test
+```
+
+The command prints the three most common words of the corpus, and the tests pass. tally is finished.
+
+## What changed {#step-06-what-changed-182c57}
+
+- <a id="step-06-README.md-8ec9a0"></a>`README.md`: the commands that a new user needs first, in the order to run them. 10 lines added. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/README.md).
+  - look at `## Run it`
+
+<details><summary>The diff of <code>README.md</code></summary>
+
+```diff
+@@ -1,3 +1,13 @@
+ # tally
+ 
+ Count the words in a text.
++
++## Run it
++
++Make the environment, the corpus and the report first. Then count the words of a file:
++
++    just setup
++    uv run tally data/corpus.txt
++
++`uv run tally --top 10 data/corpus.txt` prints only the ten most common words. `just test` runs the tests, and
++`just report` writes the ten most common words of the corpus to `build/top.txt`.
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/compare/9e37b6eed29516f62bc176d1eaa66bf4e86683a6...974d653080b0bd7dd06741b60225518cfecc908e). [The code after it](https://github.com/rahuldave/tally/tree/974d653080b0bd7dd06741b60225518cfecc908e).

@@ -1,0 +1,143 @@
+---
+title: "1 Counting"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Build it yourself.** [Read the tutorial](../read/step-01.qmd) is the other way to read this part.
+
+If you start at this part, make your clone as **Get the project** says, and then run this command. It puts in your clone the files that this part starts from. A file that the project deleted before this part stays, so delete it if `git check` lists it:
+
+```bash
+git rm -rq --cached --ignore-unmatch -- :/ && git restore --source 6a63758166d3 --staged --worktree -- :/
+```
+
+```bash
+just setup
+```
+
+tally must count the words of a text. First we write a function that counts, and try it alone. Then the command
+reads a text, and prints what the function counts.
+
+[The code before this part](https://github.com/rahuldave/tally/tree/6a63758166d3aeee516faa6244414d7b54b5a730). [The code after it](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).
+
+## 1.1 A function that counts {#step-01.1}
+
+A word counter needs a way to count. A function, `count`, takes a text and gives a dictionary from each word to how
+many times it appears. It goes in `src/tally/__init__.py`, above `main`. The command does not use it yet.
+
+Apply the patch to [`src/tally/__init__.py`](#step-01.1-src-tally-__init__.py-b5485b), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/12fcbe75226dde15e7500b71439bad84712fd2b0.diff | git apply --include=src/tally/__init__.py
+```
+
+The patch puts `count` above the line `def main() -> None:`, with two blank lines between them.
+
+```bash
+uv run python -c "from tally import count; print(count('a b a'))"
+```
+
+It prints `{'a': 2, 'b': 1}`, two of `a` and one of `b`. So the function works, though the command still has
+nothing to count.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 12fcbe75226d
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source 6a63758166d3 --staged -- :/ && git restore --source 12fcbe75226d --staged --worktree -- :/
+```
+
+### What changed {#step-01.1-what-changed-182c57}
+
+- <a id="step-01.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: a dictionary from each word to how many times it appears. 7 lines added. [The file](https://github.com/rahuldave/tally/blob/12fcbe75226dde15e7500b71439bad84712fd2b0/src/tally/__init__.py).
+  - look at `counts[word] = counts.get(word, 0) + 1`
+
+<details open><summary>The patch to <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -1,5 +1,12 @@
+ """tally: count the words in a text."""
+ 
+ 
++def count(text):
++    counts = {}
++    for word in text.split():
++        counts[word] = counts.get(word, 0) + 1
++    return counts
++
++
+ def main() -> None:
+     print("tally: nothing to count yet")
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/12fcbe75226dde15e7500b71439bad84712fd2b0). [The code after it](https://github.com/rahuldave/tally/tree/12fcbe75226dde15e7500b71439bad84712fd2b0).
+
+## 1.2 The command counts {#step-01.2}
+
+`count` works, but the command still prints that it has nothing to count. `main` must read a text and print the
+counts. It reads the file that the command names, or the standard input when the command names no file. The module
+`sys` gives both the arguments of the command and the standard input.
+
+Apply the patch to [`src/tally/__init__.py`](#step-01.2-src-tally-__init__.py-b5485b), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/eb951f74756383392f528427a0cf44e135d5c64f.diff | git apply --include=src/tally/__init__.py
+```
+
+The patch adds `import sys` under the docstring of the module, and writes `main` again, in place of the old one.
+
+```bash
+echo "a b a" | uv run tally
+```
+
+It prints `2 a` and then `1 b`. The command now counts.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check eb951f747563
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source 12fcbe75226d --staged -- :/ && git restore --source eb951f747563 --staged --worktree -- :/
+```
+
+### What changed {#step-01.2-what-changed-182c57}
+
+- <a id="step-01.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `main` reads the text and prints the counts. 5 lines added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/eb951f74756383392f528427a0cf44e135d5c64f/src/tally/__init__.py).
+  - look at `for word, n in sorted(count(text).items()):`
+
+<details open><summary>The patch to <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -1,5 +1,7 @@
+ """tally: count the words in a text."""
+ 
++import sys
++
+ 
+ def count(text):
+     counts = {}
+@@ -9,4 +11,6 @@ def count(text):
+ 
+ 
+ def main() -> None:
+-    print("tally: nothing to count yet")
++    text = open(sys.argv[1]).read() if len(sys.argv) > 1 else sys.stdin.read()
++    for word, n in sorted(count(text).items()):
++        print(n, word)
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f).

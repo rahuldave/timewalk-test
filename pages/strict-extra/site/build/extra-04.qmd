@@ -1,0 +1,152 @@
+---
+title: "4 One dependency less"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Build it yourself.** [Read the tutorial](../read/extra-04.qmd) is the other way to read this part.
+
+If you start at this part, make your clone as **Get the project** says, and then run this command. It puts in your clone the files that this part starts from. A file that the project deleted before this part stays, so delete it if `git check` lists it:
+
+```bash
+git rm -rq --cached --ignore-unmatch -- :/ && git restore --source 25f4f751628b --staged --worktree -- :/
+```
+
+```bash
+just setup
+```
+
+tally uses tabulate for one table, of two columns. A few lines of its own draw the same table, and the project
+needs one package less.
+
+[The code before this part](https://github.com/rahuldave/tally/tree/25f4f751628b8461806074ef35b6cd489e7c9ce8). [The code after it](https://github.com/rahuldave/tally/tree/818eaf0e0f7c19b85c5ff03b2ada94c58afbd299).
+
+## 4.1 tally draws its own table {#extra-04.1}
+
+A function `table` draws the header, the rule of dashes, and the rows, with the same widths as tabulate.
+
+Apply the patch to [`src/tally/__init__.py`](#extra-04.1-src-tally-__init__.py-b5485b), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/72b6c553d362423f55d6cf57aefbd53b5588beba.diff | git apply --include=src/tally/__init__.py
+```
+
+The patch removes `from tabulate import tabulate`, adds the function `table` above `main`, and calls it in place of
+`tabulate`.
+
+```bash
+uv run tally --top 3 --table data/corpus.txt
+```
+
+It prints the same table as tabulate printed. It has the header `word` and `times`, a rule of dashes, and three
+rows.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 72b6c553d362
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source 25f4f751628b --staged -- :/ && git restore --source 72b6c553d362 --staged --worktree -- :/
+```
+
+### What changed {#extra-04.1-what-changed-182c57}
+
+- <a id="extra-04.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the function `table`, in place of tabulate. 10 lines added, 2 removed. [The file](https://github.com/rahuldave/tally/blob/72b6c553d362423f55d6cf57aefbd53b5588beba/src/tally/__init__.py).
+  - look at `def table(rows: list[tuple[str, int]]) -> str:`
+
+<details open><summary>The patch to <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -2,7 +2,6 @@
+ 
+ import sys
+ 
+-from tabulate import tabulate
+ from talib import top
+ 
+ 
+@@ -14,6 +13,15 @@ def count(text: str) -> dict[str, int]:
+     return counts
+ 
+ 
++def table(rows: list[tuple[str, int]]) -> str:
++    "The rows under a header and a rule: the words on the left, the counts on the right."
++    left = max([len("word") + 2, *(len(word) for word, _ in rows)])
++    right = max([len("times") + 2, *(len(str(times)) for _, times in rows)])
++    lines = [f"{'word':<{left}}  {'times':>{right}}", f"{'-' * left}  {'-' * right}"]
++    lines += [f"{word:<{left}}  {times:>{right}}" for word, times in rows]
++    return "\n".join(lines)
++
++
+ def main() -> None:
+     "Count the words of a file, or of the standard input. Options: --top N, and --table."
+     args = sys.argv[1:]
+@@ -29,7 +37,7 @@ def main() -> None:
+     counts = count(text)
+     rows = top(counts, n) if n else sorted(counts.items())
+     if as_table:
+-        print(tabulate(rows, headers=["word", "times"]))
++        print(table(rows))
+         return
+     for word, times in rows:
+         print(times, word)
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/72b6c553d362423f55d6cf57aefbd53b5588beba). [The code after it](https://github.com/rahuldave/tally/tree/72b6c553d362423f55d6cf57aefbd53b5588beba).
+
+## 4.2 tabulate goes {#extra-04.2}
+
+Nothing imports tabulate now, but the project still depends on it. `uv remove` takes it out of `pyproject.toml`
+and `uv.lock`:
+
+The author ran `uv remove tabulate` here. It writes `pyproject.toml` and `uv.lock`. On a later day, it can write newer versions of packages than the author's, and this walk compares `pyproject.toml` and `uv.lock` exactly. So do not run it. Run this command in its place, from the top of the project. It takes each file as the author has it from the project, and installs exactly the versions that `uv.lock` names:
+
+```bash
+git restore --source 818eaf0e0f7c -- pyproject.toml uv.lock && uv sync --locked --all-groups --all-packages
+```
+
+```bash
+uv run python -m unittest discover -s tests -q
+```
+
+All four tests pass, without tabulate.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 818eaf0e0f7c
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source 72b6c553d362 --staged -- :/ && git restore --source 818eaf0e0f7c --staged --worktree -- :/
+```
+
+### What changed {#extra-04.2-what-changed-182c57}
+
+- <a id="extra-04.2-pyproject.toml-5d07e7"></a>`pyproject.toml`: tabulate is gone. 0 lines added, 1 removed. It comes from `uv remove tabulate`, and you take it from the project. [The file](https://github.com/rahuldave/tally/blob/818eaf0e0f7c19b85c5ff03b2ada94c58afbd299/pyproject.toml).
+- <a id="extra-04.2-uv.lock-8356d8"></a>`uv.lock`: tabulate is gone. 1 line added, 14 removed. It comes from `uv remove tabulate`, and you take it from the project. [The file](https://github.com/rahuldave/tally/blob/818eaf0e0f7c19b85c5ff03b2ada94c58afbd299/uv.lock).
+
+<details><summary>The diff that <code>uv remove tabulate</code> makes in <code>pyproject.toml</code>, which you take from the project</summary>
+
+```diff
+@@ -5,7 +5,6 @@ description = "Count the words in a text"
+ readme = "README.md"
+ requires-python = ">=3.12"
+ dependencies = [
+-    "tabulate>=0.9,<0.10",
+     "talib",
+ ]
+ 
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/818eaf0e0f7c19b85c5ff03b2ada94c58afbd299). [The code after it](https://github.com/rahuldave/tally/tree/818eaf0e0f7c19b85c5ff03b2ada94c58afbd299).

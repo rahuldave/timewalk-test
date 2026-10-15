@@ -648,8 +648,9 @@ One command does it all. `uv add` writes ruff into `pyproject.toml` and `uv.lock
 uv add --dev ruff
 ```
 
-On a later day, `uv add` gets a newer ruff, and your two files name another version than the ones here. The
-version is then the only difference, and that is correct.
+If you run `uv add` on a later day than the author did, it gets a newer ruff than the author's ruff 0.17.0. Your
+`pyproject.toml` and `uv.lock` then name the newer version, and that is correct. The page can give you a command that
+takes the two files from the project in place of `uv add`. Then they name ruff 0.17.0, and `uv sync` installs it.
 
 ```bash
 uv run ruff format --check

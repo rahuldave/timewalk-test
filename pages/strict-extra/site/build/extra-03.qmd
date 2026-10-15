@@ -1,0 +1,271 @@
+---
+title: "3 A library"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Build it yourself.** [Read the tutorial](../read/extra-03.qmd) is the other way to read this part.
+
+If you start at this part, make your clone as **Get the project** says, and then run this command. It puts in your clone the files that this part starts from. A file that the project deleted before this part stays, so delete it if `git check` lists it:
+
+```bash
+git rm -rq --cached --ignore-unmatch -- :/ && git restore --source d6f47209c66d --staged --worktree -- :/
+```
+
+```bash
+just setup
+```
+
+`top` keeps the most common words of any counts. Another program that counts words could use it too. So it goes
+into a library of its own, `talib`, in the same workspace. A workspace is a set of packages that share one
+`uv.lock`.
+
+[The code before this part](https://github.com/rahuldave/tally/tree/d6f47209c66d7bb88e4e389e2eb9bc495694df55). [The code after it](https://github.com/rahuldave/tally/tree/909df18d1c02f51f42154cdded5a8ef515482057).
+
+## 3.1 A library, with uv init {#extra-03.1}
+
+`uv init --lib` makes a library. In a folder of a project, it also makes the library a member of the project's
+workspace. `--author-from none` leaves out the name of the author, which uv would take from your git settings.
+
+The author ran `uv init --lib --author-from none packages/talib` here. It writes `packages/talib/README.md`, `packages/talib/pyproject.toml`, `packages/talib/src/talib/__init__.py`, `packages/talib/src/talib/py.typed` and `pyproject.toml`. On a later day, it can write newer versions of packages than the author's, and this walk compares `packages/talib/pyproject.toml` and `pyproject.toml` exactly. So do not run it. Run this command in its place, from the top of the project. It takes each file as the author has it from the project:
+
+```bash
+git restore --source f154823215af -- packages/talib/README.md packages/talib/pyproject.toml packages/talib/src/talib/__init__.py packages/talib/src/talib/py.typed pyproject.toml
+```
+
+`uv.lock` does not name talib yet, so it is out of date until the next move. A `uv run` would lock it again, so the
+check reads the file:
+
+```bash
+grep -A2 'tool.uv.workspace' pyproject.toml
+```
+
+It prints the table `[tool.uv.workspace]`, with `members = [` and `"packages/talib",` under it.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check f154823215af
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source d6f47209c66d --staged -- :/ && git restore --source f154823215af --staged --worktree -- :/
+```
+
+### What changed {#extra-03.1-what-changed-182c57}
+
+- <a id="extra-03.1-packages-talib-README.md-78b878"></a>`packages/talib/README.md`: empty, for the words about the library. New, 0 lines. It comes from `uv init --lib --author-from none packages/talib`, and you take it from the project. [The file](https://github.com/rahuldave/tally/blob/f154823215af08326941369c87bdd501eaebc7ad/packages/talib/README.md).
+- <a id="extra-03.1-packages-talib-pyproject.toml-4fa4f2"></a>`packages/talib/pyproject.toml`: the project of the library. New, 11 lines. It comes from `uv init --lib --author-from none packages/talib`, and you take it from the project. [The file](https://github.com/rahuldave/tally/blob/f154823215af08326941369c87bdd501eaebc7ad/packages/talib/pyproject.toml).
+- <a id="extra-03.1-packages-talib-src-talib-__init__.py-01f6a2"></a>`packages/talib/src/talib/__init__.py`: a first function, `hello`. New, 2 lines. It comes from `uv init --lib --author-from none packages/talib`, and you take it from the project. [The file](https://github.com/rahuldave/tally/blob/f154823215af08326941369c87bdd501eaebc7ad/packages/talib/src/talib/__init__.py).
+- <a id="extra-03.1-packages-talib-src-talib-py.typed-4fc88d"></a>`packages/talib/src/talib/py.typed`: empty, to say that the library has types. New, 0 lines. It comes from `uv init --lib --author-from none packages/talib`, and you take it from the project. [The file](https://github.com/rahuldave/tally/blob/f154823215af08326941369c87bdd501eaebc7ad/packages/talib/src/talib/py.typed).
+- <a id="extra-03.1-pyproject.toml-5d07e7"></a>`pyproject.toml`: the workspace, with talib as its member. 5 lines added. It comes from `uv init --lib --author-from none packages/talib`, and you take it from the project. [The file](https://github.com/rahuldave/tally/blob/f154823215af08326941369c87bdd501eaebc7ad/pyproject.toml).
+  - look at `"packages/talib",`
+
+<details><summary>The diff that <code>uv init --lib --author-from none packages/talib</code> makes in <code>packages/talib/pyproject.toml</code>, which you take from the project</summary>
+
+```diff
+@@ -0,0 +1,11 @@
++[project]
++name = "talib"
++version = "0.1.0"
++description = "Add your description here"
++readme = "README.md"
++requires-python = ">=3.12"
++dependencies = []
++
++[build-system]
++requires = ["uv_build>=0.12.13,<0.13.0"]
++build-backend = "uv_build"
+```
+
+</details>
+
+<details><summary>The diff that <code>uv init --lib --author-from none packages/talib</code> makes in <code>packages/talib/src/talib/__init__.py</code>, which you take from the project</summary>
+
+```diff
+@@ -0,0 +1,2 @@
++def hello() -> str:
++    return "Hello from talib!"
+```
+
+</details>
+
+<details><summary>The diff that <code>uv init --lib --author-from none packages/talib</code> makes in <code>pyproject.toml</code>, which you take from the project</summary>
+
+```diff
+@@ -28,3 +28,8 @@ line-length = 100
+ 
+ [tool.uv]
+ default-groups = ["dev", "docs"]
++
++[tool.uv.workspace]
++members = [
++    "packages/talib",
++]
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/f154823215af08326941369c87bdd501eaebc7ad). [The code after it](https://github.com/rahuldave/tally/tree/f154823215af08326941369c87bdd501eaebc7ad).
+
+## 3.2 tally depends on talib {#extra-03.2}
+
+tally cannot import talib until it depends on it. `uv add` finds talib in the workspace, and takes it from there:
+
+The author ran `uv add talib` here. It writes `pyproject.toml` and `uv.lock`. On a later day, it can write newer versions of packages than the author's, and this walk compares `pyproject.toml` and `uv.lock` exactly. So do not run it. Run this command in its place, from the top of the project. It takes each file as the author has it from the project, and installs exactly the versions that `uv.lock` names:
+
+```bash
+git restore --source de7bf1a4a64c -- pyproject.toml uv.lock && uv sync --locked --all-groups --all-packages
+```
+
+```bash
+uv run python -c "import talib; print(talib.hello())"
+```
+
+It prints `Hello from talib!`.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check de7bf1a4a64c
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source f154823215af --staged -- :/ && git restore --source de7bf1a4a64c --staged --worktree -- :/
+```
+
+### What changed {#extra-03.2-what-changed-182c57}
+
+- <a id="extra-03.2-pyproject.toml-5d07e7"></a>`pyproject.toml`: talib, from the workspace. 4 lines added. It comes from `uv add talib`, and you take it from the project. [The file](https://github.com/rahuldave/tally/blob/de7bf1a4a64c1c6f40718889ced3592c21113636/pyproject.toml).
+  - look at `talib = { workspace = true }`
+- <a id="extra-03.2-uv.lock-8356d8"></a>`uv.lock`: talib, as a member of the workspace. 16 lines added, 1 removed. It comes from `uv add talib`, and you take it from the project. [The file](https://github.com/rahuldave/tally/blob/de7bf1a4a64c1c6f40718889ced3592c21113636/uv.lock).
+
+<details><summary>The diff that <code>uv add talib</code> makes in <code>pyproject.toml</code>, which you take from the project</summary>
+
+```diff
+@@ -6,6 +6,7 @@ readme = "README.md"
+ requires-python = ">=3.12"
+ dependencies = [
+     "tabulate>=0.9,<0.10",
++    "talib",
+ ]
+ 
+ [project.scripts]
+@@ -33,3 +34,6 @@ default-groups = ["dev", "docs"]
+ members = [
+     "packages/talib",
+ ]
++
++[tool.uv.sources]
++talib = { workspace = true }
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/de7bf1a4a64c1c6f40718889ced3592c21113636). [The code after it](https://github.com/rahuldave/tally/tree/de7bf1a4a64c1c6f40718889ced3592c21113636).
+
+## 3.3 top goes into talib {#extra-03.3}
+
+`top` is still in tally, and talib has only `hello`. One patch moves `top` across, in both packages.
+
+Apply the patch to [`packages/talib/src/talib/__init__.py`](#extra-03.3-packages-talib-src-talib-__init__.py-01f6a2), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/909df18d1c02f51f42154cdded5a8ef515482057.diff | git apply --include=packages/talib/src/talib/__init__.py
+```
+
+Apply the patch to [`src/tally/__init__.py`](#extra-03.3-src-tally-__init__.py-b5485b), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/909df18d1c02f51f42154cdded5a8ef515482057.diff | git apply --include=src/tally/__init__.py
+```
+
+In `packages/talib/src/talib/__init__.py`, the patch puts a docstring and `top` in place of `hello`. In
+`src/tally/__init__.py`, it removes `top`, and adds `from talib import top` under `from tabulate import tabulate`.
+
+```bash
+uv run python -m unittest discover -s tests -q
+```
+
+All four tests pass.
+
+```bash
+head -4 packages/talib/src/talib/__init__.py
+```
+
+```text
+"""talib: small helpers for the counts of words."""
+
+
+def top(counts: dict[str, int], n: int) -> list[tuple[str, int]]:
+```
+
+It prints the docstring of the library, two blank lines, and the first line of `top`.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 909df18d1c02
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source de7bf1a4a64c --staged -- :/ && git restore --source 909df18d1c02 --staged --worktree -- :/
+```
+
+### What changed {#extra-03.3-what-changed-182c57}
+
+- <a id="extra-03.3-packages-talib-src-talib-__init__.py-01f6a2"></a>`packages/talib/src/talib/__init__.py`: `top`, in place of `hello`. 6 lines added, 2 removed. [The file](https://github.com/rahuldave/tally/blob/909df18d1c02f51f42154cdded5a8ef515482057/packages/talib/src/talib/__init__.py).
+  - look at `def top(counts: dict[str, int], n: int) -> list[tuple[str, int]]:`
+- <a id="extra-03.3-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: `top` comes from talib. 1 line added, 5 removed. [The file](https://github.com/rahuldave/tally/blob/909df18d1c02f51f42154cdded5a8ef515482057/src/tally/__init__.py).
+  - look at `from talib import top`
+
+<details open><summary>The patch to <code>packages/talib/src/talib/__init__.py</code></summary>
+
+```diff
+@@ -1,2 +1,6 @@
+-def hello() -> str:
+-    return "Hello from talib!"
++"""talib: small helpers for the counts of words."""
++
++
++def top(counts: dict[str, int], n: int) -> list[tuple[str, int]]:
++    "The n most common words, most common first."
++    return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]
+```
+
+</details>
+
+<details open><summary>The patch to <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -3,6 +3,7 @@
+ import sys
+ 
+ from tabulate import tabulate
++from talib import top
+ 
+ 
+ def count(text: str) -> dict[str, int]:
+@@ -13,11 +14,6 @@ def count(text: str) -> dict[str, int]:
+     return counts
+ 
+ 
+-def top(counts: dict[str, int], n: int) -> list[tuple[str, int]]:
+-    "The n most common words, most common first."
+-    return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]
+-
+-
+ def main() -> None:
+     "Count the words of a file, or of the standard input. Options: --top N, and --table."
+     args = sys.argv[1:]
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/909df18d1c02f51f42154cdded5a8ef515482057). [The code after it](https://github.com/rahuldave/tally/tree/909df18d1c02f51f42154cdded5a8ef515482057).

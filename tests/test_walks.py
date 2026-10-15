@@ -26,7 +26,7 @@ def steps_of(page) -> list[str]:
 def test_the_picker_changes_the_walk_in_every_window(walked) -> None:
     "Your window lists the walks; a change gives both windows that walk's steps, notes and slides. The Room shows the title."
     yours, room = walked
-    assert yours.evaluate("[...document.querySelectorAll('#walk-picker option')].map((o) => o.value)") == ["narrative", "tests", "parts", "story", "tutorial", "hooks", "small", "testing", "finish", "release", "extra"]
+    assert yours.evaluate("[...document.querySelectorAll('#walk-picker option')].map((o) => o.value)") == ["narrative", "tests", "parts", "story", "tutorial", "hooks", "small", "testing", "finish", "release", "extra", "strict", "strict-extra"]
     assert room.locator("#walk-picker").is_hidden() and room.locator("#walk-title").inner_text() == "tally, step by step (narrative)"
     yours.select_option("#walk-picker", "tests")
     for page in (yours, room):
@@ -96,7 +96,7 @@ def test_the_checks_pass_this_class(kit: Path) -> None:
     done = check(kit)
     out = done.stdout + done.stderr
     assert done.returncode == 0, out
-    assert "11 walks, 0 errors, 0 warnings" in out, out
+    assert "13 walks, 0 errors, 0 warnings" in out, out
 
 
 BROKEN = [
@@ -150,7 +150,7 @@ def test_the_menu_groups_the_walks_by_kind_and_names_the_kind_on_show(walked) ->
     "Narratives and tutorials each have a group in the menu; a label beside it says the kind of the walk on show."
     yours, room = walked
     groups = yours.evaluate("[...document.querySelectorAll('#walk-picker optgroup')].map((g) => g.label + ': ' + [...g.children].map((o) => o.value).join(' '))")
-    assert groups == ["Narratives: narrative tests parts story", "Tutorials: tutorial hooks small testing finish release extra"]
+    assert groups == ["Narratives: narrative tests parts story", "Tutorials: tutorial hooks small testing finish release extra strict strict-extra"]
     shows(yours, "#walk-kind", "Narrative")
     yours.select_option("#walk-picker", "hooks")
     shows(yours, "#walk-kind", "Tutorial")
