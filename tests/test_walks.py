@@ -91,15 +91,12 @@ def check(kit: Path) -> subprocess.CompletedProcess:
 
 
 def test_the_checks_pass_this_class(kit: Path) -> None:
-    "timewalk-check finds no error in the walks of this class, and one warning: the do$ line of extra-03b.1, which exits 1 by design."
+    """timewalk-check finds no error and no warning in the walks of this class. The do$ line of extra-03b.1 exits 1 by design,
+    after it writes the move's fixes, so it is no warning (timewalk 1.4.2)."""
     done = check(kit)
     out = done.stdout + done.stderr
     assert done.returncode == 0, out
-    assert "11 walks, 0 errors, 1 warnings" in out, out
-    warnings = [line for line in out.splitlines() if line.startswith("warning:")]
-    assert len(warnings) == 1, out
-    assert warnings[0].startswith("warning: walk extra: extra-03b.1: the do$ line `uv run ruff check --fix` fails at the commit before the move "
-                                  "(exit 1)"), out
+    assert "11 walks, 0 errors, 0 warnings" in out, out
 
 
 BROKEN = [
