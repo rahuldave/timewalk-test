@@ -1,7 +1,7 @@
 # Built by `just build` from history/, and its replay copy
 repo/
 repo-replay/
-build/
+/build/
 .venv/
 __pycache__/
 .pytest_cache/

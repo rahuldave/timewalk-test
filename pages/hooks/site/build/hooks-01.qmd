@@ -1,0 +1,216 @@
+---
+title: "1 The hook"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Build it yourself.** [Read the tutorial](../read/hooks-01.qmd) is the other way to read this part.
+
+If you start at this part, make your clone as **Get the project** says, and then run this command. It puts in your clone the files that this part starts from. A file that the project deleted before this part stays, so delete it if `git check` lists it:
+
+```bash
+git rm -rq --cached --ignore-unmatch -- :/ && git restore --source eb951f747563 --staged --worktree -- :/
+```
+
+```bash
+just setup
+```
+
+A check that each person must remember to run is a check that someone forgets. We write the check as a recipe.
+Then a hook runs the recipe before each `git commit`, and a last recipe tells git to use the hook.
+
+[The code before this part](https://github.com/rahuldave/tally/tree/eb951f74756383392f528427a0cf44e135d5c64f). [The code after it](https://github.com/rahuldave/tally/tree/531ba4ddcb71619b788518683004a96f9574a461).
+
+## 1.1 A recipe that checks the code {#hooks-01.1}
+
+A file with a syntax error breaks tally, and nothing finds it before it goes into git. A recipe `check` compiles
+every Python file of tally. Python then reports a syntax error at once, without running the code.
+
+Apply the patch to [`justfile`](#hooks-01.1-justfile-424f0b), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/e1ef40fe88bbf92165b8da067169897e163a59af.diff | git apply --include=justfile
+```
+
+The patch adds the recipe `check` at the end of the `justfile`.
+
+```bash
+just check && echo "the code compiles"
+```
+
+It prints `the code compiles`, because every file compiles.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check e1ef40fe88bb
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source eb951f747563 --staged -- :/ && git restore --source e1ef40fe88bb --staged --worktree -- :/
+```
+
+### What changed {#hooks-01.1-what-changed-182c57}
+
+- <a id="hooks-01.1-justfile-424f0b"></a>`justfile`: the recipe compiles every Python file. 4 lines added. [The file](https://github.com/rahuldave/tally/blob/e1ef40fe88bbf92165b8da067169897e163a59af/justfile).
+  - look at `uv run python -m py_compile src/tally/*.py`
+
+<details open><summary>The patch to <code>justfile</code></summary>
+
+```diff
+@@ -13,3 +13,7 @@ run file:
+ # Run the tests
+ test:
+     uv run python -m unittest discover -s tests -q
++
++# Check that every Python file compiles
++check:
++    uv run python -m py_compile src/tally/*.py
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/e1ef40fe88bbf92165b8da067169897e163a59af). [The code after it](https://github.com/rahuldave/tally/tree/e1ef40fe88bbf92165b8da067169897e163a59af).
+
+## 1.2 A hook script {#hooks-01.2}
+
+`just check` works only when someone runs it. A hook runs it every time. git runs the file `pre-commit` of its
+folder of hooks before each `git commit`, and stops the `git commit` when the file fails. The hook,
+`hooks/pre-commit`, has three lines. They name the shell that runs it, say what it does, and run the check. The
+file comes whole, as a patch.
+
+Apply the patch to [`hooks/pre-commit`](#hooks-01.2-hooks-pre-commit-470a57), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1.diff | git apply --include=hooks/pre-commit
+```
+
+Read its last line, `just check`. It is the whole of what the hook does.
+
+```bash
+sh hooks/pre-commit; echo "the hook said $?"
+```
+
+The code compiles, so the hook says 0.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 5bd8d5bb524c
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source e1ef40fe88bb --staged -- :/ && git restore --source 5bd8d5bb524c --staged --worktree -- :/
+```
+
+### What changed {#hooks-01.2-what-changed-182c57}
+
+- <a id="hooks-01.2-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: three lines that git runs before a `git commit`. the hook only runs the check. New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1/hooks/pre-commit).
+  - look at `just check`
+
+<details open><summary>The patch to <code>hooks/pre-commit</code></summary>
+
+```diff
+@@ -0,0 +1,3 @@
++#!/bin/sh
++# Run before each commit: refuse it if the code does not compile.
++just check
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1). [The code after it](https://github.com/rahuldave/tally/tree/5bd8d5bb524c565e0cfa0cdfb184ca9895203ef1).
+
+## 1.3 Make it runnable {#hooks-01.3}
+
+git runs a hook only if the hook is executable, so we make it executable.
+
+```bash
+chmod +x hooks/pre-commit
+```
+
+Run the hook by hand on a broken file, and see it fail. Then remove the file:
+
+```bash
+printf 'def (\n' > src/tally/broken.py; ./hooks/pre-commit; echo "the hook said $?"
+rm src/tally/broken.py
+```
+
+The hook says 1, so git would stop the `git commit`.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 8d19bc56776a
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source 5bd8d5bb524c --staged -- :/ && git restore --source 8d19bc56776a --staged --worktree -- :/
+```
+
+### What changed {#hooks-01.3-what-changed-182c57}
+
+- <a id="hooks-01.3-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: Its lines stay as they were. It comes from `chmod +x hooks/pre-commit`. [The file](https://github.com/rahuldave/tally/blob/8d19bc56776ab8ebc942b5465d8dd270e33e7485/hooks/pre-commit).
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/8d19bc56776ab8ebc942b5465d8dd270e33e7485). [The code after it](https://github.com/rahuldave/tally/tree/8d19bc56776ab8ebc942b5465d8dd270e33e7485).
+
+## 1.4 Install it {#hooks-01.4}
+
+git does not copy hooks with a repository, and does not look in the folder `hooks` unless it is told to. So each
+copy of the project installs the hook. A recipe `install-hook` sets `core.hooksPath`, the setting of git that names
+the folder of hooks. The recipe changes the settings of git, so it is a recipe of its own, and not a part of
+`just setup`. `just setup` only makes the environment and the artifacts.
+
+Apply the patch to [`justfile`](#hooks-01.4-justfile-424f0b), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/531ba4ddcb71619b788518683004a96f9574a461.diff | git apply --include=justfile
+```
+
+The patch adds the recipe `install-hook`, with its comment, at the end of the `justfile`.
+
+```bash
+just install-hook && git config core.hooksPath
+```
+
+It prints `hooks`, so git now runs the hook before each `git commit`.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 531ba4ddcb71
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source 8d19bc56776a --staged -- :/ && git restore --source 531ba4ddcb71 --staged --worktree -- :/
+```
+
+### What changed {#hooks-01.4-what-changed-182c57}
+
+- <a id="hooks-01.4-justfile-424f0b"></a>`justfile`: one line of git config, in a recipe of its own. 4 lines added. [The file](https://github.com/rahuldave/tally/blob/531ba4ddcb71619b788518683004a96f9574a461/justfile).
+  - look at `git config core.hooksPath hooks`
+
+<details open><summary>The patch to <code>justfile</code></summary>
+
+```diff
+@@ -17,3 +17,7 @@ test:
+ # Check that every Python file compiles
+ check:
+     uv run python -m py_compile src/tally/*.py
++
++# Make git run the hooks in hooks/, before each commit. This changes git's config, so it is not part of setup
++install-hook:
++    git config core.hooksPath hooks
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/531ba4ddcb71619b788518683004a96f9574a461). [The code after it](https://github.com/rahuldave/tally/tree/531ba4ddcb71619b788518683004a96f9574a461).

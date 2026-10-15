@@ -2,3 +2,4 @@
 [slides]
 release-00 = ["../../../slides/talk.md#3"]
 release-01 = ["release.md#1"]
+release-02 = ["release.md#2"]

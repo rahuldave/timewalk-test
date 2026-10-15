@@ -9,7 +9,8 @@ Each part ends with a section called **What changed**. It lists every file that 
 In Build it yourself, a file that a command makes says which command. A diff that is open is a patch. Apply it with the command in the text, or make the same change in your editor.
 
 tally counts words, and has two files of tests. We make a release, version 0.2.0. First the tests of an empty text
-get a name that fits more cases. Then tally gets its new version, and last the lockfile records it.
+get a name that fits more cases. Then tally gets its new version, and last the lockfile records it. After the release, we tidy the project. The
+recipes get a hidden file, and every test goes in one file.
 
 We make the release in moves. A move is one small change, made by one patch or by one command. You make each move,
 and the page checks your files against it.
@@ -417,3 +418,261 @@ git restore --source aea02344f2e3 --staged -- :/ && git restore --source 96d6bbd
 </details>
 
 [This change on GitHub](https://github.com/rahuldave/tally/commit/96d6bbd94a65f08776215543e0d3c49575422541). [The code after it](https://github.com/rahuldave/tally/tree/96d6bbd94a65f08776215543e0d3c49575422541).
+
+<a id="release-02"></a>
+
+## 2 Tidy the project
+
+```bash
+just setup
+```
+
+The release is out. Now we tidy the project, so that it is easier to find your way in it. The top folder keeps
+the files that a user reads first. The tests, in two files, go into one file, named after the project.
+
+Each file that moves or goes here moves by a command, `mv`, or goes by a command, `rm`.
+
+[The code before this part](https://github.com/rahuldave/tally/tree/96d6bbd94a65f08776215543e0d3c49575422541). [The code after it](https://github.com/rahuldave/tally/tree/eb82f801c8df99c497da0e5940a6a97593808319).
+
+<a id="release-02.1"></a>
+
+### 2.1 A hidden file for the recipes
+
+A user of tally reads `README.md` first, and has no use for the recipes of the `justfile`. They are for the people
+who work on tally. `just` also finds its recipes in a file named `.justfile`, a hidden file that `ls` does not list.
+`mv` gives the `justfile` that name:
+
+```bash
+mv justfile .justfile
+```
+
+```bash
+just --list
+```
+
+It prints the same four recipes as before, `default`, `run`, `setup` and `test`.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check f338b5b0824c
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source 96d6bbd94a65 --staged -- :/ && git restore --source f338b5b0824c --staged --worktree -- :/
+```
+
+#### What changed
+
+- <a id="release-02.1-.justfile-a21be3"></a>`.justfile`: the recipes, in a hidden file. Renamed from `justfile`. It comes from `mv justfile .justfile`. [The file](https://github.com/rahuldave/tally/blob/f338b5b0824cd8dbb2bbc27c04d7bf2de0032cd7/.justfile).
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/f338b5b0824cd8dbb2bbc27c04d7bf2de0032cd7). [The code after it](https://github.com/rahuldave/tally/tree/f338b5b0824cd8dbb2bbc27c04d7bf2de0032cd7).
+
+<a id="release-02.2"></a>
+
+### 2.2 A test of lines
+
+A text often has more than one line. No test yet gives `count` a text with a newline in it. A new test,
+`test_lines`, counts `a b`, a newline, and `a`.
+
+Apply the patch to [`tests/test_count.py`](#release-02.2-tests-test_count.py-e674f6), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/3a4ad8d9af5153b7eb458030e59169de6d7fef95.diff | git apply --include=tests/test_count.py
+```
+
+The patch adds the test `test_lines` at the end of the class `Count`.
+
+```bash
+uv run python -m unittest discover -s tests -q
+```
+
+All five tests pass.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 3a4ad8d9af51
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source f338b5b0824c --staged -- :/ && git restore --source 3a4ad8d9af51 --staged --worktree -- :/
+```
+
+#### What changed
+
+- <a id="release-02.2-tests-test_count.py-e674f6"></a>`tests/test_count.py`: a test of a text of two lines. 3 lines added. [The file](https://github.com/rahuldave/tally/blob/3a4ad8d9af5153b7eb458030e59169de6d7fef95/tests/test_count.py).
+  - look at `def test_lines(self):`
+
+<details open><summary>The patch to <code>tests/test_count.py</code></summary>
+
+```diff
+@@ -9,3 +9,6 @@ class Count(unittest.TestCase):
+ 
+     def test_case(self):
+         self.assertEqual(count("A a"), {"a": 2})
++
++    def test_lines(self):
++        self.assertEqual(count("a b\na"), {"a": 2, "b": 1})
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/3a4ad8d9af5153b7eb458030e59169de6d7fef95). [The code after it](https://github.com/rahuldave/tally/tree/3a4ad8d9af5153b7eb458030e59169de6d7fef95).
+
+<a id="release-02.3"></a>
+
+### 2.3 One name for the tests
+
+The tests are in two files, `tests/test_count.py` and `tests/test_edge.py`. One file is one place to look. It
+gets the name of the project, `tests/test_tally.py`. `mv` gives the file of edge cases that name:
+
+```bash
+mv tests/test_edge.py tests/test_tally.py
+```
+
+```bash
+uv run python -m unittest discover -s tests -q
+```
+
+All five tests pass, as before. unittest finds each file whose name starts with `test`.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check fa608c2a2aa3
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source 3a4ad8d9af51 --staged -- :/ && git restore --source fa608c2a2aa3 --staged --worktree -- :/
+```
+
+#### What changed
+
+- <a id="release-02.3-tests-test_tally.py-b402c1"></a>`tests/test_tally.py`: the tests of edge cases, under the new name. Renamed from `tests/test_edge.py`. It comes from `mv tests/test_edge.py tests/test_tally.py`. [The file](https://github.com/rahuldave/tally/blob/fa608c2a2aa34ad657eaea6348198955863191e2/tests/test_tally.py).
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/fa608c2a2aa34ad657eaea6348198955863191e2). [The code after it](https://github.com/rahuldave/tally/tree/fa608c2a2aa34ad657eaea6348198955863191e2).
+
+<a id="release-02.4"></a>
+
+### 2.4 Every test in one file
+
+The class `Count`, with its three tests, goes into `tests/test_tally.py` too.
+
+Apply the patch to [`tests/test_tally.py`](#release-02.4-tests-test_tally.py-b402c1), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/3d2bf4fc97f4b3711f3f8378b4db3311ce795a24.diff | git apply --include=tests/test_tally.py
+```
+
+The patch adds the class `Count`, with its three tests, at the end of `tests/test_tally.py`.
+
+```bash
+uv run python -m unittest discover -s tests -q
+```
+
+All eight tests pass. The three tests of `Count` run twice, once from each file. The next change removes the old
+file.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 3d2bf4fc97f4
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source fa608c2a2aa3 --staged -- :/ && git restore --source 3d2bf4fc97f4 --staged --worktree -- :/
+```
+
+#### What changed
+
+- <a id="release-02.4-tests-test_tally.py-b402c1"></a>`tests/test_tally.py`: every test of tally, in one file. 11 lines added. [The file](https://github.com/rahuldave/tally/blob/3d2bf4fc97f4b3711f3f8378b4db3311ce795a24/tests/test_tally.py).
+  - look at `class Count(unittest.TestCase):`
+
+<details open><summary>The patch to <code>tests/test_tally.py</code></summary>
+
+```diff
+@@ -9,3 +9,14 @@ class Edge(unittest.TestCase):
+ 
+     def test_spaces(self):
+         self.assertEqual(count("  \n\t "), {})
++
++
++class Count(unittest.TestCase):
++    def test_words(self):
++        self.assertEqual(count("a b a"), {"a": 2, "b": 1})
++
++    def test_case(self):
++        self.assertEqual(count("A a"), {"a": 2})
++
++    def test_lines(self):
++        self.assertEqual(count("a b\na"), {"a": 2, "b": 1})
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/3d2bf4fc97f4b3711f3f8378b4db3311ce795a24). [The code after it](https://github.com/rahuldave/tally/tree/3d2bf4fc97f4b3711f3f8378b4db3311ce795a24).
+
+<a id="release-02.5"></a>
+
+### 2.5 The old file of tests goes
+
+Every test of `tests/test_count.py` is now in `tests/test_tally.py` too. `rm` removes the old file:
+
+```bash
+rm tests/test_count.py
+```
+
+```bash
+uv run python -m unittest discover -s tests -q
+```
+
+Each test runs once again, and all five tests pass.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check eb82f801c8df
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source 3d2bf4fc97f4 --staged -- :/ && git restore --source eb82f801c8df --staged --worktree -- :/
+```
+
+#### What changed
+
+- <a id="release-02.5-tests-test_count.py-e674f6"></a>`tests/test_count.py`: its tests are in `tests/test_tally.py`. Deleted. It comes from `rm tests/test_count.py`.
+
+<details><summary>The diff that <code>rm tests/test_count.py</code> makes in <code>tests/test_count.py</code></summary>
+
+```diff
+@@ -1,14 +0,0 @@
+-import unittest
+-
+-from tally import count
+-
+-
+-class Count(unittest.TestCase):
+-    def test_words(self):
+-        self.assertEqual(count("a b a"), {"a": 2, "b": 1})
+-
+-    def test_case(self):
+-        self.assertEqual(count("A a"), {"a": 2})
+-
+-    def test_lines(self):
+-        self.assertEqual(count("a b\na"), {"a": 2, "b": 1})
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/eb82f801c8df99c497da0e5940a6a97593808319). [The code after it](https://github.com/rahuldave/tally/tree/eb82f801c8df99c497da0e5940a6a97593808319).

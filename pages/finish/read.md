@@ -120,8 +120,6 @@ with their code.
 
 [The code before this part](https://github.com/rahuldave/tally/tree/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
 
-<a id="step-05.3"></a>
-
 ### 5.3 A report, which just setup makes
 
 The most common words of the corpus make a report, which others want to read without running tally. A recipe of

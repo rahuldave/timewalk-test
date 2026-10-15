@@ -87,7 +87,7 @@ select = ["step-01.1", "step-02", "step-05.2"]   # a narrative stops at steps an
 [[walk]]
 id = "release"
 title = "A release of tally, one move at a time"
-description = "A rename by a patch, a new version, and then its lock: a move whose own uv.lock is out of date."
+description = "A rename by a patch, a new version and its lock, and then files renamed and removed by mv and rm."
 kind = "tutorial"
 folder = "walks/release"
 tags = "release-*"                # a tutorial on one part, with tags of its own on the branch release

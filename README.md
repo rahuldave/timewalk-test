@@ -63,7 +63,7 @@ walk with the menu at the left of the step bar.
 | **The tests of tally, with notes of its own** (`testing`) | tutorial, some moves, notes of its own | A small tutorial with its own notes, `walks/testing/notes.md`. Its `{{include ...}}` lines take the move sections from the tutorial's notes. Each stop runs `$ just setup`, and has its own words between and after the moves: what the walk leaves out, and what the moves did |
 | **Types, then the report, with notes of its own** (`finish`) | tutorial, a step and a move, notes of its own | A stop with a whole step, `{{include step-04}}`, which brings the step's `$ just setup` with it, then a stop of one move after a gap, `{{include step-05.3}}`. Its own text has a block for each mode |
 | **A git hook, one move at a time** (`hooks`) | tutorial, its own tags, sync off | A tutorial on one part, on the branch `hooks`. At move hooks-01.3, the hook refuses a broken file. Up and Down page through the slides without making moves |
-| **A release of tally, one move at a time** (`release`) | tutorial, its own tags, `loose` | A tutorial on the branch `release`. Move release-01.1 renames a file by a patch. Move release-01.2 changes the version in `pyproject.toml`, so its own `uv.lock` is out of date until release-01.3 runs `uv lock`. Its Build it yourself page checks release-01.2 with `git check SHA --stale-lock` |
+| **A release of tally, one move at a time** (`release`) | tutorial, its own tags, `loose` | A tutorial on the branch `release`. Move release-01.1 renames a file by a patch. Move release-01.2 changes the version in `pyproject.toml`, so its own `uv.lock` is out of date until release-01.3 runs `uv lock`. Its Build it yourself page checks release-01.2 with `git check SHA --stale-lock`. In release-02, `mv` and `rm` rename and remove files, as a student who never commits must |
 
 ### An example of each feature
 
@@ -76,6 +76,7 @@ walk with the menu at the left of the step bar.
 | `loose`, files that match by the names of their packages | The tutorial in `toc.toml`, for the `pyproject.toml` and `uv.lock` of step-03.1 |
 | A rename by a patch, with `patch$` lines for the old path and the new | release-01.1, in `walks/release/notes.md` |
 | A move whose commit has a `uv.lock` that is out of date | release-01.2. The next move, release-01.3, runs `do$ uv lock` |
+| A rename and a removal by command, `do$ mv` and `do$ rm`, and never `git mv` or `git rm`, which fail for a student who never commits | release-02.1 renames a file that the walk never changed. release-02.3 renames a file that release-01.1 made, and release-02.4 patches it. release-02.5 removes a file that release-02.2 changed |
 | A `show:` line in two backticks, for a line with a backtick in it | step-04.2, which quotes the docstring of `count` |
 | `select`, with a range of moves and a title | The walk `small` in `toc.toml` |
 | `intro`, the text under "About this walk" | `walks/small/intro.md`, with a cue that the Room hides, and `walks/story/intro.md` |
@@ -97,7 +98,7 @@ notes column.
 
 | Path | What it is |
 |---|---|
-| `history/build.py` | Builds `repo/`: tagged steps `step-00` to `step-06` on `main`, with small commits for the tutorial before step-01, step-02, step-03, step-04 and step-05, and none before step-06; a branch `parts` with tags `parts-01` and `parts-02`; and a branch `hooks` with tags `hooks-00` to `hooks-02` and small commits between them. The same hashes on every build |
+| `history/build.py` | Builds `repo/`: tagged steps `step-00` to `step-06` on `main`, with small commits for the tutorial before step-01, step-02, step-03, step-04 and step-05, and none before step-06; a branch `parts` with tags `parts-01` and `parts-02`; a branch `hooks` with tags `hooks-00` to `hooks-02` and small commits between them; and a branch `release` with tags `release-00` to `release-02`. The same hashes on every build |
 | `history/step-03.1-uv.lock` | The `uv.lock` that `uv add --dev ruff` wrote at step-03.1, with uv 0.12.13 on the project at step-02. `build.py` reads it, so every build gives the same hashes |
 | `toc.toml` | The table of contents: the nine walks, the default first. Each has a `description`, which the band shows at the walk's first step |
 | `notes.md`, `slides/` | The default walk: its notes, and its manifest with the slide files |

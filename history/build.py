@@ -12,9 +12,10 @@ The project is `tally`, a small word counter. Its history has what every kind of
 - a branch `parts` from step-00 with its own tags, `parts-01` and `parts-02`, for a walk on one part;
 - a branch `hooks` from step-01 with its own tags, `hooks-00` to `hooks-02`, and small commits between them, for a
   tutorial on one part: a git hook that checks the code before each commit.
-- a branch `release` from step-02 with its own tags, `release-00` and `release-01`, for a tutorial with `loose`. Its
+- a branch `release` from step-02 with its own tags, `release-00` to `release-02`, for a tutorial with `loose`. Its
   first move renames a file by a patch. Its second changes the version in pyproject.toml, so the commit's own uv.lock
-  is out of date, and its third runs `uv lock` and adds a list of changes.
+  is out of date, and its third runs `uv lock` and adds a list of changes. release-02 renames and removes files by
+  command, `mv` and `rm`, as a student who never commits must: `git rm` and `git mv` need git's index.
 
 Every author, committer and date is fixed, so the commits get the same hashes on every build.
 """
@@ -269,11 +270,28 @@ TEST_EDGE = TEST_EMPTY.replace("class Empty(", "class Edge(") + '''
 CHANGES = "# Changes\n\n## 0.2.0\n\nThe tests of an empty text are now the tests of edge cases, with a test of a text of spaces.\n"
 VERSION_2 = PYPROJECT.replace('version = "0.1.0"', 'version = "0.2.0"')
 UV_LOCK_2 = UV_LOCK.replace('version = "0.1.0"', 'version = "0.2.0"')
+# release-02.2 adds a test to tests/test_count.py. release-02.3 renames tests/test_edge.py to tests/test_tally.py with `mv`,
+# release-02.4 copies the class of tests/test_count.py into it, and release-02 removes tests/test_count.py.
+TEST_LINES = TEST_COUNT + '''
+    def test_lines(self):
+        self.assertEqual(count("a b\\na"), {"a": 2, "b": 1})
+'''
+TEST_TALLY = TEST_EDGE + "\n\n" + TEST_LINES.split("\n\n\n", 1)[1]
 RELEASE = [
     ("release-01.1: the tests of an empty text become the tests of edge cases", {"tests/test_empty.py": GONE, "tests/test_edge.py": TEST_EDGE}, None),
     ("release-01.2: version 0.2.0", {"pyproject.toml": VERSION_2}, None),
     ("release-01: the lock of version 0.2.0, written by uv lock, and the list of changes", {"uv.lock": UV_LOCK_2, "CHANGES.md": CHANGES},
      ("release-01", "Release 0.2.0\n\nThe tests of edge cases get their name, and tally gets a new version and its lock.")),
+    # release-02: each file moves or goes by a command, as `mv` and `rm` leave it. The student never commits, so git's index
+    # still has the files of release-00: `git rm tests/test_count.py` would fail on the change of release-02.2, and
+    # `git mv tests/test_edge.py` on a file that the index does not have.
+    ("release-02.1: the justfile gets a hidden name, by mv justfile .justfile", {"justfile": GONE, ".justfile": JUSTFILE}, None),
+    ("release-02.2: a test of a text of several lines", {"tests/test_count.py": TEST_LINES}, None),
+    ("release-02.3: the tests of edge cases get the name tests/test_tally.py, by mv tests/test_edge.py tests/test_tally.py",
+     {"tests/test_edge.py": GONE, "tests/test_tally.py": TEST_EDGE}, None),
+    ("release-02.4: the tests of counting go into tests/test_tally.py", {"tests/test_tally.py": TEST_TALLY}, None),
+    ("release-02: the old file of tests goes, by rm tests/test_count.py", {"tests/test_count.py": GONE},
+     ("release-02", "Tidy the project\n\nThe recipes get a hidden file, and every test goes in one file.")),
 ]
 
 

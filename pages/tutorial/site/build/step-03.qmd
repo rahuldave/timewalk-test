@@ -1,0 +1,263 @@
+---
+title: "3 Formatting, and a corpus"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Build it yourself.** [Read the tutorial](../read/step-03.qmd) is the other way to read this part.
+
+If you start at this part, make your clone as **Get the project** says, and then run this command. It puts in your clone the files that this part starts from. A file that the project deleted before this part stays, so delete it if `git check` lists it:
+
+```bash
+git rm -rq --cached --ignore-unmatch -- :/ && git restore --source bfcbe07463b5 --staged --worktree -- :/
+```
+
+```bash
+just setup
+```
+
+tally works, and it has tests. Two things help the work ahead. Code in one style is easier to read and to change,
+so we install ruff, a formatter and linter. And a count of three words shows little, so `just setup` makes a
+corpus, a text of 2000 words to count.
+
+[The code before this part](https://github.com/rahuldave/tally/tree/bfcbe07463b5c6f3c0764e4ac19a054cb0acee20). [The code after it](https://github.com/rahuldave/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35).
+
+## 3.1 ruff, a tool for development {#step-03.1}
+
+Each person writes code in a style of their own, with other quotes, blank lines and lengths of line. A formatter
+writes every file in one style. A linter reads the code, and reports mistakes that the tests do not find. ruff is
+both. It goes in the group `dev` of the project. The group `dev` is for the people who work on tally, so a user
+who installs tally does not get ruff.
+
+One command does it all. `uv add` writes ruff into `pyproject.toml` and `uv.lock`, and installs it in `.venv`:
+
+```bash
+uv add --dev ruff
+```
+
+On a later day, `uv add` gets a newer ruff, and your two files name another version than the ones here. The
+version is then the only difference, and that is correct.
+
+```bash
+uv run ruff format --check
+```
+
+ruff reads every Python file of the project, and prints `5 files already formatted`.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check edb9544c04d2
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source bfcbe07463b5 --staged -- :/ && git restore --source edb9544c04d2 --staged --worktree -- :/
+```
+
+### What changed {#step-03.1-what-changed-182c57}
+
+- <a id="step-03.1-pyproject.toml-5d07e7"></a>`pyproject.toml`: ruff, in a group of its own. The version is the newest on the day that ruff was added. 5 lines added. It comes from `uv add --dev ruff`. [The file](https://github.com/rahuldave/tally/blob/edb9544c04d29869122cfcef2a0c2173b94c3b06/pyproject.toml).
+  - look at `"ruff>=0.17.0",`
+- <a id="step-03.1-uv.lock-8356d8"></a>`uv.lock`: the exact version of ruff, which every learner gets with `just setup`. 35 lines added. It comes from `uv add --dev ruff`. [The file](https://github.com/rahuldave/tally/blob/edb9544c04d29869122cfcef2a0c2173b94c3b06/uv.lock).
+  - look at `name = "ruff"`
+
+<details><summary>The diff that <code>uv add --dev ruff</code> makes in <code>pyproject.toml</code></summary>
+
+```diff
+@@ -12,3 +12,8 @@ tally = "tally:main"
+ [build-system]
+ requires = ["uv_build>=0.12.13,<0.13.0"]
+ build-backend = "uv_build"
++
++[dependency-groups]
++dev = [
++    "ruff>=0.17.0",
++]
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/edb9544c04d29869122cfcef2a0c2173b94c3b06). [The code after it](https://github.com/rahuldave/tally/tree/edb9544c04d29869122cfcef2a0c2173b94c3b06).
+
+## 3.2 A line length for ruff {#step-03.2}
+
+ruff and each editor have their own idea of how long a line can be. A setting in `pyproject.toml` makes them agree.
+It is a table `[tool.ruff]`, with a line length of 100.
+
+Apply the patch to [`pyproject.toml`](#step-03.2-pyproject.toml-5d07e7), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327.diff | git apply --include=pyproject.toml
+```
+
+The patch adds the table `[tool.ruff]` at the end of `pyproject.toml`, after the group `dev`.
+
+```bash
+uv run ruff check --show-settings src | grep line_length
+uv run ruff format --check
+```
+
+The first command prints `linter.line_length = 100`, so ruff reads the setting. The code still fits, and every file
+is already formatted.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 0b7b0a80e580
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source edb9544c04d2 --staged -- :/ && git restore --source 0b7b0a80e580 --staged --worktree -- :/
+```
+
+### What changed {#step-03.2-what-changed-182c57}
+
+- <a id="step-03.2-pyproject.toml-5d07e7"></a>`pyproject.toml`: one setting, for the linter and the formatter both. 3 lines added. [The file](https://github.com/rahuldave/tally/blob/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327/pyproject.toml).
+  - look at `line-length = 100`
+
+<details open><summary>The patch to <code>pyproject.toml</code></summary>
+
+```diff
+@@ -17,3 +17,6 @@ build-backend = "uv_build"
+ dev = [
+     "ruff>=0.17.0",
+ ]
++
++[tool.ruff]
++line-length = 100
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327). [The code after it](https://github.com/rahuldave/tally/tree/0b7b0a80e5804523e11cc5f5d4d334f4a9dc8327).
+
+## 3.3 A corpus, which just setup makes {#step-03.3}
+
+A count of `a b a` shows little. tally needs a long text to count, the same for every learner. A script,
+`scripts/corpus.py`, writes `data/corpus.txt`, 2000 words from a short list, in the same order each time. The
+script comes whole, as a patch.
+
+Apply the patch to [`scripts/corpus.py`](#step-03.3-scripts-corpus.py-ab344b), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/1568a522d23312c59c6e42cb027ec25ba3ae8b35.diff | git apply --include=scripts/corpus.py
+```
+
+The corpus is an artifact, a file that the project makes and git does not hold. So `.gitignore` names the folder
+`data/`. git leaves an ignored file alone, so the corpus stays when the code changes.
+
+Apply the patch to [`.gitignore`](#step-03.3-.gitignore-a5cc29), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/1568a522d23312c59c6e42cb027ec25ba3ae8b35.diff | git apply --include=.gitignore
+```
+
+The patch adds the folder `data/` at the end of `.gitignore`, under a comment.
+
+`just setup` makes the environment, and now it runs the script too. So every learner has the corpus. The script
+leaves a corpus that is there alone, so a second `just setup` writes nothing.
+
+Apply the patch to [`justfile`](#step-03.3-justfile-424f0b), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/1568a522d23312c59c6e42cb027ec25ba3ae8b35.diff | git apply --include=justfile
+```
+
+In the recipe `setup`, the patch adds the line that runs the script, after the line `uv sync`.
+
+```bash
+just setup
+uv run tally data/corpus.txt | sort -rn | head -3
+```
+
+`just setup` prints `wrote data/corpus.txt: 2000 words`. tally prints the three most common words of the corpus,
+`127 line`, `126 class` and `125 word`.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 1568a522d233
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source 0b7b0a80e580 --staged -- :/ && git restore --source 1568a522d233 --staged --worktree -- :/
+```
+
+### What changed {#step-03.3-what-changed-182c57}
+
+- <a id="step-03.3-.gitignore-a5cc29"></a>`.gitignore`: git does not hold the corpus. 3 lines added. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/.gitignore).
+  - look at `data/`
+- <a id="step-03.3-justfile-424f0b"></a>`justfile`: `just setup` now makes the corpus too. 1 line added. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/justfile).
+  - look at `uv run python scripts/corpus.py data/corpus.txt`
+- <a id="step-03.3-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: the script writes the same 2000 words each time, and leaves a corpus that is there alone. New, 25 lines. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/scripts/corpus.py).
+  - look at `if target.exists():`
+
+<details open><summary>The patch to <code>.gitignore</code></summary>
+
+```diff
+@@ -8,3 +8,6 @@ wheels/
+ 
+ # Virtual environments
+ .venv
++
++# Artifacts that just setup makes: they are not in git
++data/
+```
+
+</details>
+
+<details open><summary>The patch to <code>justfile</code></summary>
+
+```diff
+@@ -5,6 +5,7 @@ default:
+ # Make the environment of this step: the first command of every step
+ setup:
+     uv sync
++    uv run python scripts/corpus.py data/corpus.txt
+ 
+ # Count the words of a file
+ run file:
+```
+
+</details>
+
+<details open><summary>The patch to <code>scripts/corpus.py</code></summary>
+
+```diff
+@@ -0,0 +1,25 @@
++"""Write data/corpus.txt, a text of 2000 words to count, the same every time. Leave it alone if it is there."""
++
++import sys
++from pathlib import Path
++
++WORDS = "the a word count text tally test step move commit tag note slide class shell file line code".split()
++
++
++def main() -> None:
++    target = Path(sys.argv[1] if len(sys.argv) > 1 else "data/corpus.txt")
++    if target.exists():
++        print(f"{target} is there")
++        return
++    seed, words = 7, []
++    for _ in range(2000):
++        seed = (seed * 1103515245 + 12345) % 2**31
++        words.append(WORDS[seed % len(WORDS)])
++    target.parent.mkdir(parents=True, exist_ok=True)
++    lines = (" ".join(words[i : i + 12]) for i in range(0, len(words), 12))
++    target.write_text("\n".join(lines) + "\n")
++    print(f"wrote {target}: {len(words)} words")
++
++
++if __name__ == "__main__":
++    main()
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/rahuldave/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35).

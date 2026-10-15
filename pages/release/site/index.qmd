@@ -5,7 +5,8 @@ title: "A release of tally, one move at a time"
 <!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
 
 tally counts words, and has two files of tests. We make a release, version 0.2.0. First the tests of an empty text
-get a name that fits more cases. Then tally gets its new version, and last the lockfile records it.
+get a name that fits more cases. Then tally gets its new version, and last the lockfile records it. After the release, we tidy the project. The
+recipes get a hidden file, and every test goes in one file.
 
 We make the release in moves. A move is one small change, made by one patch or by one command. You make each move,
 and the page checks your files against it.
@@ -22,6 +23,7 @@ Each change explained, with the code to look at.
 
 - [0 Where the release starts](read/release-00.qmd)
 - [1 Release 0.2.0](read/release-01.qmd)
+- [2 Tidy the project](read/release-02.qmd)
 
 ## Build it yourself
 
@@ -49,3 +51,4 @@ git config alias.check '!f() { i="$(git rev-parse --git-path check-index)" && { 
 
 - [0 Where the release starts](build/release-00.qmd)
 - [1 Release 0.2.0](build/release-01.qmd)
+- [2 Tidy the project](build/release-02.qmd)

@@ -1,0 +1,134 @@
+---
+title: "4 Types and a docstring"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Build it yourself.** [Read the tutorial](../read/step-04.qmd) is the other way to read this part.
+
+If you start at this part, make your clone as **Get the project** says, and then run this command. It puts in your clone the files that this part starts from. A file that the project deleted before this part stays, so delete it if `git check` lists it:
+
+```bash
+git rm -rq --cached --ignore-unmatch -- :/ && git restore --source 1568a522d233 --staged --worktree -- :/
+```
+
+This part is whole. It adds the types, then the docstring.
+
+```bash
+just setup
+```
+
+To learn what `count` takes and what it gives, a reader must now read its body. Its signature can say it at a
+glance, and an editor can check it. One line under the signature can say what the function does. Neither changes
+what `count` does, so the tests pass as before.
+
+[The code before this part](https://github.com/rahuldave/tally/tree/1568a522d23312c59c6e42cb027ec25ba3ae8b35). [The code after it](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).
+
+## 4.1 Types {#step-04.1}
+
+The signature `def count(text):` does not say what `text` is, or what `count` gives back. Types say it. `count`
+takes a `str`, and gives a `dict[str, int]`, a dictionary from words to counts. The body stays the same.
+
+Apply the patch to [`src/tally/__init__.py`](#step-04.1-src-tally-__init__.py-b5485b), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/a7606fcc89be70f26f75353333a506e9891a6ea1.diff | git apply --include=src/tally/__init__.py
+```
+
+The patch writes the signature of `count` again, with its types.
+
+```bash
+uv run python -m unittest discover -s tests -q
+```
+
+The three tests pass as before, because types change what the code says, not what it does.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check a7606fcc89be
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source 1568a522d233 --staged -- :/ && git restore --source a7606fcc89be --staged --worktree -- :/
+```
+
+### What changed {#step-04.1-what-changed-182c57}
+
+- <a id="step-04.1-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: the signature says what goes in and what comes out. 1 line added, 1 removed. [The file](https://github.com/rahuldave/tally/blob/a7606fcc89be70f26f75353333a506e9891a6ea1/src/tally/__init__.py).
+  - look at `def count(text: str) -> dict[str, int]:`
+
+<details open><summary>The patch to <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -3,7 +3,7 @@
+ import sys
+ 
+ 
+-def count(text):
++def count(text: str) -> dict[str, int]:
+     counts = {}
+     for word in text.lower().split():
+         counts[word] = counts.get(word, 0) + 1
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/a7606fcc89be70f26f75353333a506e9891a6ea1). [The code after it](https://github.com/rahuldave/tally/tree/a7606fcc89be70f26f75353333a506e9891a6ea1).
+
+## 4.2 A docstring {#step-04.2}
+
+The types say what `count` takes and gives, but not what it does with the text. A docstring says it. It is a string on
+the first line of a function. Python keeps it in `count.__doc__`, and `help(count)` prints it.
+
+Apply the patch to [`src/tally/__init__.py`](#step-04.2-src-tally-__init__.py-b5485b), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/f79588d3b046ec2787725cdb6e3fcf952014e078.diff | git apply --include=src/tally/__init__.py
+```
+
+The patch adds the docstring under the signature of `count`, before the line `counts = {}`.
+
+```bash
+uv run python -c "import tally; print(tally.count.__doc__)"
+```
+
+It prints the docstring, ``How many times each word of `text` appears, ignoring case.``
+
+`count` now says what it takes and what it gives, in its signature and in its docstring. Its body did not change.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check f79588d3b046
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source a7606fcc89be --staged -- :/ && git restore --source f79588d3b046 --staged --worktree -- :/
+```
+
+### What changed {#step-04.2-what-changed-182c57}
+
+- <a id="step-04.2-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: one line under the signature says what the function does. 1 line added. [The file](https://github.com/rahuldave/tally/blob/f79588d3b046ec2787725cdb6e3fcf952014e078/src/tally/__init__.py).
+  - look at ``"How many times each word of `text` appears, ignoring case."``
+
+<details open><summary>The patch to <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -4,6 +4,7 @@ import sys
+ 
+ 
+ def count(text: str) -> dict[str, int]:
++    "How many times each word of `text` appears, ignoring case."
+     counts = {}
+     for word in text.lower().split():
+         counts[word] = counts.get(word, 0) + 1
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078).

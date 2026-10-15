@@ -172,8 +172,6 @@ just setup
 
 [The code before this part](https://github.com/rahuldave/tally/tree/f79588d3b046ec2787725cdb6e3fcf952014e078). [The code after it](https://github.com/rahuldave/tally/tree/72a0129dcee765132ad267788636ff4af9066369).
 
-<a id="step-05.1"></a>
-
 ### 5.1 A function for the most common words
 
 `count` gives the counts in no useful order. To find the most common words, tally must sort the counts, most common

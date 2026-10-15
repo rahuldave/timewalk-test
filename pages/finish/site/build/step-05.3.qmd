@@ -1,0 +1,111 @@
+---
+title: "5.3 A report of the corpus"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Build it yourself.** [Read the tutorial](../read/step-05.3.qmd) is the other way to read this part.
+
+This part does not start where the part before it ends, because the walk skips some changes. This command puts the files that this part starts from in place of yours. Run it, and then go on:
+
+```bash
+git restore --source f79588d3b046 --staged -- :/ && git restore --source c4b92c9bd158 --staged --worktree -- :/
+```
+
+If you start at this part, make your clone as **Get the project** says, and then run this command. It puts in your clone the files that this part starts from. A file that the project deleted before this part stays, so delete it if `git check` lists it:
+
+```bash
+git rm -rq --cached --ignore-unmatch -- :/ && git restore --source c4b92c9bd158 --staged --worktree -- :/
+```
+
+```bash
+just setup
+```
+
+Since the last part, the walk leaves out the function `top`, its test, and the option `--top`. This part begins
+with their code.
+
+[The code before this part](https://github.com/rahuldave/tally/tree/c4b92c9bd158cd85d783cf17adc6bedc76c9ba0d). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).
+
+## 5.3 A report, which just setup makes {#step-05.3}
+
+The most common words of the corpus make a report, which others want to read without running tally. A recipe of
+the `justfile`, `report`, writes the ten most common words to `build/top.txt`. The recipe has two lines, and `just`
+prints each line before it runs it. The second line has two parts.
+
+- **`mkdir -p build`** makes the folder `build`, and does nothing when the folder is there.
+- **`uv run tally --top 10 data/corpus.txt`** counts the corpus, and keeps the ten most common words.
+- **`> build/top.txt`** sends what tally prints to the file, in place of the terminal.
+
+Apply the patch to [`justfile`](#step-05.3-justfile-424f0b), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/9e37b6eed29516f62bc176d1eaa66bf4e86683a6.diff | git apply --include=justfile
+```
+
+The patch adds the recipe `report` at the end of the `justfile`.
+
+The report is an artifact, as the corpus is. git ignores the folder `build/`, so git holds the recipe, and not the
+report. `just setup` makes the report when the file is missing. `test -f build/top.txt` is true when the file is
+there, and `||` runs `just report` only when it is not.
+
+The same patch adds a line to the recipe `setup`, after the line that makes the corpus.
+
+A report from an earlier run stays, because git ignores it. So remove the report first, and then `just setup` makes
+it again:
+
+```bash
+rm -f build/top.txt
+just setup
+cat build/top.txt
+```
+
+The file has ten lines, the most common word first.
+
+Open `build/top.txt`, and compare it with what `uv run tally --top 10 data/corpus.txt` prints.
+
+tally is now finished. It counts, it has tests and types, and `just setup` makes its report.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 9e37b6eed295
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source c4b92c9bd158 --staged -- :/ && git restore --source 9e37b6eed295 --staged --worktree -- :/
+```
+
+### What changed {#step-05.3-what-changed-182c57}
+
+- <a id="step-05.3-justfile-424f0b"></a>`justfile`: the report, and the line in `setup` that makes it when it is missing. 6 lines added. [The file](https://github.com/rahuldave/tally/blob/9e37b6eed29516f62bc176d1eaa66bf4e86683a6/justfile).
+  - look at `uv run tally --top 10 data/corpus.txt > build/top.txt`
+  - look at `test -f build/top.txt || just report`
+
+<details open><summary>The patch to <code>justfile</code></summary>
+
+```diff
+@@ -6,6 +6,7 @@ default:
+ setup:
+     uv sync
+     uv run python scripts/corpus.py data/corpus.txt
++    test -f build/top.txt || just report
+ 
+ # Count the words of a file
+ run file:
+@@ -14,3 +15,8 @@ run file:
+ # Run the tests
+ test:
+     uv run python -m unittest discover -s tests -q
++
++# Write the ten most common words of the corpus to build/top.txt
++report:
++    mkdir -p build
++    uv run tally --top 10 data/corpus.txt > build/top.txt
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/9e37b6eed29516f62bc176d1eaa66bf4e86683a6). [The code after it](https://github.com/rahuldave/tally/tree/9e37b6eed29516f62bc176d1eaa66bf4e86683a6).

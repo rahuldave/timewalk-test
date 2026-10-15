@@ -1,0 +1,127 @@
+---
+title: "2 Tests in the hook"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Build it yourself.** [Read the tutorial](../read/hooks-02.qmd) is the other way to read this part.
+
+If you start at this part, make your clone as **Get the project** says, and then run this command. It puts in your clone the files that this part starts from. A file that the project deleted before this part stays, so delete it if `git check` lists it:
+
+```bash
+git rm -rq --cached --ignore-unmatch -- :/ && git restore --source 531ba4ddcb71 --staged --worktree -- :/
+```
+
+```bash
+just setup
+```
+
+Code that compiles can still count wrong. The tests find that, so the hook must run them too. First we write a
+test, then the hook runs the tests after the check.
+
+[The code before this part](https://github.com/rahuldave/tally/tree/531ba4ddcb71619b788518683004a96f9574a461). [The code after it](https://github.com/rahuldave/tally/tree/df640e57553c144400b44e92cf33341aafd445f2).
+
+## 2.1 A first test {#hooks-02.1}
+
+The hook can run tests only if there are tests. A first test, in `tests/test_count.py`, checks that `count` counts
+the words of `a b a`.
+
+Apply the patch to [`tests/test_count.py`](#hooks-02.1-tests-test_count.py-e674f6), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/03c1416124f56e13bcd39af675927dcbd399de44.diff | git apply --include=tests/test_count.py
+```
+
+The patch makes the file `tests/test_count.py`, with the class `Count` and its test.
+
+```bash
+uv run python -m unittest discover -s tests -q
+```
+
+The test passes.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 03c1416124f5
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source 531ba4ddcb71 --staged -- :/ && git restore --source 03c1416124f5 --staged --worktree -- :/
+```
+
+### What changed {#hooks-02.1-what-changed-182c57}
+
+- <a id="hooks-02.1-tests-test_count.py-e674f6"></a>`tests/test_count.py`: one test of counting. New, 9 lines. [The file](https://github.com/rahuldave/tally/blob/03c1416124f56e13bcd39af675927dcbd399de44/tests/test_count.py).
+  - look at `self.assertEqual(count("a b a"), {"a": 2, "b": 1})`
+
+<details open><summary>The patch to <code>tests/test_count.py</code></summary>
+
+```diff
+@@ -0,0 +1,9 @@
++import unittest
++
++from tally import count
++
++
++class Count(unittest.TestCase):
++    def test_words(self):
++        self.assertEqual(count("a b a"), {"a": 2, "b": 1})
++
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/03c1416124f56e13bcd39af675927dcbd399de44). [The code after it](https://github.com/rahuldave/tally/tree/03c1416124f56e13bcd39af675927dcbd399de44).
+
+## 2.2 The hook runs the tests too {#hooks-02.2}
+
+The hook compiles the code, but a failing test does not stop a `git commit`. One more line in the hook runs the
+tests after the check.
+
+Apply the patch to [`hooks/pre-commit`](#hooks-02.2-hooks-pre-commit-470a57), from the top of the project:
+
+```bash
+curl -fsSL https://github.com/rahuldave/tally/commit/df640e57553c144400b44e92cf33341aafd445f2.diff | git apply --include=hooks/pre-commit
+```
+
+The patch adds one line at the end of `hooks/pre-commit`, after the line `just check`.
+
+```bash
+sh hooks/pre-commit && echo "the hook passed"
+```
+
+The hook compiles the code, runs the tests, and prints `the hook passed`.
+
+Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check df640e57553c
+```
+
+If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
+
+```bash
+git restore --source 03c1416124f5 --staged -- :/ && git restore --source df640e57553c --staged --worktree -- :/
+```
+
+### What changed {#hooks-02.2-what-changed-182c57}
+
+- <a id="hooks-02.2-hooks-pre-commit-470a57"></a>`hooks/pre-commit`: the tests run after the check. 1 line added. [The file](https://github.com/rahuldave/tally/blob/df640e57553c144400b44e92cf33341aafd445f2/hooks/pre-commit).
+  - look at `uv run python -m unittest discover -s tests -q`
+
+<details open><summary>The patch to <code>hooks/pre-commit</code></summary>
+
+```diff
+@@ -1,3 +1,4 @@
+ #!/bin/sh
+ # Run before each commit: refuse it if the code does not compile.
+ just check
++uv run python -m unittest discover -s tests -q
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/df640e57553c144400b44e92cf33341aafd445f2). [The code after it](https://github.com/rahuldave/tally/tree/df640e57553c144400b44e92cf33341aafd445f2).
