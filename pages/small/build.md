@@ -32,7 +32,7 @@ git switch -c mine 6a4b1a0e5003
 Then add the command `git check`, which compares your files with the project's after each move, and leaves what `git add` has staged as it was.
 
 ```bash
-git config alias.check '!f() { i="$(git rev-parse --git-path check-index)" && { cp "$(git rev-parse --git-path index)" "$i" 2>/dev/null || rm -f "$i"; } && export GIT_INDEX_FILE="$i" && git add -A && git diff --cached --stat "$1"; }; f'
+git config alias.check '!f() { i="$(git rev-parse --git-path check-index)" && { cp -p "$(git rev-parse --git-path index)" "$i" 2>/dev/null || rm -f "$i"; } && export GIT_INDEX_FILE="$i" && git add -A && git diff --cached --stat "$1"; }; f'
 ```
 
 <a id="step-02.2-to-step-02.3"></a>

@@ -91,7 +91,7 @@ description = "A rename by a patch, a new version and its lock, and then files r
 kind = "tutorial"
 folder = "walks/release"
 tags = "release-*"                # a tutorial on one part, with tags of its own on the branch release
-# release-01.2 changes pyproject.toml, and leaves uv lock to the next move: the pages check it with --stale-lock
+# release-01.2 changes the version in pyproject.toml, and leaves uv lock to the next move: git check compares uv.lock by names
 loose = ["pyproject.toml", "uv.lock"]
 
 [[walk]]

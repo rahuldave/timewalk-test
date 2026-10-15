@@ -26,13 +26,106 @@ cd tally
 git switch -c mine 974d653080b0
 ```
 
-Then add the command `git check`, which compares your files with the project's after each move, and leaves what `git add` has staged as it was. It compares `pyproject.toml` by the names of its packages, so another version of a package does not count as a difference. It does not compare the lines of `uv.lock`. It checks that you and the project both have a `uv.lock`, or both have none. It also checks that your `uv.lock` is up to date with your `pyproject.toml`. Where the project's own `uv.lock` is not, the page gives `git check` the option `--stale-lock`, which leaves out that check.
+Then add the command `git check`, which compares your files with the project's after each move, and leaves what `git add` has staged as it was. It compares `pyproject.toml` and `uv.lock` by the names of their packages, so another version of a package does not count as a difference. A small Python program, `package_names.py`, reads each of these files as data, and uv runs it. These commands write the program into the folder `.git`, and tell git to show each file as the program prints it.
 
 ```bash
-echo '/pyproject.toml diff=names' >> .git/info/attributes
-echo 'packages/talib/pyproject.toml diff=names' >> .git/info/attributes
-git config diff.names.textconv "sed -E 's/^([[:space:]]*\"[A-Za-z0-9_.-]+(\\[[^]]*\\])?)[^\";]*/\\1/'"
-git config alias.check '!f() { i="$(git rev-parse --git-path check-index)" && { cp "$(git rev-parse --git-path index)" "$i" 2>/dev/null || rm -f "$i"; } && export GIT_INDEX_FILE="$i" && git add -A && git diff --cached "$1" -- ":/" ":(top,exclude,glob)uv.lock" && git diff --cached --name-status --diff-filter=AD "$1" -- ":(top,glob)uv.lock" && { [ "$2" = --stale-lock ] || [ ! -f uv.lock ] || uv lock --check -q; }; }; f'
+cat > "$(git rev-parse --git-common-dir)/package_names.py" <<'PY'
+"""Print a pyproject.toml or a uv.lock without the versions of its packages, so that git check compares their names.
+
+    python package_names.py pyproject.toml FILE
+    python package_names.py uv.lock FILE
+
+A pyproject.toml keeps all it says, with each requirement cut to its name, its extras, its address and its marker. A
+uv.lock keeps the names that the project's own packages ask for, and the members of the workspace. The rules are those
+of timewalk's package_names. The result is JSON, one item a line. A file that is not TOML is printed as it is.
+"""
+
+import json
+import re
+import sys
+import tomllib
+
+# A requirement such as "pytest>=8.3.4", "Uvicorn[standard] ; python_version < '3.12'" or "x @ git+https://...": its name,
+# its extras, what comes between (the versions, or "@" and an address), and its marker after the ";".
+REQUIREMENT = re.compile(r"^\s*([A-Za-z0-9][A-Za-z0-9._-]*)\s*(\[[^\]]*\])?([^;]*)(?:;(.*))?$", re.S)
+
+
+def package_names(
+    path: str,  # The file's path in the project; its name says how to read it
+    data: bytes,  # Its contents
+) -> object | None:  # What it says without the versions of packages, to compare; None if it is not a file of packages
+    """Read a pyproject.toml or a uv.lock with the versions left out, as timewalk's package_names does."""
+    name = path.rsplit("/", 1)[-1]
+    if name not in ("pyproject.toml", "uv.lock"):
+        return None
+    try:
+        doc = tomllib.loads(data.decode("utf-8"))
+    except (UnicodeDecodeError, tomllib.TOMLDecodeError):
+        return None
+
+    def cut(requirement: object) -> object:   # "pytest>=8.3.4" is pytest; a table, such as { include-group = "test" }, stays
+        found = REQUIREMENT.match(requirement) if isinstance(requirement, str) else None
+        if not found:
+            return requirement
+        extras = sorted(e.strip().lower() for e in (found.group(2) or "[]")[1:-1].split(",") if e.strip())
+        between, marker = found.group(3).strip(), " ".join((found.group(4) or "").split())
+        address = between[1:].strip() if between.startswith("@") else ""   # a package from an address: the address counts
+        return (re.sub(r"[-_.]+", "-", found.group(1)).lower() + (f"[{','.join(extras)}]" if extras else "")
+                + (f" @ {address}" if address else "") + (f"; {marker}" if marker else ""))
+
+    def names(value: object) -> list:   # every name = "..." in a table, at any depth
+        if isinstance(value, dict):
+            return [*([value["name"]] if isinstance(value.get("name"), str) else []), *(n for v in value.values() for n in names(v))]
+        return [n for v in value for n in names(v)] if isinstance(value, list) else []
+
+    if name == "uv.lock":
+        own = [p for p in doc.get("package", []) if isinstance(p, dict) and isinstance(p.get("source"), dict)
+               and {"editable", "virtual"} & set(p["source"])]
+        return {"requires-python": doc.get("requires-python"), "manifest": sorted(set(names(doc.get("manifest", {})))),
+                "own": {p.get("name"): sorted(set(names({k: v for k, v in p.items() if k not in ("name", "version", "source")})))
+                        for p in own}}
+    lists = [("project", "dependencies"), ("build-system", "requires"), ("tool", "uv", "dev-dependencies")]
+    groups = [("project", "optional-dependencies"), ("dependency-groups",)]
+
+    def at(keys: tuple) -> object:   # the table or list at a path of keys, or None
+        value = doc
+        for key in keys:
+            value = value.get(key) if isinstance(value, dict) else None
+        return value
+
+    for keys in lists:
+        if isinstance(at(keys), list):
+            at(keys[:-1])[keys[-1]] = sorted(map(cut, at(keys)), key=repr)
+    for keys in groups:
+        table = at(keys)
+        for group, wanted in (table.items() if isinstance(table, dict) else []):
+            if isinstance(wanted, list):
+                table[group] = sorted(map(cut, wanted), key=repr)
+    return doc
+
+
+def main() -> int:  # The exit code
+    """Print a file as package_names reads it, or as it is when it is not TOML."""
+    kind, file = sys.argv[1], sys.argv[2]
+    with open(file, "rb") as handle:
+        data = handle.read()
+    found = package_names(kind, data)
+    if found is None:
+        sys.stdout.buffer.write(data)
+    else:
+        print(json.dumps(found, indent=1, sort_keys=True, ensure_ascii=False, default=str))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+PY
+echo '/pyproject.toml diff=pyproject' >> .git/info/attributes
+echo 'packages/talib/pyproject.toml diff=pyproject' >> .git/info/attributes
+echo '/uv.lock diff=uvlock' >> .git/info/attributes
+git config diff.pyproject.textconv 'uv run --quiet --no-config --no-project --python ">=3.11" python "$(git rev-parse --git-common-dir)/package_names.py" pyproject.toml'
+git config diff.uvlock.textconv 'uv run --quiet --no-config --no-project --python ">=3.11" python "$(git rev-parse --git-common-dir)/package_names.py" uv.lock'
+git config alias.check '!f() { i="$(git rev-parse --git-path check-index)" && { cp -p "$(git rev-parse --git-path index)" "$i" 2>/dev/null || rm -f "$i"; } && export GIT_INDEX_FILE="$i" && git add -A && git diff --cached "$1" -- ":/"; }; f'
 ```
 
 <a id="extra-00"></a>
@@ -483,20 +576,33 @@ uv add --group docs mdformat
 `uv sync` installs the group `dev` and no other group, unless the project names more. One more line in the table
 `[tool.uv]` of `pyproject.toml` names both groups, so that `just setup` installs mdformat too.
 
-After `uv add --group docs mdformat`, apply the rest of the change to [`pyproject.toml`](#extra-01.3-pyproject.toml-5d07e7), from the top of the project:
+After `uv add --group docs mdformat`, set the other values that this change sets in [`pyproject.toml`](#extra-01.3-pyproject.toml-5d07e7). Run this command from the top of the project. It reads your file with tomlkit, a library for TOML files. It sets each of these values as the project has it, and keeps the rest of your file:
 
 ```bash
-git apply -C1 <<'PATCH'
---- a/pyproject.toml
-+++ b/pyproject.toml
-@@ -25,3 +25,6 @@ docs = [
- 
- [tool.ruff]
- line-length = 100
-+
-+[tool.uv]
-+default-groups = ["dev", "docs"]
-PATCH
+uv run --quiet --no-config --no-project --with tomlkit python - <<'PY'
+import pathlib, tomlkit
+path = pathlib.Path('pyproject.toml')
+doc = tomlkit.parse(path.read_text(encoding='utf-8')) if path.exists() else tomlkit.document()
+# Each value that the change sets, by its keys
+SET = [
+    (('tool', 'uv'), {'default-groups': ['dev', 'docs']}),
+]
+
+def put(table, keys, value):   # make each table on the way; a table goes into the one there, key by key
+    for key in keys[:-1]:
+        if key not in table:
+            table[key] = tomlkit.table(True)
+        table = table[key]
+    if isinstance(value, dict) and isinstance(table.get(keys[-1]), dict):
+        for key, item in value.items():
+            put(table[keys[-1]], [key], item)
+    else:
+        table[keys[-1]] = value
+
+for keys, value in SET:
+    put(doc, keys, value)
+path.write_text(tomlkit.dumps(doc), encoding='utf-8')
+PY
 ```
 
 After `uv add`, the patch adds a table `[tool.uv]` at the end of `pyproject.toml`, with the line `default-groups`.
@@ -1262,12 +1368,10 @@ grep -A2 'tool.uv.workspace' pyproject.toml
 
 It prints the table `[tool.uv.workspace]`, with `members = [` and `"packages/talib",` under it.
 
-At this move, the project's own `uv.lock` does not match its `pyproject.toml`. So the command has `--stale-lock`, which leaves out the check that your `uv.lock` matches your `pyproject.toml`.
-
 Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
 
 ```bash
-git check f154823215af --stale-lock
+git check f154823215af
 ```
 
 If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:

@@ -36,7 +36,7 @@ def render(
     done = subprocess.run([sys.executable, "-c", "from timewalk.export import main; main()", str(kit / "repo"), "--toc", str(kit / "toc.toml"),
                            "--walk", walk, "--json", str(facts), "--github", "https://github.com/o/tally"], capture_output=True, text=True, check=False)
     assert done.returncode == 0, done.stdout + done.stderr
-    # --repo: render.py runs uv lock --check at each commit, and gives git check --stale-lock where the project's uv.lock is out of date
+    # --repo: render.py reads each pyproject.toml that a patch$ line changes, for the command that sets its values
     done = subprocess.run([sys.executable, str(KIT / "scripts" / "render.py"), str(facts), "--markdown", str(out), "--site", str(out / "site"),
                            "--repo", str(kit / "repo")], capture_output=True, text=True, check=False)
     assert done.returncode == 0, done.stdout + done.stderr
@@ -115,7 +115,8 @@ def test_read_pages(whole: Path) -> None:
     pages = whole / "pages"
     files = sorted(pages.glob("walks/*/read.md")) + sorted(pages.glob("site/read/*.qmd")) + sorted(pages.glob("sites/*/read/*.qmd"))
     assert files, "render.py wrote no page to read"
-    done = run(sys.executable, KIT / "scripts" / "read_check.py", *files, "--repo", whole / "repo", "--toc", whole / "toc.toml")
+    done = run(sys.executable, KIT / "scripts" / "read_check.py", *files, "--repo", whole / "repo", "--toc", whole / "toc.toml",
+               "--project-url", GITHUB)
     assert done.returncode == 0, "\n".join(line for line in (done.stdout + done.stderr).splitlines() if not line.startswith("ok "))
 
 

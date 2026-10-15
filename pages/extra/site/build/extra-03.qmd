@@ -40,12 +40,10 @@ grep -A2 'tool.uv.workspace' pyproject.toml
 
 It prints the table `[tool.uv.workspace]`, with `members = [` and `"packages/talib",` under it.
 
-At this move, the project's own `uv.lock` does not match its `pyproject.toml`. So the command has `--stale-lock`, which leaves out the check that your `uv.lock` matches your `pyproject.toml`.
-
 Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
 
 ```bash
-git check f154823215af --stale-lock
+git check f154823215af
 ```
 
 If you are stuck, this command puts the files of this move in place of yours. A file that you made yourself stays:
