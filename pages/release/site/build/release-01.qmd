@@ -136,7 +136,7 @@ git restore --source a54eadb267e9 --staged -- :/ && git restore --source aea0234
 ## 1.3 The lock, and the list of changes {#release-01.3}
 
 `uv.lock` records the exact version of each package of the project, tally too. `uv lock` writes it again from
-`pyproject.toml`:
+`pyproject.toml`.
 
 ```bash
 uv lock
@@ -156,7 +156,8 @@ The patch makes the file `CHANGES.md`, with a heading for 0.2.0 and one sentence
 uv lock --check && grep -A1 '^name = "tally"' uv.lock
 ```
 
-`uv lock --check` prints nothing, because the lockfile is up to date. Then `grep` prints the entry of tally, with
+`uv lock --check` prints `Resolved 1 package` and the time it took, and stops with no error, because the lockfile is
+up to date. Then `grep` prints the entry of tally, with
 `version = "0.2.0"`.
 
 Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:

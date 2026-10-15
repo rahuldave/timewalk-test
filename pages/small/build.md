@@ -13,9 +13,11 @@ second part is the function for the most common words. Each part begins with the
 
 The walk leaves out the rest of tally:
 
-- Before the first part, it leaves out the first file of tests, `tests/test_count.py`. The first part begins with it in place.
+- Before the first part, it leaves out the project, the function `count` and the command that reads a file. It also
+  leaves out the first file of tests, `tests/test_count.py`. The first part begins with all of them in place.
 - Between the two parts, it leaves out ruff, the corpus, the types and the docstring. The second part begins with their code.
-- After the second part, it leaves out the option `--top` and the report.
+- After the second part, it leaves out the option `--top`, the report, and the section of the README that says how to
+  run tally.
 
 ## Get the project
 

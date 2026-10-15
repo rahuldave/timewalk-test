@@ -31,22 +31,23 @@ present walk="" *args:
     walk="{{ walk }}"
     {{ timewalk_run }} timewalk repo --toc toc.toml ${walk:+--walk "$walk"} --clock {{ args }}
 
-# Check the notes and slides of every walk against the steps
+# Check the notes and slides of every walk against the steps, and a tutorial's moves, and then the pages that students read
 check: build
+    #!/usr/bin/env bash
+    set -euo pipefail
     {{ timewalk_run }} timewalk-check repo --toc toc.toml
+    # The pages that students read, as a class's check does: every line in Build it yourself, and the writing guide
+    TIMEWALK="${TIMEWALK_LOCAL:-git+https://github.com/rahuldave/timewalk}" \
+        python3 "${WALK_KIT:-$HOME/Projects/walk-kit}/scripts/render.py" --class . --repo repo --github {{ github }}
 
-# Check the text that readers see: the README, notes, intros, slides and pages/. Not CLAUDE.md.
-# walk-kit's check.py checks the form, then its review.py has a model review the writing (reports in reports/writing/).
-# -v goes to check.py and adds the soft notes. WALK_KIT=PATH uses another walk-kit.
+# Check the README, notes and slides against the writing guide: their form, then a review by a model. -v shows the soft notes, --all reviews each file whole
 style *args:
     #!/usr/bin/env bash
     set -euo pipefail
+    # The recipe of a class made with walk-kit. WALK_KIT=PATH uses another walk-kit
     kit="${WALK_KIT:-$HOME/Projects/walk-kit}"
-    shopt -s nullglob
-    files=(README.md notes.md slides/*.md walks/*/notes.md walks/*/intro.md walks/*/slides/*.md)
-    while IFS= read -r page; do files+=("$page"); done < <(find pages -name '*.md' 2>/dev/null | sort)
-    python3 "$kit/style/check.py" "$@" "${files[@]}"
-    python3 "$kit/scripts/review.py" --class . --repo repo "${files[@]}"
+    test -f "$kit/scripts/style.py" || { echo "style: no walk-kit in $kit; set WALK_KIT" >&2; exit 1; }
+    python3 "$kit/scripts/style.py" --class . --repo repo "$@"
 
 # tally on GitHub, which the pages link to and students clone. history/build.py makes repo/, and `just publish` pushes it there
 project := "tally"
@@ -68,6 +69,39 @@ pages: build
         "${run[@]}" timewalk-export repo --toc toc.toml --walk "$id" --json "$facts/$id.json" --github {{ github }}
         python3 "$kit/scripts/render.py" "$facts/$id.json" --markdown "pages/$id" --site "pages/$id/site" --repo repo
     done
+
+# Follow every Build it yourself page in a scratch clone, as a student would: every git check must pass. Logs go to build/follow.
+# Then each part page of the website, as a student who starts at that part. just follow --github fetches from GitHub, as a student does
+follow *args: build
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # The recipe of a class made with walk-kit, with the pages rendered into build/pages, and not into tally-walk
+    kit="${WALK_KIT:-$HOME/Projects/walk-kit}"
+    export TIMEWALK="${TIMEWALK_LOCAL:-git+https://github.com/rahuldave/timewalk}"
+    out=build/pages
+    python3 "$kit/scripts/render.py" --class . --repo repo --github {{ github }} --pages "$out" > /dev/null
+    # With Claude Code, a model also checks the text against the output, into reports/follow/
+    check=()
+    if command -v claude > /dev/null; then check=(--check-output --report-dir .); fi
+    scratch=$(mktemp -d)
+    trap 'rm -rf "$scratch"' EXIT
+    shopt -s nullglob
+    mkdir -p build/follow
+    failed=0
+    for page in "$out"/walks/*/build.md; do
+        id=$(basename "$(dirname "$page")")
+        echo "follow: walk $id"
+        python3 "$kit/scripts/follow.py" "$page" --repo repo --work "$scratch/$id" --log "build/follow/$id.md" \
+            ${check[@]+"${check[@]}"} "$@" || failed=1
+    done
+    # A part page has the same text as its part of build.md, so the model does not check it again
+    for page in "$out"/site/build/*.qmd "$out"/sites/*/build/*.qmd; do
+        name=$(basename "$(dirname "$(dirname "$page")")")-$(basename "$page" .qmd)
+        echo "follow: part page $name"
+        python3 "$kit/scripts/follow.py" "$page" --repo repo --work "$scratch/part-$name" --log "build/follow/part-$name.md" "$@" \
+            || failed=1
+    done
+    exit "$failed"
 
 # Make the PDF of one walk's slides: just pdf tutorial
 pdf walk="narrative": build

@@ -16,8 +16,8 @@ echo "a b a" | uv run tally
 echo "The the THE" | uv run tally
 ```
 
-The first command prints `2 a` and `1 b`. The second prints three words of one each, because tally does not know
-yet that they are one word. The second slide is a picture of what `count` does.
+The first command prints `2 a` and `1 b`. The second prints three lines, `1 THE`, `1 The` and `1 the`. tally counts
+each as a different word, because it does not know yet that case does not matter. The second slide is a picture of what `count` does.
 
 > Ask: is that a bug, and who decides?
 

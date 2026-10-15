@@ -13,7 +13,8 @@ Nothing checks yet that they count right.
 
 {{include step-02.1}}
 
-The first test is the pattern for the next two. A test gives `count` a text, and compares what it gives back.
+The first two tests are the pattern for the third. A test gives `count` a text, and compares what `count` gives back
+with the counts that it must give.
 
 {{include step-02.2..step-02.3}}
 

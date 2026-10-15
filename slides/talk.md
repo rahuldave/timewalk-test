@@ -36,7 +36,7 @@ The signature says what goes in and what comes out.
 
 ## The most common words
 
-Sorted by count, then by the word.
+The highest count first. Two words with the same count are in alphabetical order.
 
 ---
 

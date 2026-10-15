@@ -73,7 +73,8 @@ uv run python -m unittest discover -s tests -q
 One test fails. `test_case` expects `{'a': 2}`, and gets `{'A': 1, 'a': 1}`. The failure is a question that the
 code has not answered yet.
 
-The first test is the pattern for the next two. A test gives `count` a text, and compares what it gives back.
+The first two tests are the pattern for the third. A test gives `count` a text, and compares what `count` gives back
+with the counts that it must give.
 
 Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
 

@@ -22,7 +22,7 @@ many times it appears. It goes in `src/tally/__init__.py`, above `main`. The com
 
 A patch to [`src/tally/__init__.py`](#step-01.1-src-tally-__init__.py-b5485b).
 
-In `src/tally/__init__.py`, `count` now stands above `main`. It splits the text at each space. For each word, it
+In `src/tally/__init__.py`, `count` now stands above `main`. It splits the text at every space, tab and end of line. For each word, it
 adds 1 to the count so far, and `counts.get(word, 0)` gives 0 for a word it has not seen.
 
 ```bash
@@ -69,7 +69,7 @@ A patch to [`src/tally/__init__.py`](#step-01.2-src-tally-__init__.py-b5485b).
 
 In `src/tally/__init__.py`, `import sys` now stands under the docstring of the module. The first line of `main`
 reads the text, from the file named in `sys.argv[1]` or from the standard input. The loop prints each word with
-its count, in the order of the words.
+its count. `sorted` puts the words in alphabetical order.
 
 ```bash
 echo "a b a" | uv run tally

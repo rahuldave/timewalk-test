@@ -758,13 +758,13 @@ def test_a_walk_with_its_own_notes_has_its_words_around_the_moves_it_includes(br
         assert head(kit).startswith("step-01:"), "the stop starts before step-02.1, at the tag before it"
         assert yours.locator("#notes .p-intro blockquote").is_visible() and room.locator("#notes .p-intro blockquote").is_hidden()
         notes = yours.evaluate("[...document.querySelectorAll('#notes > :not(.p-intro)')].map((e) => e.innerText).join('\\n')")
-        order = ["just setup", "tally counts words already", "A test of counting", "The first test is the pattern", "A test of an empty text",
+        order = ["just setup", "tally counts words already", "A test of counting", "The first two tests are the pattern", "A test of an empty text",
                  "Case does not matter", "Three tests now say what"]
         assert [notes.index(text) for text in order] == sorted(notes.index(text) for text in order), notes
         assert "one file at a time" not in notes, "the step's own text in the tutorial is not included"
         assert yours.locator("#notes-edit").is_hidden(), "its notes are made from two files, and edited in an editor"
         yours.click("#move-modes button:has-text('Watch')")
-        has_text(yours, "The first test is the pattern")
+        has_text(yours, "The first two tests are the pattern")
         yours.mouse.click(300, 400)
         yours.keyboard.press("ArrowRight")
         for page in (yours, room):

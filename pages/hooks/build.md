@@ -12,8 +12,9 @@ tally counts words, and nothing stops a broken file from going into git. We buil
 before each `git commit`. The hook checks that the code compiles, and later that the tests pass. When the check
 fails, git does not record the change.
 
-We build the hook in moves. A move is one small change, made by one patch or by one command. You make each move, and
-the page checks your files against it.
+We build the hook in moves. A move is one small change, made by one patch or by one command.
+
+You make each move, and the page checks your files against it.
 
 ## Get the project
 
@@ -356,7 +357,7 @@ git restore --source 5bd8d5bb524c --staged -- :/ && git restore --source 8d19bc5
 git does not copy hooks with a repository, and does not look in the folder `hooks` unless it is told to. So each
 copy of the project installs the hook. A recipe `install-hook` sets `core.hooksPath`, the setting of git that names
 the folder of hooks. The recipe changes the settings of git, so it is a recipe of its own, and not a part of
-`just setup`. `just setup` only makes the environment and the artifacts.
+`just setup`. `just setup` only runs `uv sync`, which makes the environment.
 
 Apply the patch to [`justfile`](#hooks-01.4-justfile-424f0b), from the top of the project:
 

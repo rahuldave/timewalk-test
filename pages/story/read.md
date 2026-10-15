@@ -4,12 +4,12 @@
 
 **Read the tutorial.** Each change explained, with the code to look at.
 
-Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. What changed is what you check your files against.
+Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change.
 
 The story of how tally counts, in three parts. They are the function that counts, the tests, and the option `--top`.
 
-Each part shows the code as it was then. The walk leaves out the rest. It leaves out the command that reads a file,
-ruff and the corpus, the types and the docstring, `top`, and the report.
+Each part shows the code as it was then. The walk leaves out the other changes. They made the command that reads a file, ruff and the corpus, and the types
+and the docstring. They also made the function `top` and the report. The third part uses some of them.
 
 <a id="step-01.1"></a>
 
@@ -24,7 +24,7 @@ many times it appears. It goes in `src/tally/__init__.py`, above `main`. The com
 
 A patch to [`src/tally/__init__.py`](#step-01.1-src-tally-__init__.py-b5485b).
 
-In `src/tally/__init__.py`, `count` now stands above `main`. It splits the text at each space. For each word, it
+In `src/tally/__init__.py`, `count` now stands above `main`. It splits the text at every space, tab and end of line. For each word, it
 adds 1 to the count so far, and `counts.get(word, 0)` gives 0 for a word it has not seen.
 
 ```bash

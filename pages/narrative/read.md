@@ -4,7 +4,7 @@
 
 **Read the tutorial.** Each change explained, with the code to look at.
 
-Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. What changed is what you check your files against.
+Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change.
 
 We follow tally, a word counter, from a project that does nothing to a command with tests, types and a report.
 tally is a uv project from the beginning. Every command runs through `uv run`, in the project's own `.venv`, and
@@ -177,8 +177,8 @@ echo "a b a" | uv run tally
 echo "The the THE" | uv run tally
 ```
 
-The first command prints `2 a` and `1 b`. The second prints three words of one each, because tally does not know
-yet that they are one word. The second slide is a picture of what `count` does.
+The first command prints `2 a` and `1 b`. The second prints three lines, `1 THE`, `1 The` and `1 the`. tally counts
+each as a different word, because it does not know yet that case does not matter. The second slide is a picture of what `count` does.
 
 > Ask: is that a bug, and who decides?
 

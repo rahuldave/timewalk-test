@@ -12,8 +12,9 @@ tally counts words, and has two files of tests. We make a release, version 0.2.0
 get a name that fits more cases. Then tally gets its new version, and last the lockfile records it. After the release, we tidy the project. The
 recipes get a hidden file, and every test goes in one file.
 
-We make the release in moves. A move is one small change, made by one patch or by one command. You make each move,
-and the page checks your files against it.
+We make the release in moves. A move is one small change, made by one patch or by one command.
+
+You make each move, and the page checks your files against it.
 
 ## Get the project
 
@@ -363,7 +364,7 @@ git restore --source a54eadb267e9 --staged -- :/ && git restore --source aea0234
 ### 1.3 The lock, and the list of changes
 
 `uv.lock` records the exact version of each package of the project, tally too. `uv lock` writes it again from
-`pyproject.toml`:
+`pyproject.toml`.
 
 ```bash
 uv lock
@@ -383,7 +384,8 @@ The patch makes the file `CHANGES.md`, with a heading for 0.2.0 and one sentence
 uv lock --check && grep -A1 '^name = "tally"' uv.lock
 ```
 
-`uv lock --check` prints nothing, because the lockfile is up to date. Then `grep` prints the entry of tally, with
+`uv lock --check` prints `Resolved 1 package` and the time it took, and stops with no error, because the lockfile is
+up to date. Then `grep` prints the entry of tally, with
 `version = "0.2.0"`.
 
 Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
@@ -440,7 +442,7 @@ Each file that moves or goes here moves by a command, `mv`, or goes by a command
 
 A user of tally reads `README.md` first, and has no use for the recipes of the `justfile`. They are for the people
 who work on tally. `just` also finds its recipes in a file named `.justfile`, a hidden file that `ls` does not list.
-`mv` gives the `justfile` that name:
+`mv` gives the `justfile` that name.
 
 ```bash
 mv justfile .justfile
@@ -529,7 +531,7 @@ git restore --source f338b5b0824c --staged -- :/ && git restore --source 3a4ad8d
 ### 2.3 One name for the tests
 
 The tests are in two files, `tests/test_count.py` and `tests/test_edge.py`. One file is one place to look. It
-gets the name of the project, `tests/test_tally.py`. `mv` gives the file of edge cases that name:
+gets the name of the project, `tests/test_tally.py`. `mv` gives the file of edge cases that name.
 
 ```bash
 mv tests/test_edge.py tests/test_tally.py
@@ -625,7 +627,7 @@ git restore --source fa608c2a2aa3 --staged -- :/ && git restore --source 3d2bf4f
 
 ### 2.5 The old file of tests goes
 
-Every test of `tests/test_count.py` is now in `tests/test_tally.py` too. `rm` removes the old file:
+Every test of `tests/test_count.py` is now in `tests/test_tally.py` too. `rm` removes the old file.
 
 ```bash
 rm tests/test_count.py
@@ -635,7 +637,7 @@ rm tests/test_count.py
 uv run python -m unittest discover -s tests -q
 ```
 
-Each test runs once again, and all five tests pass.
+Each test now runs one time only, and all five tests pass.
 
 Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
 

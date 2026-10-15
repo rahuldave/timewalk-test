@@ -13,8 +13,10 @@ end, it counts the words of a file, has tests and types, and writes a report of 
 command runs through uv, in the project's own environment.
 
 We make tally in moves. A move is one small change, made by one patch or by one command. A patch changes a file, and
-a command such as `uv add` writes the files it needs. You make each move, and the page checks your files against it.
-When they match, the move is made, and the next one starts.
+a command such as `uv add` writes the files it needs.
+
+You make each move, and the page checks your files against it. When they match, the move is made, and the next one
+starts.
 
 Each move first says what problem it solves. Then it gives the change, piece by piece. Last, a command checks the
 result, and a list names each file that changed, with what to look for in it.
@@ -547,7 +549,7 @@ writes every file in one style. A linter reads the code, and reports mistakes th
 both. It goes in the group `dev` of the project. The group `dev` is for the people who work on tally, so a user
 who installs tally does not get ruff.
 
-One command does it all. `uv add` writes ruff into `pyproject.toml` and `uv.lock`, and installs it in `.venv`:
+One command does it all. `uv add` writes ruff into `pyproject.toml` and `uv.lock`, and installs it in `.venv`.
 
 ```bash
 uv add --dev ruff
@@ -681,7 +683,7 @@ curl -fsSL https://github.com/rahuldave/tally/commit/1568a522d23312c59c6e42cb027
 The patch adds the folder `data/` at the end of `.gitignore`, under a comment.
 
 `just setup` makes the environment, and now it runs the script too. So every learner has the corpus. The script
-leaves a corpus that is there alone, so a second `just setup` writes nothing.
+does not touch a corpus that is already there, so a second `just setup` writes nothing.
 
 Apply the patch to [`justfile`](#step-03.3-justfile-424f0b), from the top of the project:
 
@@ -696,8 +698,8 @@ just setup
 uv run tally data/corpus.txt | sort -rn | head -3
 ```
 
-`just setup` prints `wrote data/corpus.txt: 2000 words`. tally prints the three most common words of the corpus,
-`127 line`, `126 class` and `125 word`.
+`just setup` prints `wrote data/corpus.txt: 2000 words`. `sort -rn` puts the lines of tally in order of count, highest
+first, and `head -3` keeps the first three. They are `127 line`, `126 class` and `125 word`.
 
 Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
 
@@ -717,7 +719,7 @@ git restore --source 0b7b0a80e580 --staged -- :/ && git restore --source 1568a52
   - look at `data/`
 - <a id="step-03.3-justfile-424f0b"></a>`justfile`: `just setup` now makes the corpus too. 1 line added. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/justfile).
   - look at `uv run python scripts/corpus.py data/corpus.txt`
-- <a id="step-03.3-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: the script writes the same 2000 words each time, and leaves a corpus that is there alone. New, 25 lines. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/scripts/corpus.py).
+- <a id="step-03.3-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: the script writes the same 2000 words each time, and does not touch a corpus that is already there. New, 25 lines. [The file](https://github.com/rahuldave/tally/blob/1568a522d23312c59c6e42cb027ec25ba3ae8b35/scripts/corpus.py).
   - look at `if target.exists():`
 
 <details open><summary>The patch to <code>.gitignore</code></summary>
@@ -917,7 +919,7 @@ git restore --source a7606fcc89be --staged -- :/ && git restore --source f79588d
 just setup
 ```
 
-tally prints a line for every word, in the order of the words. A reader of a long text wants the most common words
+tally prints a line for every word, in alphabetical order. A reader of a long text wants the most common words
 first, and only a few of them. A function finds them, and an option of the command prints them. A recipe writes a
 report of the ten most common words of the corpus.
 

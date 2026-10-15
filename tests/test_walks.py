@@ -267,7 +267,7 @@ def test_timewalk_export_writes_the_walks_with_their_own_notes(kit: Path, tmp_pa
         text = (out / name).read_text()
         assert text.index("This walk takes only the tests of tally") < text.index("## step-02.1 to step-02.3 Three tests of counting")
         assert "> Say:" not in text and "{{include" not in text
-        order = ["tally counts words already", "### step-02.1", "The first test is the pattern", "### step-02.2", "### step-02.3",
+        order = ["tally counts words already", "### step-02.1", "The first two tests are the pattern", "### step-02.2", "### step-02.3",
                  "Three tests now say what", "## step-05.1 A test of the most common words", "Since the last part", "### step-05.1", "The walk stops here"]
         assert [text.index(t) for t in order] == sorted(text.index(t) for t in order)
         assert "### step-05.2" not in text and "one file at a time" not in text

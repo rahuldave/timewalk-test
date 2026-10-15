@@ -5,8 +5,12 @@ end, it counts the words of a file, has tests and types, and writes a report of 
 command runs through uv, in the project's own environment.
 
 We make tally in moves. A move is one small change, made by one patch or by one command. A patch changes a file, and
-a command such as `uv add` writes the files it needs. You make each move, and the page checks your files against it.
-When they match, the move is made, and the next one starts.
+a command such as `uv add` writes the files it needs.
+
+::: do
+You make each move, and the page checks your files against it. When they match, the move is made, and the next one
+starts.
+:::
 
 Each move first says what problem it solves. Then it gives the change, piece by piece. Last, a command checks the
 result, and a list names each file that changed, with what to look for in it.
@@ -52,7 +56,7 @@ The patch puts `count` above the line `def main() -> None:`, with two blank line
 :::
 
 ::: watch
-In `src/tally/__init__.py`, `count` now stands above `main`. It splits the text at each space. For each word, it
+In `src/tally/__init__.py`, `count` now stands above `main`. It splits the text at every space, tab and end of line. For each word, it
 adds 1 to the count so far, and `counts.get(word, 0)` gives 0 for a word it has not seen.
 :::
 
@@ -80,7 +84,7 @@ The patch adds `import sys` under the docstring of the module, and writes `main`
 ::: watch
 In `src/tally/__init__.py`, `import sys` now stands under the docstring of the module. The first line of `main`
 reads the text, from the file named in `sys.argv[1]` or from the standard input. The loop prints each word with
-its count, in the order of the words.
+its count. `sorted` puts the words in alphabetical order.
 :::
 
 $ echo "a b a" | uv run tally
@@ -201,7 +205,7 @@ writes every file in one style. A linter reads the code, and reports mistakes th
 both. It goes in the group `dev` of the project. The group `dev` is for the people who work on tally, so a user
 who installs tally does not get ruff.
 
-One command does it all. `uv add` writes ruff into `pyproject.toml` and `uv.lock`, and installs it in `.venv`:
+One command does it all. `uv add` writes ruff into `pyproject.toml` and `uv.lock`, and installs it in `.venv`.
 
 do$ uv add --dev ruff
 
@@ -269,7 +273,7 @@ The patch adds the folder `data/` at the end of `.gitignore`, under a comment.
 :::
 
 `just setup` makes the environment, and now it runs the script too. So every learner has the corpus. The script
-leaves a corpus that is there alone, so a second `just setup` writes nothing.
+does not touch a corpus that is already there, so a second `just setup` writes nothing.
 
 patch$ justfile
 
@@ -286,13 +290,13 @@ number before it. The first number is always 7, so the words are the same each t
 $ just setup
 $ uv run tally data/corpus.txt | sort -rn | head -3
 
-`just setup` prints `wrote data/corpus.txt: 2000 words`. tally prints the three most common words of the corpus,
-`127 line`, `126 class` and `125 word`.
+`just setup` prints `wrote data/corpus.txt: 2000 words`. `sort -rn` puts the lines of tally in order of count, highest
+first, and `head -3` keeps the first three. They are `127 line`, `126 class` and `125 word`.
 
 files:
 - diff `justfile`: `just setup` now makes the corpus too.
   show: `uv run python scripts/corpus.py data/corpus.txt`
-- diff `scripts/corpus.py`: the script writes the same 2000 words each time, and leaves a corpus that is there alone.
+- diff `scripts/corpus.py`: the script writes the same 2000 words each time, and does not touch a corpus that is already there.
   show: `if target.exists():`
 - diff `.gitignore`: git does not hold the corpus.
   show: `data/`
@@ -356,7 +360,7 @@ files:
 
 $ just setup
 
-tally prints a line for every word, in the order of the words. A reader of a long text wants the most common words
+tally prints a line for every word, in alphabetical order. A reader of a long text wants the most common words
 first, and only a few of them. A function finds them, and an option of the command prints them. A recipe writes a
 report of the ten most common words of the corpus.
 

@@ -4,14 +4,13 @@
 
 **Read the tutorial.** Each change explained, with the code to look at. [Build it yourself](build.md) is the other way to read it.
 
-Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. What changed is what you check your files against.
+Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change.
 
 tally counts words, and nothing stops a broken file from going into git. We build a hook, a script that git runs
 before each `git commit`. The hook checks that the code compiles, and later that the tests pass. When the check
 fails, git does not record the change.
 
-We build the hook in moves. A move is one small change, made by one patch or by one command. You make each move, and
-the page checks your files against it.
+We build the hook in moves. A move is one small change, made by one patch or by one command.
 
 <a id="hooks-00"></a>
 
@@ -281,7 +280,7 @@ The hook says 1, so git would stop the `git commit`.
 git does not copy hooks with a repository, and does not look in the folder `hooks` unless it is told to. So each
 copy of the project installs the hook. A recipe `install-hook` sets `core.hooksPath`, the setting of git that names
 the folder of hooks. The recipe changes the settings of git, so it is a recipe of its own, and not a part of
-`just setup`. `just setup` only makes the environment and the artifacts.
+`just setup`. `just setup` only runs `uv sync`, which makes the environment.
 
 A patch to [`justfile`](#hooks-01.4-justfile-424f0b).
 

@@ -9,15 +9,14 @@ end, it counts the words of a file, has tests and types, and writes a report of 
 command runs through uv, in the project's own environment.
 
 We make tally in moves. A move is one small change, made by one patch or by one command. A patch changes a file, and
-a command such as `uv add` writes the files it needs. You make each move, and the page checks your files against it.
-When they match, the move is made, and the next one starts.
+a command such as `uv add` writes the files it needs.
 
 Each move first says what problem it solves. Then it gives the change, piece by piece. Last, a command checks the
 result, and a list names each file that changed, with what to look for in it.
 
 There are two ways to read this tutorial. Both have the same parts, in the same order.
 
-Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. What changed is what you check your files against.
+Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. In Build it yourself, What changed is what you check your files against.
 
 In Build it yourself, a file that a command makes says which command. A diff that is open is a patch. Apply it with the command in the text, or make the same change in your editor.
 

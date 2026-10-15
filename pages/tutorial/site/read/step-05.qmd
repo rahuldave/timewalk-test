@@ -10,7 +10,7 @@ title: "5 The most common words, and a report"
 just setup
 ```
 
-tally prints a line for every word, in the order of the words. A reader of a long text wants the most common words
+tally prints a line for every word, in alphabetical order. A reader of a long text wants the most common words
 first, and only a few of them. A function finds them, and an option of the command prints them. A recipe writes a
 report of the ten most common words of the corpus.
 

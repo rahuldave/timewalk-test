@@ -4,7 +4,7 @@
 
 **Read the tutorial.** Each change explained, with the code to look at. [Build it yourself](build.md) is the other way to read it.
 
-Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. What changed is what you check your files against.
+Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change.
 
 This walk takes only the tests of tally. It begins where tally can already count the words of a text. It leaves out
 the formatting, the types and the report.
@@ -44,7 +44,8 @@ uv run python -m unittest discover -s tests -q
 One test fails. `test_case` expects `{'a': 2}`, and gets `{'A': 1, 'a': 1}`. The failure is a question that the
 code has not answered yet.
 
-The first test is the pattern for the next two. A test gives `count` a text, and compares what it gives back.
+The first two tests are the pattern for the third. A test gives `count` a text, and compares what `count` gives back
+with the counts that it must give.
 
 #### What changed
 

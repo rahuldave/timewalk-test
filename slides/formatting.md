@@ -22,4 +22,4 @@ and the presenter scrolls it while the class reads.
 | Tool | Reads |
 |---|---|
 | ruff | `[tool.ruff]` |
-| pytest | `[tool.pytest.ini_options]` |
+| uv | `[dependency-groups]` |

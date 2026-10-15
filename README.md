@@ -1,18 +1,19 @@
 # timewalk-test
 
 The integration test of [timewalk](https://github.com/rahuldave/timewalk), and a class kit that shows every
-feature of it. A class folder with nine walks steps through `tally`, a small word counter, whose history
+feature of it. A class folder with ten walks steps through `tally`, a small word counter, whose history
 `history/build.py` builds into `repo/`. The tests drive the page in two windows, the way a class uses it.
 
 ```
 just present            # open the walks in a browser, starting on the default walk
-just present tutorial   # start on another walk: narrative, tests, parts, story, tutorial, hooks, small, testing or finish
-just check              # check the notes and slides of every walk against the steps
+just present tutorial   # start on another walk: narrative, tests, parts, story, tutorial, hooks, small, testing, finish or release
+just check              # check the notes and slides of every walk against the steps, then the pages that students read
 just pdf hooks          # the PDF of one walk's slides, in build/
 just build              # build repo/ again, and start again from the first step
 just pages              # render the pages that students read, for every walk, into pages/
 just site               # build the website of pages/ into _site/, and serve it at http://127.0.0.1:8000
-just style              # check the README, notes, slides and pages by walk-kit's writing guide
+just style              # check the README, notes and slides by walk-kit's writing guide; --all reviews each file whole
+just follow             # follow every Build it yourself page and part page in a scratch clone, as a student would
 just test               # build a fresh copy, then run every test
 just publish            # push repo/ to github.com/rahuldave/tally, every branch and tag
 just walk-init          # make ../tally-walk, the repository that students fork, with walk-kit
@@ -28,9 +29,16 @@ timewalk-test also tests the pages that students read. The `walk` skill, in walk
 of each walk. `just pages` writes them into `pages/`, one folder for each walk, and you can commit them. A tutorial also
 gets a Build it yourself page, with every command to run.
 
+The recipes `check`, `style` and `follow` are the recipes of a class made with walk-kit. So when timewalk-test runs
+them, it tests the recipes that classes use. `just check` runs `timewalk-check`, and then walk-kit's
+`render.py --class`, which checks the pages of every walk. `just style` runs walk-kit's `style.py` on the README, the
+notes and the slides. `just follow` renders the pages into `build/pages`, and follows each Build it yourself page and
+each part page of the websites.
+
 `just test -k pages` makes the pages again in a temporary folder. Then it runs each Build it yourself page in a fresh
-copy of the project, and every check on the page must pass. It skips that part when walk-kit has no `scripts/follow.py`.
-`just style` checks the text of the pages, the README, the notes and the slides.
+copy of the project, and every check on the page must pass. It also follows each part page of the websites, checks
+each page to read with walk-kit's `read_check.py`, and runs `render.py --class`. With `TIMEWALK_TEST_GITHUB=1`, it also
+runs walk-kit's `just test-github`, which follows the pages of tally-walk on GitHub.
 
 The website of the pages is at https://rahuldave.com/timewalk-test/, with one site for each walk. GitHub publishes
 it on each push to `main` that changes `pages/`. `just site` builds the same website on your computer.
@@ -100,12 +108,12 @@ notes column.
 |---|---|
 | `history/build.py` | Builds `repo/`: tagged steps `step-00` to `step-06` on `main`, with small commits for the tutorial before step-01, step-02, step-03, step-04 and step-05, and none before step-06; a branch `parts` with tags `parts-01` and `parts-02`; a branch `hooks` with tags `hooks-00` to `hooks-02` and small commits between them; and a branch `release` with tags `release-00` to `release-02`. The same hashes on every build |
 | `history/step-03.1-uv.lock` | The `uv.lock` that `uv add --dev ruff` wrote at step-03.1, with uv 0.12.13 on the project at step-02. `build.py` reads it, so every build gives the same hashes |
-| `toc.toml` | The table of contents: the nine walks, the default first. Each has a `description`, which the band shows at the walk's first step |
+| `toc.toml` | The table of contents: the ten walks, the default first. Each has a `description`, which the band shows at the walk's first step |
 | `notes.md`, `slides/` | The default walk: its notes, and its manifest with the slide files |
 | `walks/NAME/` | Each other walk: `notes.md`, and `slides/slides.toml` with its own slide files. The small walks `small` and `story` have only an `intro.md`, and read the notes and slides of the tutorial. The small walks `testing` and `finish` have only a `notes.md` of their own, and read the move sections and the slides of the tutorial |
 | `pages/ID/` | The pages of each walk, from `just pages`: `read.md`, `build.md` for a tutorial, and the website in `site/` |
 | `justfile` | The recipes above |
-| `tests/` | pytest and Playwright: two windows through every walk, step, move and slide, commands typed into a shell, the checks on broken copies of the class, and the PDF. `tests/test_facts.py` checks the facts that `timewalk-export --json` writes, for a tutorial, a narrative, the small walks with `select` and with notes of their own, and a narrative that stops at moves, against timewalk's `facts.schema.json`. `tests/test_pages.py` renders the pages of every walk, and follows each Build it yourself page |
+| `tests/` | pytest and Playwright: two windows through every walk, step, move and slide, commands typed into a shell, the checks on broken copies of the class, and the PDF. `tests/test_facts.py` checks the facts that `timewalk-export --json` writes, for a tutorial, a narrative, the small walks with `select` and with notes of their own, and a narrative that stops at moves, against timewalk's `facts.schema.json`. `tests/test_pages.py` renders the pages of every walk, follows each Build it yourself page and part page, checks each page to read, and runs `render.py --class` |
 
 **`just setup` starts every step, and it never touches git.** It makes the environment (`uv sync`) and the
 artifacts that the step needs. The artifacts are `data/corpus.txt` from step-03, and `build/top.txt` from step-05.

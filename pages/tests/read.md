@@ -4,7 +4,7 @@
 
 **Read the tutorial.** Each change explained, with the code to look at.
 
-Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. What changed is what you check your files against.
+Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change.
 
 We follow tally, a word counter, through the three places where its tests matter. We see it before any test, then
 when the tests come, and last when new code comes with a test of its own. Every command runs through uv.

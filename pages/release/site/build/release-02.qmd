@@ -27,7 +27,7 @@ Each file that moves or goes here moves by a command, `mv`, or goes by a command
 
 A user of tally reads `README.md` first, and has no use for the recipes of the `justfile`. They are for the people
 who work on tally. `just` also finds its recipes in a file named `.justfile`, a hidden file that `ls` does not list.
-`mv` gives the `justfile` that name:
+`mv` gives the `justfile` that name.
 
 ```bash
 mv justfile .justfile
@@ -112,7 +112,7 @@ git restore --source f338b5b0824c --staged -- :/ && git restore --source 3a4ad8d
 ## 2.3 One name for the tests {#release-02.3}
 
 The tests are in two files, `tests/test_count.py` and `tests/test_edge.py`. One file is one place to look. It
-gets the name of the project, `tests/test_tally.py`. `mv` gives the file of edge cases that name:
+gets the name of the project, `tests/test_tally.py`. `mv` gives the file of edge cases that name.
 
 ```bash
 mv tests/test_edge.py tests/test_tally.py
@@ -204,7 +204,7 @@ git restore --source fa608c2a2aa3 --staged -- :/ && git restore --source 3d2bf4f
 
 ## 2.5 The old file of tests goes {#release-02.5}
 
-Every test of `tests/test_count.py` is now in `tests/test_tally.py` too. `rm` removes the old file:
+Every test of `tests/test_count.py` is now in `tests/test_tally.py` too. `rm` removes the old file.
 
 ```bash
 rm tests/test_count.py
@@ -214,7 +214,7 @@ rm tests/test_count.py
 uv run python -m unittest discover -s tests -q
 ```
 
-Each test runs once again, and all five tests pass.
+Each test now runs one time only, and all five tests pass.
 
 Check your files against this move. The command prints nothing when they match, and otherwise shows what differs:
 

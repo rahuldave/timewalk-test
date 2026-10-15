@@ -1,6 +1,6 @@
 ## Tests first
 
-The code and its first test arrive together.
+The code and its first two tests arrive together.
 
 ---
 

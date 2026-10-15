@@ -4,7 +4,7 @@
 
 **Read the tutorial.** Each change explained, with the code to look at.
 
-Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. What changed is what you check your files against.
+Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change.
 
 We build the same counting code as the main history of tally, in another order. Here each test comes with the code
 that it tests, and not after it. This history is on a branch of its own, `parts`, which leaves `main` where the

@@ -165,7 +165,7 @@ git restore --source 5bd8d5bb524c --staged -- :/ && git restore --source 8d19bc5
 git does not copy hooks with a repository, and does not look in the folder `hooks` unless it is told to. So each
 copy of the project installs the hook. A recipe `install-hook` sets `core.hooksPath`, the setting of git that names
 the folder of hooks. The recipe changes the settings of git, so it is a recipe of its own, and not a part of
-`just setup`. `just setup` only makes the environment and the artifacts.
+`just setup`. `just setup` only runs `uv sync`, which makes the environment.
 
 Apply the patch to [`justfile`](#hooks-01.4-justfile-424f0b), from the top of the project:
 

@@ -8,12 +8,11 @@ tally counts words, and nothing stops a broken file from going into git. We buil
 before each `git commit`. The hook checks that the code compiles, and later that the tests pass. When the check
 fails, git does not record the change.
 
-We build the hook in moves. A move is one small change, made by one patch or by one command. You make each move, and
-the page checks your files against it.
+We build the hook in moves. A move is one small change, made by one patch or by one command.
 
 There are two ways to read this tutorial. Both have the same parts, in the same order.
 
-Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. What changed is what you check your files against.
+Each part ends with a section called **What changed**. It lists every file that the part changes, with a link to the file, and then the whole diff of each file, folded. A lockfile and a binary file have a link alone. The text above it explains the change. In Build it yourself, What changed is what you check your files against.
 
 In Build it yourself, a file that a command makes says which command. A diff that is open is a patch. Apply it with the command in the text, or make the same change in your editor.
 
