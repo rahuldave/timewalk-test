@@ -4,7 +4,7 @@
 [[walk]]
 id = "narrative"
 title = "tally, step by step"
-description = "How tally, a word counter, was built: one tagged step at a time, from an empty command to a report."
+description = "How tally, a word counter, was built, one part at a time: from an empty command to a report."
 kind = "narrative"                # the tagged steps, and nothing between them
 notes = "notes.md"
 slides = "slides/slides.toml"
@@ -12,7 +12,7 @@ slides = "slides/slides.toml"
 [[walk]]
 id = "tests"
 title = "Only the tests"
-description = "Three steps of tally: the code, its tests, and the most common words."
+description = "Three parts of tally: the code, its tests, and the most common words."
 kind = "narrative"
 folder = "walks/tests"            # notes.md, and slides/slides.toml, in this folder
 steps = ["step-01", "step-02", "step-05"]   # some of the steps of main
@@ -28,7 +28,7 @@ tags = "parts-*"                  # steps of its own, on another branch
 [[walk]]
 id = "tutorial"
 title = "tally, one move at a time"
-description = "Build tally yourself, one small commit at a time: a function, its tests, types, and a report."
+description = "Build tally yourself, one small change at a time: a function, its tests, types, and a report."
 kind = "tutorial"                 # the tagged steps, and the small commits between them
 folder = "walks/tutorial"         # starts in do mode, the default: the learner makes each move by hand
 # step-03.1 is made with uv add --dev ruff. A learner who runs it on a later day gets a newer ruff than the commit, so
@@ -48,7 +48,7 @@ sync = false                      # the slides do not follow the moves
 [[walk]]
 id = "small"
 title = "Two parts of tally, one move at a time"
-description = "A small tutorial taken out of the big one: two moves of step-02, and one move of step-05."
+description = "A small tutorial taken out of the big one: two moves on the tests, and one move on the most common words."
 kind = "tutorial"
 notes = "walks/tutorial/notes.md"   # the notes of the whole tutorial
 slides = "walks/tutorial/slides/slides.toml"
@@ -68,7 +68,7 @@ slides = "walks/tutorial/slides/slides.toml"
 [[walk]]
 id = "finish"
 title = "Types, then the report, with notes of its own"
-description = "A small tutorial with its own words: a whole step, then one move after a gap, and a word at the end."
+description = "A small tutorial with its own words: all the moves on types, then one move after a gap, and a word at the end."
 kind = "tutorial"
 notes = "walks/finish/notes.md"     # an include of a whole step, and an include of one move
 shared = "walks/tutorial/notes.md"
@@ -77,7 +77,7 @@ slides = "walks/tutorial/slides/slides.toml"
 [[walk]]
 id = "story"
 title = "How tally counts, in three stops"
-description = "A small narrative taken out of the tutorial: a move, a step, and a move."
+description = "A small narrative taken out of the tutorial: how tally counts, how its tests check it, and how it finds the most common words."
 kind = "narrative"
 notes = "walks/tutorial/notes.md"
 slides = "walks/tutorial/slides/slides.toml"
@@ -93,3 +93,14 @@ folder = "walks/release"
 tags = "release-*"                # a tutorial on one part, with tags of its own on the branch release
 # release-01.2 changes pyproject.toml, and leaves uv lock to the next move: the pages check it with --stale-lock
 loose = ["pyproject.toml", "uv.lock"]
+
+[[walk]]
+id = "extra"
+title = "A bigger tally, one move at a time"
+description = "tally gets a table, a page of docs with a picture, a library of its own, and code that ruff passes."
+kind = "tutorial"
+folder = "walks/extra"
+tags = "extra-*"                  # a tutorial with tags of its own on the branch extra, and a lettered extra-03b
+# uv add with a range, uv add --group, uv init --lib and uv remove: a learner on a later day gets newer versions, and
+# uv init writes the version of uv in the build system of the library
+loose = ["pyproject.toml", "uv.lock", "packages/talib/pyproject.toml"]

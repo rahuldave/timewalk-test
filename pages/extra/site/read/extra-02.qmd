@@ -1,0 +1,476 @@
+---
+title: "2 The docs"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Read the tutorial.** [Build it yourself](../build/extra-02.qmd) is the other way to read this part.
+
+```bash
+just setup
+```
+
+The README says in a few lines how to run tally. A user who wants more needs a page of docs. We write it piece by
+piece, with a picture. The README then shows how to count from Python, and a recipe checks that the docs are
+formatted.
+
+[The code before this part](https://github.com/rahuldave/tally/tree/ec6a8aa7f9a8b81ef07c6c8ec69f01307482dc32). [The code after it](https://github.com/rahuldave/tally/tree/d6f47209c66d7bb88e4e389e2eb9bc495694df55).
+
+## 2.1 A page on how to run tally {#extra-02.1}
+
+A user who opens the folder `docs` wants one page on how to run tally. Its name has spaces in it, `how to run.md`,
+as the names of pages often do.
+
+A patch to [`docs/how to run.md`](#extra-02.1-docs-how-to-run.md-3d8176).
+
+The new page `docs/how to run.md` has two sections, each with a command in a fenced block of `sh`.
+
+```bash
+uv run mdformat --check docs
+```
+
+It prints nothing, because the page is formatted as mdformat formats it.
+
+### What changed {#extra-02.1-what-changed-182c57}
+
+- <a id="extra-02.1-docs-how-to-run.md-3d8176"></a>`docs/how to run.md`: the page, with how to set up and how to count. New, 19 lines. [The file](https://github.com/rahuldave/tally/blob/17ec79e65166fe1f93c13f94b35e909ca1e36a3c/docs/how%20to%20run.md).
+  - look at `# How to run tally`
+
+<details><summary>The diff of <code>docs/how to run.md</code></summary>
+
+````diff
+@@ -0,0 +1,19 @@
++# How to run tally
++
++tally counts the words of a text file.
++
++## Set up
++
++Run this once, and again after each change of the project:
++
++```sh
++just setup
++```
++
++## Count the words of a file
++
++```sh
++uv run tally data/corpus.txt
++```
++
++It prints each word with its count, one word to a line, in the order of the alphabet.
+````
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/17ec79e65166fe1f93c13f94b35e909ca1e36a3c). [The code after it](https://github.com/rahuldave/tally/tree/17ec79e65166fe1f93c13f94b35e909ca1e36a3c).
+
+## 2.2 The most common words {#extra-02.2}
+
+The page does not say how to keep only the most common words. A section says it, with the option `--top`.
+
+A patch to [`docs/how to run.md`](#extra-02.2-docs-how-to-run.md-3d8176).
+
+At the end of `docs/how to run.md`, the section "Only the most common words" runs `uv run tally --top 10`.
+
+```bash
+uv run tally --top 10 data/corpus.txt
+```
+
+It prints the ten lines that the section promises, from `127 line` down to `110 code`.
+
+### What changed {#extra-02.2-what-changed-182c57}
+
+- <a id="extra-02.2-docs-how-to-run.md-3d8176"></a>`docs/how to run.md`: the option `--top`. 8 lines added. [The file](https://github.com/rahuldave/tally/blob/4a4de50fdb3f29580f612015d62ca81b6c9afe07/docs/how%20to%20run.md).
+  - look at `## Only the most common words`
+
+<details><summary>The diff of <code>docs/how to run.md</code></summary>
+
+````diff
+@@ -17,3 +17,11 @@ uv run tally data/corpus.txt
+ ```
+ 
+ It prints each word with its count, one word to a line, in the order of the alphabet.
++
++## Only the most common words
++
++```sh
++uv run tally --top 10 data/corpus.txt
++```
++
++It prints the ten most common words, the most common first.
+````
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/4a4de50fdb3f29580f612015d62ca81b6c9afe07). [The code after it](https://github.com/rahuldave/tally/tree/4a4de50fdb3f29580f612015d62ca81b6c9afe07).
+
+## 2.3 The table {#extra-02.3}
+
+The option `--table` is new, and the page does not name it. A section names it.
+
+A patch to [`docs/how to run.md`](#extra-02.3-docs-how-to-run.md-3d8176).
+
+At the end of `docs/how to run.md`, the section "A table" runs tally with `--top 10 --table`.
+
+```bash
+uv run mdformat --check docs
+```
+
+It prints nothing, so the page is still formatted.
+
+### What changed {#extra-02.3-what-changed-182c57}
+
+- <a id="extra-02.3-docs-how-to-run.md-3d8176"></a>`docs/how to run.md`: the option `--table`. 8 lines added. [The file](https://github.com/rahuldave/tally/blob/fea3c9b91e4687bfdd1d528ad230890d5b6df4c9/docs/how%20to%20run.md).
+  - look at `## A table`
+
+<details><summary>The diff of <code>docs/how to run.md</code></summary>
+
+````diff
+@@ -25,3 +25,11 @@ uv run tally --top 10 data/corpus.txt
+ ```
+ 
+ It prints the ten most common words, the most common first.
++
++## A table
++
++```sh
++uv run tally --top 10 --table data/corpus.txt
++```
++
++It prints the same words as a table, with a header.
+````
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/fea3c9b91e4687bfdd1d528ad230890d5b6df4c9). [The code after it](https://github.com/rahuldave/tally/tree/fea3c9b91e4687bfdd1d528ad230890d5b6df4c9).
+
+## 2.4 A picture of the most common words {#extra-02.4}
+
+A picture tells at a glance that the ten most common words have about the same count. A file `docs/tally.png`
+draws them as ten blue bars. The file is binary, so its patch has no lines to read.
+
+A patch to [`docs/tally.png`](#extra-02.4-docs-tally.png-f53d72).
+
+The new file `docs/tally.png` is a picture of ten blue bars, one for each of the most common words.
+
+```bash
+file docs/tally.png
+```
+
+It prints `docs/tally.png: PNG image data, 60 x 30, 8-bit/color RGB, non-interlaced`.
+
+### What changed {#extra-02.4-what-changed-182c57}
+
+- <a id="extra-02.4-docs-tally.png-f53d72"></a>`docs/tally.png`: ten bars, one for each of the most common words. A binary file. [The file](https://github.com/rahuldave/tally/blob/62a45097ffcb393715eff9da3826926582b2fa8b/docs/tally.png).
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/62a45097ffcb393715eff9da3826926582b2fa8b). [The code after it](https://github.com/rahuldave/tally/tree/62a45097ffcb393715eff9da3826926582b2fa8b).
+
+## 2.5 The page shows the picture {#extra-02.5}
+
+The picture is in the folder `docs`, but no page shows it. The section on the most common words shows it, under
+its command.
+
+A patch to [`docs/how to run.md`](#extra-02.5-docs-how-to-run.md-3d8176).
+
+In `docs/how to run.md`, the section "Only the most common words" shows `tally.png`, with words that say what it
+draws.
+
+```bash
+grep -n 'tally.png' "docs/how to run.md"
+```
+
+It prints the line of the picture, with its number.
+
+### What changed {#extra-02.5-what-changed-182c57}
+
+- <a id="extra-02.5-docs-how-to-run.md-3d8176"></a>`docs/how to run.md`: the picture, in its section. 2 lines added. [The file](https://github.com/rahuldave/tally/blob/3f033b6e57ab1b04706ab3efe288701b3a7848ef/docs/how%20to%20run.md).
+  - look at `![The ten most common words of the corpus, as bars](tally.png)`
+
+<details><summary>The diff of <code>docs/how to run.md</code></summary>
+
+````diff
+@@ -26,6 +26,8 @@ uv run tally --top 10 data/corpus.txt
+ 
+ It prints the ten most common words, the most common first.
+ 
++![The ten most common words of the corpus, as bars](tally.png)
++
+ ## A table
+ 
+ ```sh
+````
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/3f033b6e57ab1b04706ab3efe288701b3a7848ef). [The code after it](https://github.com/rahuldave/tally/tree/3f033b6e57ab1b04706ab3efe288701b3a7848ef).
+
+## 2.6 Count from Python {#extra-02.6}
+
+tally is a library as well as a command. A user who writes Python wants to call `count` and `top`. A new section of
+the README shows how, in a fenced block of Python.
+
+A patch to [`README.md`](#extra-02.6-README.md-8ec9a0).
+
+At the end of `README.md`, the section "Count from Python" counts the words of `"the cat and the hat"`, and keeps
+the two most common.
+
+```bash
+uv run python -c "from tally import count, top; print(top(count('the cat and the hat'), 2))"
+```
+
+It prints `[('the', 2), ('and', 1)]`, as the README says.
+
+### What changed {#extra-02.6-what-changed-182c57}
+
+- <a id="extra-02.6-README.md-8ec9a0"></a>`README.md`: the section "Count from Python", with its block of code. 13 lines added. [The file](https://github.com/rahuldave/tally/blob/4cf104b7cd816370bd0a34efc7ff2d2be39f6abb/README.md).
+  - look at `print(top(counts, 2))`
+
+<details><summary>The diff of <code>README.md</code></summary>
+
+````diff
+@@ -11,3 +11,16 @@ Make the environment, the corpus and the report first. Then count the words of a
+ 
+ `uv run tally --top 10 data/corpus.txt` prints only the ten most common words. `just test` runs the tests, and
+ `just report` writes the ten most common words of the corpus to `build/top.txt`.
++
++## Count from Python
++
++tally is a library too. `count` counts the words of a text, and `top` keeps the most common:
++
++```python
++from tally import count, top
++
++counts = count("the cat and the hat")
++print(top(counts, 2))
++```
++
++It prints `[('the', 2), ('and', 1)]`.
+````
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/4cf104b7cd816370bd0a34efc7ff2d2be39f6abb). [The code after it](https://github.com/rahuldave/tally/tree/4cf104b7cd816370bd0a34efc7ff2d2be39f6abb).
+
+## 2.7 The README links to the page {#extra-02.7}
+
+A reader of the README does not know that the page exists. A link at the end of the README names it. The path has
+spaces, so the link writes each one as `%20`.
+
+A patch to [`README.md`](#extra-02.7-README.md-8ec9a0).
+
+The last sentence of `README.md` links to the page `docs/how to run.md`, with `%20` for each space.
+
+```bash
+grep -o 'docs/how%20to%20run.md' README.md
+```
+
+It prints the path of the link, `docs/how%20to%20run.md`.
+
+### What changed {#extra-02.7-what-changed-182c57}
+
+- <a id="extra-02.7-README.md-8ec9a0"></a>`README.md`: a link to the page. 2 lines added. [The file](https://github.com/rahuldave/tally/blob/1fac49bff15eb93b2e294c28a89ad85c4ec196c1/README.md).
+  - look at `The page [How to run tally](docs/how%20to%20run.md) says more, with a picture of the most common words.`
+
+<details><summary>The diff of <code>README.md</code></summary>
+
+````diff
+@@ -24,3 +24,5 @@ print(top(counts, 2))
+ ```
+ 
+ It prints `[('the', 2), ('and', 1)]`.
++
++The page [How to run tally](docs/how%20to%20run.md) says more, with a picture of the most common words.
+````
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/1fac49bff15eb93b2e294c28a89ad85c4ec196c1). [The code after it](https://github.com/rahuldave/tally/tree/1fac49bff15eb93b2e294c28a89ad85c4ec196c1).
+
+## 2.8 The picture in green {#extra-02.8}
+
+The blue bars look like links on a page of blue links. Green bars stand apart. The patch replaces the picture.
+
+A patch to [`docs/tally.png`](#extra-02.8-docs-tally.png-f53d72).
+
+`docs/tally.png` has the same ten bars, now green.
+
+```bash
+file docs/tally.png
+```
+
+It prints `docs/tally.png: PNG image data, 60 x 30, 8-bit/color RGB, non-interlaced`, as before. Only the colour
+changed.
+
+### What changed {#extra-02.8-what-changed-182c57}
+
+- <a id="extra-02.8-docs-tally.png-f53d72"></a>`docs/tally.png`: the bars, in green. A binary file. [The file](https://github.com/rahuldave/tally/blob/2476ccb77ac1f9119d5993ed9daa59363092b454/docs/tally.png).
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/2476ccb77ac1f9119d5993ed9daa59363092b454). [The code after it](https://github.com/rahuldave/tally/tree/2476ccb77ac1f9119d5993ed9daa59363092b454).
+
+## 2.9 Count a file from Python {#extra-02.9}
+
+A short text in the README shows little. The block of Python now counts the corpus, and keeps the three most common
+words.
+
+A patch to [`README.md`](#extra-02.9-README.md-8ec9a0).
+
+The block of Python in `README.md` reads `data/corpus.txt` with `Path`, and prints the three most common words.
+
+This command takes the block of Python out of the README, and runs it:
+
+```bash
+sed -n '/^```python$/,/^```$/p' README.md | sed '1d;$d' | uv run python -
+```
+
+It prints `[('line', 127), ('class', 126), ('word', 125)]`, as the README says.
+
+### What changed {#extra-02.9-what-changed-182c57}
+
+- <a id="extra-02.9-README.md-8ec9a0"></a>`README.md`: the block of Python counts the corpus. 5 lines added, 3 removed. [The file](https://github.com/rahuldave/tally/blob/a0cde9c7cdd6520d1e82207d6ea78bfc3dba99eb/README.md).
+  - look at `counts = count(Path("data/corpus.txt").read_text())`
+
+<details><summary>The diff of <code>README.md</code></summary>
+
+````diff
+@@ -17,12 +17,14 @@ Make the environment, the corpus and the report first. Then count the words of a
+ tally is a library too. `count` counts the words of a text, and `top` keeps the most common:
+ 
+ ```python
++from pathlib import Path
++
+ from tally import count, top
+ 
+-counts = count("the cat and the hat")
+-print(top(counts, 2))
++counts = count(Path("data/corpus.txt").read_text())
++print(top(counts, 3))
+ ```
+ 
+-It prints `[('the', 2), ('and', 1)]`.
++It prints `[('line', 127), ('class', 126), ('word', 125)]`, the three most common words of the corpus.
+ 
+ The page [How to run tally](docs/how%20to%20run.md) says more, with a picture of the most common words.
+````
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/a0cde9c7cdd6520d1e82207d6ea78bfc3dba99eb). [The code after it](https://github.com/rahuldave/tally/tree/a0cde9c7cdd6520d1e82207d6ea78bfc3dba99eb).
+
+## 2.10 A recipe that checks the docs {#extra-02.10}
+
+Nobody remembers to run mdformat on each page. A recipe, `just docs`, checks the README and the folder `docs` in one
+command.
+
+A patch to [`justfile`](#extra-02.10-justfile-424f0b).
+
+At the end of the `justfile`, the recipe `docs` runs `mdformat --check` on `README.md` and on `docs`.
+
+```bash
+just docs
+```
+
+It fails, with exit code 1. mdformat says that `README.md` is not formatted. The section "Run it" has a block of
+code indented by four spaces, and mdformat writes a fenced block.
+
+### What changed {#extra-02.10-what-changed-182c57}
+
+- <a id="extra-02.10-justfile-424f0b"></a>`justfile`: the recipe `docs`. 4 lines added. [The file](https://github.com/rahuldave/tally/blob/cdde9a53f40f29d93721cc8defb7717ea5fb4d93/justfile).
+  - look at `uv run mdformat --check README.md docs`
+
+<details><summary>The diff of <code>justfile</code></summary>
+
+```diff
+@@ -20,3 +20,7 @@ test:
+ report:
+     mkdir -p build
+     uv run tally --top 10 data/corpus.txt > build/top.txt
++
++# Check that the README and the docs are formatted as mdformat formats them
++docs:
++    uv run mdformat --check README.md docs
+```
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/cdde9a53f40f29d93721cc8defb7717ea5fb4d93). [The code after it](https://github.com/rahuldave/tally/tree/cdde9a53f40f29d93721cc8defb7717ea5fb4d93).
+
+## 2.11 The README as mdformat writes it {#extra-02.11}
+
+The check fails on the README. mdformat without `--check` formats the file in place:
+
+This change came from running `uv run mdformat README.md`.
+
+In the section "Run it" of `README.md`, the two indented lines are now a fenced block.
+
+```bash
+just docs
+```
+
+It prints the command of the recipe, and mdformat prints nothing. The README and the page are formatted.
+
+### What changed {#extra-02.11-what-changed-182c57}
+
+- <a id="extra-02.11-README.md-8ec9a0"></a>`README.md`: a fenced block in place of the indented lines. 4 lines added, 2 removed. It comes from `uv run mdformat README.md`. [The file](https://github.com/rahuldave/tally/blob/b8347ac5868ce45524fd7f226379fbbeef48b461/README.md).
+
+<details><summary>The diff of <code>README.md</code></summary>
+
+````diff
+@@ -6,8 +6,10 @@ Count the words in a text.
+ 
+ Make the environment, the corpus and the report first. Then count the words of a file:
+ 
+-    just setup
+-    uv run tally data/corpus.txt
++```
++just setup
++uv run tally data/corpus.txt
++```
+ 
+ `uv run tally --top 10 data/corpus.txt` prints only the ten most common words. `just test` runs the tests, and
+ `just report` writes the ten most common words of the corpus to `build/top.txt`.
+````
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/b8347ac5868ce45524fd7f226379fbbeef48b461). [The code after it](https://github.com/rahuldave/tally/tree/b8347ac5868ce45524fd7f226379fbbeef48b461).
+
+## 2.12 The page says how to check the docs {#extra-02.12}
+
+A writer of the docs needs to know that the recipe exists. A last section of the page names it.
+
+A patch to [`docs/how to run.md`](#extra-02.12-docs-how-to-run.md-3d8176).
+
+At the end of `docs/how to run.md`, the section "Check the docs" runs `just docs`, and says what it prints.
+
+```bash
+just docs
+```
+
+mdformat prints nothing, so the new section is formatted too.
+
+### What changed {#extra-02.12-what-changed-182c57}
+
+- <a id="extra-02.12-docs-how-to-run.md-3d8176"></a>`docs/how to run.md`: how to check the docs. 8 lines added. [The file](https://github.com/rahuldave/tally/blob/d6f47209c66d7bb88e4e389e2eb9bc495694df55/docs/how%20to%20run.md).
+  - look at `## Check the docs`
+
+<details><summary>The diff of <code>docs/how to run.md</code></summary>
+
+````diff
+@@ -35,3 +35,11 @@ uv run tally --top 10 --table data/corpus.txt
+ ```
+ 
+ It prints the same words as a table, with a header.
++
++## Check the docs
++
++```sh
++just docs
++```
++
++It prints nothing when every page of the docs is formatted as mdformat formats it.
+````
+
+</details>
+
+[This change on GitHub](https://github.com/rahuldave/tally/commit/d6f47209c66d7bb88e4e389e2eb9bc495694df55). [The code after it](https://github.com/rahuldave/tally/tree/d6f47209c66d7bb88e4e389e2eb9bc495694df55).

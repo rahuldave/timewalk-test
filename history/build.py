@@ -16,6 +16,11 @@ The project is `tally`, a small word counter. Its history has what every kind of
   first move renames a file by a patch. Its second changes the version in pyproject.toml, so the commit's own uv.lock
   is out of date, and its third runs `uv lock` and adds a list of changes. release-02 renames and removes files by
   command, `mv` and `rm`, as a student who never commits must: `git rm` and `git mv` need git's index.
+- a branch `extra` from step-06 with its own tags, `extra-00` to `extra-04` and a lettered `extra-03b`, for a tutorial
+  with the cases a bigger project meets: `uv add` with a range, a dependency group, `uv remove`, a workspace made by
+  `uv init --lib`, a picture changed by a patch, a path with a space, a README with a fenced block, a step of twelve
+  moves, a command that writes its files and exits 1, and a `uv add` and a patch on one file in one move. Each file
+  that a command writes is what that command wrote, with uv 0.12.13; the uv.lock files are kept in `history/extra/`.
 
 Every author, committer and date is fixed, so the commits get the same hashes on every build.
 """
@@ -295,6 +300,260 @@ RELEASE = [
 ]
 
 
+# The branch `extra`, from step-06: a tutorial with the cases of a bigger project. Each file that a command writes is
+# what that command wrote, with uv 0.12.13 and ruff 0.17.0, run at the commit before its move. The uv.lock files are
+# kept in history/extra/: to make one again, run the move's command on a clone of repo/ at the commit before the move.
+EXTRA_LOCK = {name: (HERE / "extra" / f"{name}-uv.lock").read_text() for name in ("extra-01.1", "extra-01.3", "extra-03.2", "extra-04.2")}
+PY_STEP_06 = DEV_RUFF + RUFF
+# extra-01.1: uv add "tabulate>=0.9,<0.10". Only 0.9.0 is in that range, so the lock is the same on any day.
+PY_TABLE = PY_STEP_06.replace("dependencies = []", 'dependencies = [\n    "tabulate>=0.9,<0.10",\n]')
+# extra-01.3: uv add --group docs mdformat, then a line by hand: uv sync installs the group docs too
+PY_DOCS = PY_TABLE.replace('dev = [\n    "ruff>=0.17.0",\n]\n', 'dev = [\n    "ruff>=0.17.0",\n]\ndocs = [\n    "mdformat>=1.0.0",\n]\n')
+PY_GROUPS = PY_DOCS + '\n[tool.uv]\ndefault-groups = ["dev", "docs"]\n'
+# extra-03.1: uv init --lib --author-from none packages/talib adds the member, and leaves uv.lock out of date
+PY_WORKSPACE = PY_GROUPS + '\n[tool.uv.workspace]\nmembers = [\n    "packages/talib",\n]\n'
+TALIB_PY = '''[project]
+name = "talib"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["uv_build>=0.12.13,<0.13.0"]
+build-backend = "uv_build"
+'''
+TALIB_HELLO = 'def hello() -> str:\n    return "Hello from talib!"\n'
+# extra-03.2: uv add talib finds the member of the workspace, and gives it a source
+PY_TALIB = PY_WORKSPACE.replace('    "tabulate>=0.9,<0.10",\n]', '    "tabulate>=0.9,<0.10",\n    "talib",\n]') + \
+    "\n[tool.uv.sources]\ntalib = { workspace = true }\n"
+# extra-04.2: uv remove tabulate
+PY_NO_TABULATE = PY_TALIB.replace('    "tabulate>=0.9,<0.10",\n', "")
+
+# extra-01.2: tally --table prints the counts as a table, with tabulate
+TABLE = TOP_CLI.replace("import sys\n", "import sys\n\nfrom tabulate import tabulate\n").replace('''def main() -> None:
+    "Count the words of a file, or of the standard input. With --top N, only the N most common."
+    args, n = sys.argv[1:], None
+    if args[:1] == ["--top"]:
+        n, args = int(args[1]), args[2:]
+    text = open(args[0]).read() if args else sys.stdin.read()
+    counts = count(text)
+    for word, times in top(counts, n) if n else sorted(counts.items()):
+        print(times, word)
+''', '''def main() -> None:
+    "Count the words of a file, or of the standard input. Options: --top N, and --table."
+    args = sys.argv[1:]
+    as_table = "--table" in args
+    args, n = [arg for arg in args if arg != "--table"], None
+    if args[:1] == ["--top"]:
+        n, args = int(args[1]), args[2:]
+    text = open(args[0]).read() if args else sys.stdin.read()
+    counts = count(text)
+    rows = top(counts, n) if n else sorted(counts.items())
+    if as_table:
+        print(tabulate(rows, headers=["word", "times"]))
+        return
+    for word, times in rows:
+        print(times, word)
+''')
+assert "tabulate(rows" in TABLE
+# extra-03.3: top goes into the library talib, and tally imports it from there
+TALIB_TOP = '''"""talib: small helpers for the counts of words."""
+
+
+def top(counts: dict[str, int], n: int) -> list[tuple[str, int]]:
+    "The n most common words, most common first."
+    return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]
+'''
+TOP_FUNCTION = '''def top(counts: dict[str, int], n: int) -> list[tuple[str, int]]:
+    "The n most common words, most common first."
+    return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]
+
+
+'''
+assert TOP_FUNCTION in TABLE
+TABLE_TALIB = TABLE.replace(TOP_FUNCTION, "").replace("from tabulate import tabulate\n", "from tabulate import tabulate\nfrom talib import top\n")
+# extra-03b.1: uv run ruff check --fix rewrites the list of words of scripts/corpus.py (SIM905), and exits 1 on
+# the open() of main, which it cannot fix (SIM115)
+CORPUS_FIXED = CORPUS.replace(
+    'WORDS = "the a word count text tally test step move commit tag note slide class shell file line code".split()',
+    'WORDS = ["the", "a", "word", "count", "text", "tally", "test", "step", "move", "commit", "tag", "note", "slide", '
+    '"class", "shell", "file", "line", "code"]')
+assert CORPUS_FIXED != CORPUS
+# extra-03b.2: main closes the file it opens
+OPEN = "    text = open(args[0]).read() if args else sys.stdin.read()\n"
+WITH = "    if args:\n        with open(args[0]) as file:\n            text = file.read()\n    else:\n        text = sys.stdin.read()\n"
+assert OPEN in TABLE_TALIB
+TABLE_WITH = TABLE_TALIB.replace(OPEN, WITH)
+# extra-04.1: tally draws the table itself, the same as tabulate drew it
+OWN_TABLE = TABLE_WITH.replace("from tabulate import tabulate\n", "").replace("\n\ndef main", '''
+
+def table(rows: list[tuple[str, int]]) -> str:
+    "The rows under a header and a rule: the words on the left, the counts on the right."
+    left = max([len("word") + 2, *(len(word) for word, _ in rows)])
+    right = max([len("times") + 2, *(len(str(times)) for _, times in rows)])
+    lines = [f"{'word':<{left}}  {'times':>{right}}", f"{'-' * left}  {'-' * right}"]
+    lines += [f"{word:<{left}}  {times:>{right}}" for word, times in rows]
+    return "\\n".join(lines)
+
+
+def main''').replace('print(tabulate(rows, headers=["word", "times"]))', "print(table(rows))")
+assert "tabulate" not in OWN_TABLE
+
+
+def png(width: int, height: int, bars: list[int], colour: tuple[int, int, int]) -> bytes:
+    "A picture of bars, as a PNG with stored deflate blocks: the same bytes on every machine, whatever its zlib."
+    import struct
+    import zlib
+
+    rows = b""
+    for y in range(height):
+        row = bytearray([0])   # filter: none
+        for x in range(width):
+            bar, gap = divmod(x, 6)
+            up = bar < len(bars) and gap < 5 and height - y <= bars[bar]
+            row += bytes(colour if up else (255, 255, 255))
+        rows += bytes(row)
+    raw = b"\x78\x01"
+    for start in range(0, len(rows), 65535):
+        block = rows[start : start + 65535]
+        last = 1 if start + 65535 >= len(rows) else 0
+        raw += bytes([last]) + struct.pack("<HH", len(block), len(block) ^ 0xFFFF) + block
+    raw += struct.pack(">I", zlib.adler32(rows))
+
+    def chunk(kind: bytes, data: bytes) -> bytes:
+        return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data))
+
+    return b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)) + chunk(b"IDAT", raw) + chunk(b"IEND", b"")
+
+
+# extra-02: the docs, in twelve moves, so that 02.10 to 02.12 come after 02.9
+CHART = png(60, 30, [27, 26, 26, 25, 24, 24, 23, 22, 22, 21], (9, 105, 218))
+CHART_SORTED = png(60, 30, [27, 26, 26, 25, 24, 24, 23, 22, 22, 21], (26, 127, 55))
+HOW = """# How to run tally
+
+tally counts the words of a text file.
+
+## Set up
+
+Run this once, and again after each change of the project:
+
+```sh
+just setup
+```
+
+## Count the words of a file
+
+```sh
+uv run tally data/corpus.txt
+```
+
+It prints each word with its count, one word to a line, in the order of the alphabet.
+"""
+HOW_TOP = HOW + """
+## Only the most common words
+
+```sh
+uv run tally --top 10 data/corpus.txt
+```
+
+It prints the ten most common words, the most common first.
+"""
+HOW_TABLE = HOW_TOP + """
+## A table
+
+```sh
+uv run tally --top 10 --table data/corpus.txt
+```
+
+It prints the same words as a table, with a header.
+"""
+HOW_PICTURE = HOW_TABLE.replace("It prints the ten most common words, the most common first.\n",
+                                "It prints the ten most common words, the most common first.\n\n"
+                                "![The ten most common words of the corpus, as bars](tally.png)\n")
+HOW_CHECK = HOW_PICTURE + """
+## Check the docs
+
+```sh
+just docs
+```
+
+It prints nothing when every page of the docs is formatted as mdformat formats it.
+"""
+README_PYTHON = README_RUN + """
+## Count from Python
+
+tally is a library too. `count` counts the words of a text, and `top` keeps the most common:
+
+```python
+from tally import count, top
+
+counts = count("the cat and the hat")
+print(top(counts, 2))
+```
+
+It prints `[('the', 2), ('and', 1)]`.
+"""
+README_LINK = README_PYTHON + "\nThe page [How to run tally](docs/how%20to%20run.md) says more, with a picture of the most common words.\n"
+README_FILE = README_LINK.replace('''```python
+from tally import count, top
+
+counts = count("the cat and the hat")
+print(top(counts, 2))
+```
+
+It prints `[('the', 2), ('and', 1)]`.
+''', '''```python
+from pathlib import Path
+
+from tally import count, top
+
+counts = count(Path("data/corpus.txt").read_text())
+print(top(counts, 3))
+```
+
+It prints `[('line', 127), ('class', 126), ('word', 125)]`, the three most common words of the corpus.
+''')
+assert README_FILE != README_LINK
+# extra-02.11: uv run mdformat README.md writes the two indented lines of "Run it" as a fenced block
+README_FORMATTED = README_FILE.replace("\n    just setup\n    uv run tally data/corpus.txt\n", "\n```\njust setup\nuv run tally data/corpus.txt\n```\n")
+assert README_FORMATTED != README_FILE
+JUSTFILE_DOCS = JUSTFILE_REPORT + "\n# Check that the README and the docs are formatted as mdformat formats them\ndocs:\n    uv run mdformat --check README.md docs\n"
+
+EXTRA = [
+    ("extra-01.1: tabulate, added with uv add", {"pyproject.toml": PY_TABLE, "uv.lock": EXTRA_LOCK["extra-01.1"]}, None),
+    ("extra-01.2: tally --table", {"src/tally/__init__.py": TABLE}, None),
+    ("extra-01: mdformat in the group docs, which uv sync installs", {"pyproject.toml": PY_GROUPS, "uv.lock": EXTRA_LOCK["extra-01.3"]},
+     ("extra-01", "A table, and a tool for the docs\n\ntally prints a table with tabulate, and mdformat comes in a group of its own.")),
+    ("extra-02.1: a page on how to run tally", {"docs/how to run.md": HOW}, None),
+    ("extra-02.2: the most common words", {"docs/how to run.md": HOW_TOP}, None),
+    ("extra-02.3: the table", {"docs/how to run.md": HOW_TABLE}, None),
+    ("extra-02.4: a picture of the most common words", {"docs/tally.png": CHART}, None),
+    ("extra-02.5: the page shows the picture", {"docs/how to run.md": HOW_PICTURE}, None),
+    ("extra-02.6: the README counts from Python", {"README.md": README_PYTHON}, None),
+    ("extra-02.7: the README links to the page", {"README.md": README_LINK}, None),
+    ("extra-02.8: the picture in green", {"docs/tally.png": CHART_SORTED}, None),
+    ("extra-02.9: the README counts a file", {"README.md": README_FILE}, None),
+    ("extra-02.10: a recipe that checks the docs", {"justfile": JUSTFILE_DOCS}, None),
+    ("extra-02.11: the README as mdformat formats it, by uv run mdformat README.md", {"README.md": README_FORMATTED}, None),
+    ("extra-02: the page says how to check the docs", {"docs/how to run.md": HOW_CHECK},
+     ("extra-02", "The docs\n\nA page on how to run tally, with a picture, and a README that counts from Python.")),
+    ("extra-03.1: a library talib, made with uv init --lib",
+     {"pyproject.toml": PY_WORKSPACE, "packages/talib/pyproject.toml": TALIB_PY, "packages/talib/README.md": "",
+      "packages/talib/src/talib/__init__.py": TALIB_HELLO, "packages/talib/src/talib/py.typed": ""}, None),
+    ("extra-03.2: tally depends on talib, added with uv add", {"pyproject.toml": PY_TALIB, "uv.lock": EXTRA_LOCK["extra-03.2"]}, None),
+    ("extra-03: top goes into talib", {"packages/talib/src/talib/__init__.py": TALIB_TOP, "src/tally/__init__.py": TABLE_TALIB},
+     ("extra-03", "A library\n\nA second package in the workspace, talib, holds top, and tally depends on it.")),
+    ("extra-03b.1: what ruff check --fix fixes", {"scripts/corpus.py": CORPUS_FIXED}, None),
+    ("extra-03b: main closes its file", {"src/tally/__init__.py": TABLE_WITH},
+     ("extra-03b", "Lint\n\nruff fixes what it can, and we fix the rest by hand.")),
+    ("extra-04.1: tally draws its own table", {"src/tally/__init__.py": OWN_TABLE}, None),
+    ("extra-04: tabulate goes, with uv remove", {"pyproject.toml": PY_NO_TABULATE, "uv.lock": EXTRA_LOCK["extra-04.2"]},
+     ("extra-04", "One dependency less\n\ntally draws its table itself, and uv remove takes tabulate out.")),
+]
+
+
 def git(dest: Path, *args: str, when: int = 0) -> str:
     "Run git in dest with a fixed author, committer and date."
     stamp = f"2026-01-01T{10 + when // 60:02d}:{when % 60:02d}:00+00:00"
@@ -314,6 +573,9 @@ def commit_all(dest: Path, commits: list, clock: int) -> int:
                 continue
             if text is GONE:
                 path.unlink()
+                continue
+            if isinstance(text, bytes):
+                path.write_bytes(text)   # a binary file, such as a picture
                 continue
             path.write_text(text)   # a file that exists keeps its mode
         git(dest, "add", "-A", when=clock)
@@ -348,11 +610,15 @@ def build(dest: Path) -> None:
     clock = commit_all(dest, HOOKS, clock + 1)
     git(dest, "switch", "-q", "-c", "release", "step-02")
     git(dest, "tag", "-a", "release-00", "-m", "Where the release starts\n\ntally counts words, and has two files of tests.", when=clock)
-    commit_all(dest, RELEASE, clock + 1)
+    clock = commit_all(dest, RELEASE, clock + 1)
+    git(dest, "switch", "-q", "-c", "extra", "step-06")
+    git(dest, "tag", "-a", "extra-00", "-m", "Where it starts\n\ntally counts words, has tests, and writes a report.", when=clock)
+    commit_all(dest, EXTRA, clock + 1)
     git(dest, "switch", "-q", "main")
 
 
 if __name__ == "__main__":
     target = Path(sys.argv[1]) if len(sys.argv) > 1 else HERE.parent / "repo"
     build(target.resolve())
-    print(f"build: {target} has {len(MAIN)} commits on main, {len(PARTS)} on parts, {len(HOOKS)} on hooks and {len(RELEASE)} on release")
+    print(f"build: {target} has {len(MAIN)} commits on main, {len(PARTS)} on parts, {len(HOOKS)} on hooks, {len(RELEASE)} on release"
+          f" and {len(EXTRA)} on extra")

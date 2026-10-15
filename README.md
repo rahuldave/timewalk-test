@@ -1,12 +1,12 @@
 # timewalk-test
 
 The integration test of [timewalk](https://github.com/rahuldave/timewalk), and a class kit that shows every
-feature of it. A class folder with ten walks steps through `tally`, a small word counter, whose history
+feature of it. A class folder with eleven walks steps through `tally`, a small word counter, whose history
 `history/build.py` builds into `repo/`. The tests drive the page in two windows, the way a class uses it.
 
 ```
 just present            # open the walks in a browser, starting on the default walk
-just present tutorial   # start on another walk: narrative, tests, parts, story, tutorial, hooks, small, testing, finish or release
+just present tutorial   # start on another walk: narrative, tests, parts, story, tutorial, hooks, small, testing, finish, release or extra
 just check              # check the notes and slides of every walk against the steps, then the pages that students read
 just pdf hooks          # the PDF of one walk's slides, in build/
 just build              # build repo/ again, and start again from the first step
@@ -72,6 +72,7 @@ walk with the menu at the left of the step bar.
 | **Types, then the report, with notes of its own** (`finish`) | tutorial, a step and a move, notes of its own | A stop with a whole step, `{{include step-04}}`, which brings the step's `$ just setup` with it, then a stop of one move after a gap, `{{include step-05.3}}`. Its own text has a block for each mode |
 | **A git hook, one move at a time** (`hooks`) | tutorial, its own tags, sync off | A tutorial on one part, on the branch `hooks`. At move hooks-01.3, the hook refuses a broken file. Up and Down page through the slides without making moves |
 | **A release of tally, one move at a time** (`release`) | tutorial, its own tags, `loose` | A tutorial on the branch `release`. Move release-01.1 renames a file by a patch. Move release-01.2 changes the version in `pyproject.toml`, so its own `uv.lock` is out of date until release-01.3 runs `uv lock`. Its Build it yourself page checks release-01.2 with `git check SHA --stale-lock`. In release-02, `mv` and `rm` rename and remove files, as a student who never commits must |
+| **A bigger tally, one move at a time** (`extra`) | tutorial, its own tags, `loose` | A tutorial on the branch `extra`, with the cases of a bigger project. extra-01.1 runs `uv add` with a range of versions, and extra-01.3 adds a group `docs`, then a patch on the same `pyproject.toml`. extra-02 has twelve moves, so 02.10 to 02.12 come after 02.9: a page `docs/how to run.md`, with a space in its path, a picture `docs/tally.png` changed by a patch, and a README with a fenced block. extra-03 makes a library in the workspace with `uv init --lib`. In the lettered extra-03b, `uv run ruff check --fix` writes its fix and exits 1. extra-04 ends with `uv remove` |
 
 ### An example of each feature
 
@@ -84,6 +85,16 @@ walk with the menu at the left of the step bar.
 | `loose`, files that match by the names of their packages | The tutorial in `toc.toml`, for the `pyproject.toml` and `uv.lock` of step-03.1 |
 | A rename by a patch, with `patch$` lines for the old path and the new | release-01.1, in `walks/release/notes.md` |
 | A move whose commit has a `uv.lock` that is out of date | release-01.2. The next move, release-01.3, runs `do$ uv lock` |
+| `uv add` with a range of versions, a dependency group, and `uv remove` | extra-01.1 `do$ uv add "tabulate>=0.9,<0.10"`, extra-01.3 `do$ uv add --group docs mdformat`, extra-04.2 `do$ uv remove tabulate`, in `walks/extra/notes.md` |
+| A `do$` line and a `patch$` line on one file in one move | extra-01.3: `uv add`, then a line by hand in `pyproject.toml` |
+| A workspace, made by `uv init --lib`, with `loose` on the library's `pyproject.toml` | extra-03.1 to extra-03.3. The patch of extra-03.3 changes both packages |
+| A binary file, made and changed by a patch | extra-02.4 and extra-02.8, `docs/tally.png`. Build it yourself takes it with `git restore` |
+| A path with a space, in a `patch$` line in backticks | extra-02.1, ``patch$ `docs/how to run.md` `` |
+| A README with a fenced block, changed by a patch and by a command | extra-02.6 and extra-02.9, then extra-02.11 `do$ uv run mdformat README.md` |
+| A step of more than nine moves | extra-02, with twelve |
+| A `do$` line that writes its files and exits 1 | extra-03b.1, `do$ uv run ruff check --fix`. `timewalk-check` warns of it |
+| A lettered step, between two numbered ones | extra-03b, with two moves |
+| A cue right before a fenced block with two blank lines in it, and notes that end with a blank line | extra-03.3, in `walks/extra/notes.md` |
 | A rename and a removal by command, `do$ mv` and `do$ rm`, and never `git mv` or `git rm`, which fail for a student who never commits | release-02.1 renames a file that the walk never changed. release-02.3 renames a file that release-01.1 made, and release-02.4 patches it. release-02.5 removes a file that release-02.2 changed |
 | A `show:` line in two backticks, for a line with a backtick in it | step-04.2, which quotes the docstring of `count` |
 | `select`, with a range of moves and a title | The walk `small` in `toc.toml` |
@@ -106,9 +117,10 @@ notes column.
 
 | Path | What it is |
 |---|---|
-| `history/build.py` | Builds `repo/`: tagged steps `step-00` to `step-06` on `main`, with small commits for the tutorial before step-01, step-02, step-03, step-04 and step-05, and none before step-06; a branch `parts` with tags `parts-01` and `parts-02`; a branch `hooks` with tags `hooks-00` to `hooks-02` and small commits between them; and a branch `release` with tags `release-00` to `release-02`. The same hashes on every build |
+| `history/build.py` | Builds `repo/`: tagged steps `step-00` to `step-06` on `main`, with small commits for the tutorial before step-01, step-02, step-03, step-04 and step-05, and none before step-06; a branch `parts` with tags `parts-01` and `parts-02`; a branch `hooks` with tags `hooks-00` to `hooks-02` and small commits between them; a branch `release` with tags `release-00` to `release-02`; and a branch `extra` from step-06 with tags `extra-00` to `extra-04` and a lettered `extra-03b`. The same hashes on every build |
 | `history/step-03.1-uv.lock` | The `uv.lock` that `uv add --dev ruff` wrote at step-03.1, with uv 0.12.13 on the project at step-02. `build.py` reads it, so every build gives the same hashes |
-| `toc.toml` | The table of contents: the ten walks, the default first. Each has a `description`, which the band shows at the walk's first step |
+| `history/extra/` | The `uv.lock` that each `uv add` or `uv remove` of the walk `extra` wrote, with uv 0.12.13 at the commit before its move. `build.py` reads them |
+| `toc.toml` | The table of contents: the eleven walks, the default first. Each has a `description`, which the band shows at the walk's first step |
 | `notes.md`, `slides/` | The default walk: its notes, and its manifest with the slide files |
 | `walks/NAME/` | Each other walk: `notes.md`, and `slides/slides.toml` with its own slide files. The small walks `small` and `story` have only an `intro.md`, and read the notes and slides of the tutorial. The small walks `testing` and `finish` have only a `notes.md` of their own, and read the move sections and the slides of the tutorial |
 | `pages/ID/` | The pages of each walk, from `just pages`: `read.md`, `build.md` for a tutorial, and the website in `site/` |

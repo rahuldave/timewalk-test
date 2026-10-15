@@ -1,0 +1,8 @@
+# The slides of the walk extra: one for each tagged stop, extra-03b too
+[slides]
+extra-00 = ["extra.md#1"]
+extra-01 = ["extra.md#2"]
+extra-02 = ["extra.md#3"]
+extra-03 = ["extra.md#4"]
+extra-03b = ["extra.md#5"]
+extra-04 = ["extra.md#6"]

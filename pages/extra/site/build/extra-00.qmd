@@ -1,0 +1,289 @@
+---
+title: "0 Where it starts"
+---
+
+<!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
+
+**Build it yourself.** [Read the tutorial](../read/extra-00.qmd) is the other way to read this part.
+
+```bash
+just setup
+```
+
+tally counts the words of a file, and `--top N` keeps the most common. Run it on the corpus, to see where we begin.
+
+```bash
+uv run tally --top 3 data/corpus.txt
+```
+
+It prints `127 line`, `126 class` and `125 word`, one to a line.
+
+Check your files against this part. The command prints nothing when they match, and otherwise shows what differs:
+
+```bash
+git check 974d653080b0
+```
+
+If you are stuck, this command puts the files of this part in place of yours. A file that you made yourself stays:
+
+```bash
+git rm -rq --cached --ignore-unmatch -- :/ && git restore --source 974d653080b0 --staged --worktree -- :/
+```
+
+## What changed {#extra-00-what-changed-182c57}
+
+- <a id="extra-00-.gitignore-a5cc29"></a>`.gitignore`: New, 13 lines. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/.gitignore).
+- <a id="extra-00-.python-version-7696e9"></a>`.python-version`: New, 1 line. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/.python-version).
+- <a id="extra-00-README.md-8ec9a0"></a>`README.md`: New, 13 lines. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/README.md).
+- <a id="extra-00-justfile-424f0b"></a>`justfile`: adds `recipe default`, `recipe report`, `recipe run`, `recipe setup`, `recipe test`. New, 22 lines. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/justfile).
+- <a id="extra-00-pyproject.toml-5d07e7"></a>`pyproject.toml`: New, 22 lines. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/pyproject.toml).
+- <a id="extra-00-scripts-corpus.py-ab344b"></a>`scripts/corpus.py`: adds `main`. New, 25 lines. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/scripts/corpus.py).
+- <a id="extra-00-src-tally-__init__.py-b5485b"></a>`src/tally/__init__.py`: adds `count`, `main`, `top`. New, 27 lines. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/src/tally/__init__.py).
+- <a id="extra-00-src-tally-__main__.py-534c24"></a>`src/tally/__main__.py`: New, 3 lines. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/src/tally/__main__.py).
+- <a id="extra-00-tests-test_count.py-e674f6"></a>`tests/test_count.py`: adds `class Count`, `test_case`, `test_words`. New, 11 lines. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/tests/test_count.py).
+- <a id="extra-00-tests-test_empty.py-ffb51e"></a>`tests/test_empty.py`: adds `class Empty`, `test_empty`. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/tests/test_empty.py).
+- <a id="extra-00-tests-test_top.py-1f85fe"></a>`tests/test_top.py`: adds `class Top`, `test_most_common_first`. New, 8 lines. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/tests/test_top.py).
+- <a id="extra-00-uv.lock-8356d8"></a>`uv.lock`: New, 43 lines. [The file](https://github.com/rahuldave/tally/blob/974d653080b0bd7dd06741b60225518cfecc908e/uv.lock).
+
+<details><summary>The diff of <code>.gitignore</code></summary>
+
+```diff
+@@ -0,0 +1,13 @@
++# Python-generated files
++__pycache__/
++*.py[oc]
++build/
++dist/
++wheels/
++*.egg-info
++
++# Virtual environments
++.venv
++
++# Artifacts that just setup makes: they are not in git
++data/
+```
+
+</details>
+
+<details><summary>The diff of <code>.python-version</code></summary>
+
+```diff
+@@ -0,0 +1 @@
++3.12
+```
+
+</details>
+
+<details><summary>The diff of <code>README.md</code></summary>
+
+```diff
+@@ -0,0 +1,13 @@
++# tally
++
++Count the words in a text.
++
++## Run it
++
++Make the environment, the corpus and the report first. Then count the words of a file:
++
++    just setup
++    uv run tally data/corpus.txt
++
++`uv run tally --top 10 data/corpus.txt` prints only the ten most common words. `just test` runs the tests, and
++`just report` writes the ten most common words of the corpus to `build/top.txt`.
+```
+
+</details>
+
+<details><summary>The diff of <code>justfile</code></summary>
+
+```diff
+@@ -0,0 +1,22 @@
++# The recipes of tally. Each one runs through uv, in the project's own environment.
++default:
++    @just --list
++
++# Make the environment of this step: the first command of every step
++setup:
++    uv sync
++    uv run python scripts/corpus.py data/corpus.txt
++    test -f build/top.txt || just report
++
++# Count the words of a file
++run file:
++    uv run tally {{ file }}
++
++# Run the tests
++test:
++    uv run python -m unittest discover -s tests -q
++
++# Write the ten most common words of the corpus to build/top.txt
++report:
++    mkdir -p build
++    uv run tally --top 10 data/corpus.txt > build/top.txt
+```
+
+</details>
+
+<details><summary>The diff of <code>pyproject.toml</code></summary>
+
+```diff
+@@ -0,0 +1,22 @@
++[project]
++name = "tally"
++version = "0.1.0"
++description = "Count the words in a text"
++readme = "README.md"
++requires-python = ">=3.12"
++dependencies = []
++
++[project.scripts]
++tally = "tally:main"
++
++[build-system]
++requires = ["uv_build>=0.12.13,<0.13.0"]
++build-backend = "uv_build"
++
++[dependency-groups]
++dev = [
++    "ruff>=0.17.0",
++]
++
++[tool.ruff]
++line-length = 100
+```
+
+</details>
+
+<details><summary>The diff of <code>scripts/corpus.py</code></summary>
+
+```diff
+@@ -0,0 +1,25 @@
++"""Write data/corpus.txt, a text of 2000 words to count, the same every time. Leave it alone if it is there."""
++
++import sys
++from pathlib import Path
++
++WORDS = "the a word count text tally test step move commit tag note slide class shell file line code".split()
++
++
++def main() -> None:
++    target = Path(sys.argv[1] if len(sys.argv) > 1 else "data/corpus.txt")
++    if target.exists():
++        print(f"{target} is there")
++        return
++    seed, words = 7, []
++    for _ in range(2000):
++        seed = (seed * 1103515245 + 12345) % 2**31
++        words.append(WORDS[seed % len(WORDS)])
++    target.parent.mkdir(parents=True, exist_ok=True)
++    lines = (" ".join(words[i : i + 12]) for i in range(0, len(words), 12))
++    target.write_text("\n".join(lines) + "\n")
++    print(f"wrote {target}: {len(words)} words")
++
++
++if __name__ == "__main__":
++    main()
+```
+
+</details>
+
+<details><summary>The diff of <code>src/tally/__init__.py</code></summary>
+
+```diff
+@@ -0,0 +1,27 @@
++"""tally: count the words in a text."""
++
++import sys
++
++
++def count(text: str) -> dict[str, int]:
++    "How many times each word of `text` appears, ignoring case."
++    counts = {}
++    for word in text.lower().split():
++        counts[word] = counts.get(word, 0) + 1
++    return counts
++
++
++def top(counts: dict[str, int], n: int) -> list[tuple[str, int]]:
++    "The n most common words, most common first."
++    return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))[:n]
++
++
++def main() -> None:
++    "Count the words of a file, or of the standard input. With --top N, only the N most common."
++    args, n = sys.argv[1:], None
++    if args[:1] == ["--top"]:
++        n, args = int(args[1]), args[2:]
++    text = open(args[0]).read() if args else sys.stdin.read()
++    counts = count(text)
++    for word, times in top(counts, n) if n else sorted(counts.items()):
++        print(times, word)
+```
+
+</details>
+
+<details><summary>The diff of <code>src/tally/__main__.py</code></summary>
+
+```diff
+@@ -0,0 +1,3 @@
++from tally import main
++
++main()
+```
+
+</details>
+
+<details><summary>The diff of <code>tests/test_count.py</code></summary>
+
+```diff
+@@ -0,0 +1,11 @@
++import unittest
++
++from tally import count
++
++
++class Count(unittest.TestCase):
++    def test_words(self):
++        self.assertEqual(count("a b a"), {"a": 2, "b": 1})
++
++    def test_case(self):
++        self.assertEqual(count("A a"), {"a": 2})
+```
+
+</details>
+
+<details><summary>The diff of <code>tests/test_empty.py</code></summary>
+
+```diff
+@@ -0,0 +1,8 @@
++import unittest
++
++from tally import count
++
++
++class Empty(unittest.TestCase):
++    def test_empty(self):
++        self.assertEqual(count(""), {})
+```
+
+</details>
+
+<details><summary>The diff of <code>tests/test_top.py</code></summary>
+
+```diff
+@@ -0,0 +1,8 @@
++import unittest
++
++from tally import top
++
++
++class Top(unittest.TestCase):
++    def test_most_common_first(self):
++        self.assertEqual(top({"a": 1, "b": 3, "c": 2}, 2), [("b", 3), ("c", 2)])
+```
+
+</details>
+
+[The code](https://github.com/rahuldave/tally/tree/974d653080b0bd7dd06741b60225518cfecc908e).
