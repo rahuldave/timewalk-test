@@ -326,7 +326,7 @@ def test_back_to_the_start_puts_the_code_back_in_do_mode(tutored, kit: Path) -> 
         ["git", "-C", str(kit / "repo-replay"), "show", f"{saved[0]}:tests/test_count.py"], capture_output=True, text=True).stdout, "and kept"
     assert yours.locator("#notes .p-hint").inner_text().startswith("Run just setup. Then make step-02.1 by hand")
 
-ABOUT_DO = ("Build tally yourself, one small commit at a time: a function, its tests, types, and a report. A tutorial has one or more "
+ABOUT_DO = ("Build tally yourself, one small change at a time: a function, its tests, types, and a report. A tutorial has one or more "
             "steps, and each step has zero or more moves")
 
 

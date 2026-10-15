@@ -26,7 +26,7 @@ def steps_of(page) -> list[str]:
 def test_the_picker_changes_the_walk_in_every_window(walked) -> None:
     "Your window lists the walks; a change gives both windows that walk's steps, notes and slides. The Room shows the title."
     yours, room = walked
-    assert yours.evaluate("[...document.querySelectorAll('#walk-picker option')].map((o) => o.value)") == ["narrative", "tests", "parts", "story", "tutorial", "hooks", "small", "testing", "finish", "release"]
+    assert yours.evaluate("[...document.querySelectorAll('#walk-picker option')].map((o) => o.value)") == ["narrative", "tests", "parts", "story", "tutorial", "hooks", "small", "testing", "finish", "release", "extra"]
     assert room.locator("#walk-picker").is_hidden() and room.locator("#walk-title").inner_text() == "tally, step by step (narrative)"
     yours.select_option("#walk-picker", "tests")
     for page in (yours, room):
@@ -91,10 +91,15 @@ def check(kit: Path) -> subprocess.CompletedProcess:
 
 
 def test_the_checks_pass_this_class(kit: Path) -> None:
-    "timewalk-check finds nothing wrong with the walks of this class."
+    "timewalk-check finds no error in the walks of this class, and one warning: the do$ line of extra-03b.1, which exits 1 by design."
     done = check(kit)
-    assert done.returncode == 0, done.stdout
-    assert "10 walks, 0 errors, 0 warnings" in done.stdout
+    out = done.stdout + done.stderr
+    assert done.returncode == 0, out
+    assert "11 walks, 0 errors, 1 warnings" in out, out
+    warnings = [line for line in out.splitlines() if line.startswith("warning:")]
+    assert len(warnings) == 1, out
+    assert warnings[0].startswith("warning: walk extra: extra-03b.1: the do$ line `uv run ruff check --fix` fails at the commit before the move "
+                                  "(exit 1)"), out
 
 
 BROKEN = [
@@ -148,7 +153,7 @@ def test_the_menu_groups_the_walks_by_kind_and_names_the_kind_on_show(walked) ->
     "Narratives and tutorials each have a group in the menu; a label beside it says the kind of the walk on show."
     yours, room = walked
     groups = yours.evaluate("[...document.querySelectorAll('#walk-picker optgroup')].map((g) => g.label + ': ' + [...g.children].map((o) => o.value).join(' '))")
-    assert groups == ["Narratives: narrative tests parts story", "Tutorials: tutorial hooks small testing finish release"]
+    assert groups == ["Narratives: narrative tests parts story", "Tutorials: tutorial hooks small testing finish release extra"]
     shows(yours, "#walk-kind", "Narrative")
     yours.select_option("#walk-picker", "hooks")
     shows(yours, "#walk-kind", "Tutorial")
@@ -160,7 +165,7 @@ def test_the_status_band_of_a_narrative(walked) -> None:
     yours, room = walked
     for page in (yours, room):
         page.wait_for_selector("#about:not([hidden])")
-        assert page.locator("#about").inner_text().startswith("How tally, a word counter, was built: one tagged step at a time")
+        assert page.locator("#about").inner_text().startswith("How tally, a word counter, was built, one part at a time: from an empty command to a report.")
         assert "A narrative goes from tag to tag" in page.locator("#about").inner_text()
         shows(page, "#status", "Narrative · step-00, step 1 of 7 · Press Next step, at the end of the notes, or the Right arrow, for the next step.")
     yours.mouse.click(300, 400)
