@@ -65,8 +65,10 @@ pages: build
     else uv lock -q --upgrade-package timewalk; run=(uv run --refresh-package timewalk); fi
     facts=$(mktemp -d)
     trap 'rm -rf "$facts"' EXIT
-    for id in $(python3 -c 'import tomllib; print(*(w["id"] for w in tomllib.load(open("toc.toml", "rb"))["walk"]))'); do
-        "${run[@]}" timewalk-export repo --toc toc.toml --walk "$id" --json "$facts/$id.json" --github {{ github }}
+    # each walk with the title that toc.toml gives it, as walk-update does: two walks on the same notes have names of their own
+    python3 -c 'import tomllib; [print(w["id"], w.get("title", ""), sep="\t") for w in tomllib.load(open("toc.toml", "rb"))["walk"]]' |
+    while IFS=$'\t' read -r id title; do
+        "${run[@]}" timewalk-export repo --toc toc.toml --walk "$id" --json "$facts/$id.json" --github {{ github }} ${title:+--title "$title"}
         python3 "$kit/scripts/render.py" "$facts/$id.json" --markdown "pages/$id" --site "pages/$id/site" --repo repo
     done
 

@@ -1,5 +1,5 @@
 ---
-title: "tally, one move at a time"
+title: "tally, with the author's exact versions"
 ---
 
 <!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->

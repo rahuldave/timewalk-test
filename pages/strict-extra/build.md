@@ -1,6 +1,6 @@
 <!-- Made by the walk skill's render.py from the facts of the walk. Do not edit it by hand: run just walk-update again. -->
 
-# A bigger tally, one move at a time
+# A bigger tally, with the author's exact versions
 
 **Build it yourself.** Every command to run and every change to make by hand, to make the project yourself. [Read the tutorial](read.md) is the other way to read it.
 
