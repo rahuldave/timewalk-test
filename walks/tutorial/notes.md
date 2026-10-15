@@ -471,8 +471,10 @@ $ just setup
 A new user of tally does not know which commands to run, or in which order. The README gets a section, "Run it",
 that says how to run tally, its tests and its report. The code does not change.
 
+patch$ README.md
+
 ::: do
-The change adds the section "Run it" to `README.md`, after the line `Count the words in a text.`
+The patch adds the section "Run it" to `README.md`, after the line `Count the words in a text.`
 :::
 
 ::: watch
