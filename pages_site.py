@@ -10,7 +10,7 @@ import sys
 import tomllib
 from pathlib import Path
 
-SMALLDOCS = ["uvx", "--from", "smalldocs>=0.1.5", "smalldocs", "render"]
+SMALLDOCS = ["uvx", "--from", "smalldocs>=0.3.0", "smalldocs", "render"]
 
 
 def build(
