@@ -96,6 +96,14 @@ follow *args: build
         python3 "$kit/scripts/follow.py" "$page" --repo repo --work "$scratch/$id" --log "build/follow/$id.md" \
             ${check[@]+"${check[@]}"} "$@" || failed=1
     done
+    # A narrative has no Build it yourself page: each part's commands run at its code, and the model checks the text
+    for page in "$out"/walks/*/read.md; do
+        [ -f "$(dirname "$page")/build.md" ] && continue
+        id=$(basename "$(dirname "$page")")
+        echo "follow: narrative $id"
+        python3 "$kit/scripts/follow.py" "$page" --narrative --repo repo --work "$scratch/narrative-$id" --log "build/follow/$id.md" \
+            ${check[@]+"${check[@]}"} "$@" || failed=1
+    done
     # A part page has the same text as its part of build.md, so the model does not check it again
     for page in "$out"/site/build/*.qmd "$out"/site/*/build/*.qmd; do
         name=$(basename "$(dirname "$(dirname "$page")")")-$(basename "$page" .qmd)
